@@ -1,0 +1,5 @@
+import { cva } from "class-variance-authority";
+
+export const autoSuggestContainerVariants = cva(
+	"w-full [&_.react-autosuggest__container]:relative [&_.react-autosuggest__suggestions-container--open]:absolute [&_.react-autosuggest__suggestions-container--open]:z-[2] [&_.react-autosuggest__suggestions-container--open]:max-h-[400px] [&_.react-autosuggest__suggestions-container--open]:w-full [&_.react-autosuggest__suggestions-container--open]:cursor-pointer [&_.react-autosuggest__suggestions-container--open]:overflow-scroll [&_.react-autosuggest__suggestions-container--open]:border [&_.react-autosuggest__suggestions-container--open]:border-base-200 [&_.react-autosuggest__suggestions-container--open]:bg-base-100 [&_.react-autosuggest__suggestions-container--open]:shadow-sm [&_.react-autosuggest__suggestions-list]:p-0 [&_input]:h-10 [&_input]:w-full [&_input]:rounded-sm [&_input]:px-2 [&_input]:text-base [&_input]:outline-none [&_input]:placeholder:text-neutral-500 [&_li]:cursor-pointer [&_li]:list-none [&_li]:border-b [&_li]:border-base-200 [&_li]:px-4 [&_li]:py-2 [&_li:hover]:bg-neutral-200",
+);
