@@ -1,8 +1,5 @@
 import React, { useEffect, useImperativeHandle, useState } from "react";
 
-import ProfilePicture from "@components/ProfilePicture";
-import { buildURL } from "@components/UploadButton";
-
 const MentionList = (props) => {
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -51,8 +48,8 @@ const MentionList = (props) => {
 		},
 	}));
 
-	const profilePicUrl = (item) =>
-		buildURL({ path: item.profile_image_url || "" });
+	const profileInitial = (item) =>
+		(item.label || `User ${item.id}`).trim().charAt(0).toUpperCase() || "?";
 
 	return (
 		<div className="dropdown-menu mention-list">
@@ -64,12 +61,7 @@ const MentionList = (props) => {
 						onClick={() => selectItem(index)}
 						type="button"
 					>
-						<span className="mention-list__avatar">
-							<ProfilePicture
-								borderRadius="round"
-								strProfilePictureUrl={profilePicUrl(item)}
-							/>
-						</span>
+						<span className="mention-list__avatar">{profileInitial(item)}</span>
 						<span className="mention-list__label">
 							{item.label || `User ${item.id}`}
 						</span>

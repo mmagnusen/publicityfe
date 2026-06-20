@@ -117,6 +117,7 @@ const ContextAuthenticatedUser = createContext({
 	funcUpdateProfile: noop,
 	funcUpdateProfilePicture: noop,
 	funcUpdateUser: noop,
+	funcUpdateUserTags: noop,
 	funcVerifyToken: noop,
 	funcDeleteGalleryImage: noop,
 	hasActiveSubscription: false,
@@ -191,9 +192,39 @@ export const AuthenticatedUserContextProvider = ({
 				return;
 			}
 
-			setAuthenticatedUser(userFromCookies);
+			let sessionUser = userFromCookies;
+			if (!sessionUser.username?.trim()) {
+				try {
+					const { data } = await instanceAxios({
+						method: "post",
+						url: `/users/api-token-verify/`,
+						data: { token: sessionUser.token },
+					});
+					const idFields = identityFieldsFromApiUser(data.user);
+					sessionUser = {
+						...sessionUser,
+						firstName: data.user.first_name,
+						lastName: data.user.last_name,
+						email: data.user.email,
+						emailVerified: data.user.email_verified ?? false,
+						pk: data.user.pk,
+						username: data.user.username,
+						hasActiveSubscription: data.user.has_active_subscription,
+						groups: data.user.groups ?? sessionUser.groups,
+						isStaff: data.user.is_staff ?? sessionUser.isStaff,
+						referral_code: data.user.referral_code ?? sessionUser.referral_code,
+						reward_points: data.user.reward_points ?? sessionUser.reward_points,
+						...idFields,
+					};
+					cookies.set(AUTHENTICATED_USER_COOKIE, sessionUser, { path: "/" });
+				} catch {
+					// Keep existing session; profile link stays hidden until re-login.
+				}
+			}
+
+			setAuthenticatedUser(sessionUser);
 			setProfilePicURL(readProfilePicFromCookie());
-			const verified = verifiedFlagsFromCookies(userFromCookies);
+			const verified = verifiedFlagsFromCookies(sessionUser);
 			setEmailVerified(verified.emailVerified);
 			setIdentityVerified(verified.identityVerified);
 		} catch (error: unknown) {
@@ -222,8 +253,11 @@ export const AuthenticatedUserContextProvider = ({
 	);
 
 	const isAdmin = useMemo(() => {
-		return authenticatedUser?.groups?.some((group) => group.name === "Admin");
-	}, [authenticatedUser?.groups]);
+		return (
+			authenticatedUser?.isStaff === true ||
+			authenticatedUser?.groups?.some((group) => group.name === "Admin")
+		);
+	}, [authenticatedUser?.isStaff, authenticatedUser?.groups]);
 
 	useEffect(() => {
 		void syncSessionFromCookie();
@@ -375,6 +409,7 @@ export const AuthenticatedUserContextProvider = ({
 				token: data.token,
 				groups: data.user.groups,
 				hasActiveSubscription: data.user.has_active_subscription,
+				isStaff: data.user.is_staff ?? false,
 				referral_code: data.user.referral_code,
 				reward_points: data.user.reward_points,
 				...idFields,
@@ -496,13 +531,19 @@ export const AuthenticatedUserContextProvider = ({
 	// When logging in via google, we need to pass the token explicitly as authenticatedUser is not yet set
 	const funcUpdateProfile = async (objUpdatedProfile: any, token?: string) => {
 		try {
+			const { headline, ...profileFields } = objUpdatedProfile ?? {};
+			const payload: Record<string, unknown> = {
+				...profileFields,
+				token: token ?? authenticatedUser?.token,
+			};
+			if (headline !== undefined) {
+				payload.tagline = headline;
+			}
+
 			const { data } = await instanceAxios({
 				method: "patch",
 				url: `/profile/update-human-profile`,
-				data: {
-					...objUpdatedProfile,
-					token: token ?? authenticatedUser?.token,
-				},
+				data: payload,
 			});
 
 			return data;
@@ -561,6 +602,24 @@ export const AuthenticatedUserContextProvider = ({
 		} catch (error: any) {
 			reportError(error, "funcUpdateUser", REPORT_POSTHOG_ONLY);
 			throw new Error(error);
+		}
+	};
+
+	const funcUpdateUserTags = async (tagPks: number[]) => {
+		const userPk = authenticatedUser?.pk;
+		if (!userPk) {
+			throw new Error("User is not authenticated.");
+		}
+
+		try {
+			await instanceAxios({
+				method: "patch",
+				url: `/users/admin-user-detail/${userPk}`,
+				data: { tag_pks: tagPks },
+			});
+		} catch (error: unknown) {
+			reportError(error, "funcUpdateUserTags", REPORT_POSTHOG_ONLY);
+			throw error;
 		}
 	};
 
@@ -639,6 +698,7 @@ export const AuthenticatedUserContextProvider = ({
 				username: data.user.username,
 				hasActiveSubscription: data.user.has_active_subscription,
 				groups: data.user.groups ?? authenticatedUser?.groups,
+				isStaff: data.user.is_staff ?? authenticatedUser?.isStaff,
 				referral_code:
 					data.user.referral_code ?? authenticatedUser?.referral_code,
 				reward_points:
@@ -852,6 +912,7 @@ export const AuthenticatedUserContextProvider = ({
 				funcUpdateProfile,
 				funcUpdateProfilePicture,
 				funcUpdateUser,
+				funcUpdateUserTags,
 				funcVerifyToken,
 				funcDeleteGalleryImage,
 				hasActiveSubscription:

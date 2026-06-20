@@ -13,10 +13,15 @@ const PUBLIC_API_PATH_PREFIXES = [
 	"/advertisement/fetch-related-ad-wanted/",
 	"/location-hub/locations",
 	"/location-hub/location-hub-by-slug/",
+	"/opportunities/opportunities",
+	"/opportunities/single-opportunity/",
+	"/media-outlets/media-outlets",
+	"/media-outlets/single-media-outlet/",
 	"/events/",
 	"/blog/",
 	"/shop/items",
 	"/users/public-users",
+	"/users/public-user/",
 ] as const;
 
 /**

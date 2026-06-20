@@ -31,6 +31,23 @@ describe("shouldInvalidateSessionOn401", () => {
 		expect(shouldInvalidateSessionOn401(error)).toBe(false);
 	});
 
+	it("returns false for public opportunities endpoints", () => {
+		const listError = {
+			isAxiosError: true,
+			response: { status: 401 },
+			config: { method: "get", url: "/opportunities/opportunities" },
+		};
+		const detailError = {
+			isAxiosError: true,
+			response: { status: 401 },
+			config: { method: "get", url: "/opportunities/single-opportunity/1" },
+		};
+		expect(isPublicApiRequestPath(listError.config.url)).toBe(true);
+		expect(isPublicApiRequestPath(detailError.config.url)).toBe(true);
+		expect(shouldInvalidateSessionOn401(listError)).toBe(false);
+		expect(shouldInvalidateSessionOn401(detailError)).toBe(false);
+	});
+
 	it("returns false for unread chat background polls", () => {
 		const error = {
 			isAxiosError: true,

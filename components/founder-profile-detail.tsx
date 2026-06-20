@@ -1,9 +1,20 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import type { Tag } from "@customTypes/tag";
+
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
+import { HistoryBackLink } from "@/components/history-back-link";
+import { ProfilePageEditButton } from "@/components/pages/Profile/ProfilePageEditButton";
+import { ProfileAvatarSection } from "@/components/profile-avatar-section";
+import { ProfileBioContent } from "@/components/profile-bio-content";
 import Text from "@/components/Text";
+import type { ProfileFormValues } from "@/lib/profileForm";
+import { bioToApiField, profileLinksFromFormValues } from "@/lib/profileForm";
 import type { FounderProfile, ProfileLink } from "@/lib/profiles";
 
 function ExternalLinkIcon() {
@@ -151,6 +162,23 @@ function LinkIcon({ type }: { type: ProfileLink["type"] }) {
 		);
 	}
 
+	if (type === "facebook") {
+		return (
+			<svg
+				viewBox="0 0 16 16"
+				fill="none"
+				className="size-4 shrink-0 text-gray-500"
+				aria-hidden
+			>
+				<title>Facebook</title>
+				<path
+					d="M9 3h2V0H9C6.8 0 5 1.8 5 4v2H3v3h2v6h3V9h2.5L11 6H8V4.5c0-.8.7-1.5 1-1.5Z"
+					fill="currentColor"
+				/>
+			</svg>
+		);
+	}
+
 	return (
 		<svg
 			viewBox="0 0 16 16"
@@ -169,21 +197,117 @@ function LinkIcon({ type }: { type: ProfileLink["type"] }) {
 	);
 }
 
-type FounderProfileDetailProps = {
-	profile: FounderProfile;
+type LiveProfileDisplay = {
+	displayName: string;
+	tagline: string | null;
+	bio: string | null;
+	links: ProfileLink[];
+	tagNames: string[];
+	profileFormValues: ProfileFormValues;
 };
 
-export function FounderProfileDetail({ profile }: FounderProfileDetailProps) {
+const buildLiveProfileDisplay = ({
+	displayName,
+	fallbackName,
+	tagline,
+	bio,
+	links = [],
+	tags = [],
+	profileFormValues,
+}: {
+	displayName?: string;
+	fallbackName: string;
+	tagline?: string | null;
+	bio?: string | null;
+	links?: ProfileLink[];
+	tags?: Tag[];
+	profileFormValues: ProfileFormValues;
+}): LiveProfileDisplay => ({
+	displayName: displayName ?? fallbackName,
+	tagline: tagline?.trim() || null,
+	bio: bio ?? null,
+	links,
+	tagNames: tags.map((tag) => tag.name),
+	profileFormValues,
+});
+
+const liveProfileDisplayFromFormValues = (
+	values: ProfileFormValues,
+	profileUsername: string,
+): LiveProfileDisplay => {
+	const displayName =
+		[values.first_name, values.last_name].filter(Boolean).join(" ").trim() ||
+		profileUsername;
+
+	return {
+		displayName,
+		tagline: values.headline.trim() || null,
+		bio: bioToApiField(values.bio) || null,
+		links: profileLinksFromFormValues(values),
+		tagNames: values.tags.map((tag) => tag.label),
+		profileFormValues: values,
+	};
+};
+
+type FounderProfileDetailProps = {
+	profile: FounderProfile;
+	displayName?: string;
+	avatarUrl?: string | null;
+	tagline?: string | null;
+	bio?: string | null;
+	links?: ProfileLink[];
+	tags?: Tag[];
+	profileUsername: string;
+	profileFormValues: ProfileFormValues;
+};
+
+export function FounderProfileDetail({
+	profile,
+	displayName,
+	avatarUrl,
+	tagline,
+	bio,
+	links = [],
+	tags = [],
+	profileUsername,
+	profileFormValues,
+}: FounderProfileDetailProps) {
+	const fallbackName = profile.name;
+	const [liveProfile, setLiveProfile] = useState<LiveProfileDisplay>(() =>
+		buildLiveProfileDisplay({
+			displayName,
+			fallbackName,
+			tagline,
+			bio,
+			links,
+			tags,
+			profileFormValues,
+		}),
+	);
+
+	useEffect(() => {
+		setLiveProfile(
+			buildLiveProfileDisplay({
+				displayName,
+				fallbackName,
+				tagline,
+				bio,
+				links,
+				tags,
+				profileFormValues,
+			}),
+		);
+	}, [bio, displayName, fallbackName, links, profileFormValues, tagline, tags]);
+
+	const name = liveProfile.displayName;
+	const displayTagline = liveProfile.tagline;
 	return (
 		<div className="min-h-full bg-white font-sans">
 			<header className="border-b border-gray-200 px-6 py-4">
-				<div className="mx-auto flex max-w-6xl items-center justify-between">
-					<Link
-						href="/"
-						className="text-sm font-medium text-gray-500 transition-colors hover:text-black"
-					>
+				<div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+					<HistoryBackLink className="text-sm font-medium text-gray-500 transition-colors hover:text-black">
 						← Back
-					</Link>
+					</HistoryBackLink>
 					<Link
 						href="/"
 						className="text-lg font-semibold tracking-tight text-black"
@@ -196,26 +320,18 @@ export function FounderProfileDetail({ profile }: FounderProfileDetailProps) {
 			<main className="mx-auto max-w-6xl px-6 py-10">
 				<div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
 					<aside>
-						<div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100">
-							<Image
-								src={profile.avatarUrl}
-								alt={profile.name}
-								fill
-								sizes="280px"
-								className="object-cover"
-								priority
-							/>
-						</div>
+						<ProfileAvatarSection
+							name={name}
+							initialAvatarUrl={avatarUrl}
+							profileUsername={profileUsername}
+						/>
 
 						<Heading level={1} variant="page-profile">
-							{profile.name}
+							{name}
 						</Heading>
-						<Text variant="profile-role">
-							{profile.role},{" "}
-							<span className="font-semibold text-black">
-								{profile.company}
-							</span>
-						</Text>
+						{displayTagline ? (
+							<Text variant="profile-role">{displayTagline}</Text>
+						) : null}
 						<Text variant="profile-location">
 							<MapPinIcon />
 							{profile.location}
@@ -234,55 +350,69 @@ export function FounderProfileDetail({ profile }: FounderProfileDetailProps) {
 							</span>
 						</Button>
 
-						<ul className="mt-4 space-y-2">
-							{profile.links.map((link) => (
-								<li key={`${link.type}-${link.label}`}>
-									<a
-										href={link.href}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-									>
-										<LinkIcon type={link.type} />
-										<span className="min-w-0 flex-1 truncate">
-											{link.label}
-										</span>
-										<ExternalLinkIcon />
-									</a>
-								</li>
-							))}
-						</ul>
-
-						<div className="mt-8">
-							<Text variant="label">Speaks about</Text>
-							<ul className="mt-3 flex flex-wrap gap-2">
-								{profile.topics.map((topic) => (
-									<li
-										key={topic}
-										className="rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-600"
-									>
-										{topic}
+						{liveProfile.links.length > 0 ? (
+							<ul className="mt-4 space-y-2">
+								{liveProfile.links.map((link) => (
+									<li key={`${link.type}-${link.href}`}>
+										<a
+											href={link.href}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+										>
+											<LinkIcon type={link.type} />
+											<span className="min-w-0 flex-1 truncate">
+												{link.label}
+											</span>
+											<ExternalLinkIcon />
+										</a>
 									</li>
 								))}
 							</ul>
-						</div>
+						) : null}
+
+						{liveProfile.tagNames.length > 0 ? (
+							<div className="mt-8">
+								<Text variant="label">Speaks about</Text>
+								<ul className="mt-3 flex flex-wrap gap-2">
+									{liveProfile.tagNames.map((topic) => (
+										<li
+											key={topic}
+											className="rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-600"
+										>
+											{topic}
+										</li>
+									))}
+								</ul>
+							</div>
+						) : null}
 					</aside>
 
 					<div>
-						{profile.openToMedia && (
-							<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-								<span className="size-1.5 rounded-full bg-violet-500" />
-								Open to media opportunities
-							</span>
-						)}
-
-						<div className="mt-6 space-y-4 text-base leading-relaxed text-gray-600">
-							{profile.bio.map((paragraph) => (
-								<Text key={paragraph} variant="plain">
-									{paragraph}
-								</Text>
-							))}
+						<div className="flex items-center justify-between gap-4">
+							{profile.openToMedia ? (
+								<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
+									<span className="size-1.5 rounded-full bg-violet-500" />
+									Open to media opportunities
+								</span>
+							) : (
+								<span />
+							)}
+							<ProfilePageEditButton
+								profileUsername={profileUsername}
+								initialValues={liveProfile.profileFormValues}
+								onProfileSaved={(values) => {
+									setLiveProfile(
+										liveProfileDisplayFromFormValues(values, profileUsername),
+									);
+								}}
+							/>
 						</div>
+
+						<ProfileBioContent
+							bio={liveProfile.bio}
+							key={liveProfile.bio ?? "empty"}
+						/>
 
 						<section className="mt-10">
 							<Heading level={2} variant="label">

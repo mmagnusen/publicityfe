@@ -1,0 +1,2 @@
+export const DESKTOP_SIDEBAR_WIDTH = 250;
+export const DASHBOARD_HEADER_HEIGHT = 73;

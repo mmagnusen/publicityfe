@@ -35,6 +35,7 @@ export type AuthenticatedUser = {
 	token: string;
 	username: string;
 	hasActiveSubscription: boolean;
+	isStaff?: boolean;
 };
 
 export type ChatMessage = {

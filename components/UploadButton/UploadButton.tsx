@@ -83,6 +83,7 @@ export const filePathFromBytescalePublicUrl = (
 
 type Props = {
 	bUseIcon?: boolean;
+	iconPath?: string;
 	isLoading?: boolean;
 	onComplete: ({
 		uploadedFilePath,
@@ -101,6 +102,7 @@ const frontendPublicAPIKey =
 
 const UploadButton = ({
 	bUseIcon,
+	iconPath = mdiCogOutline,
 	isLoading,
 	options,
 	path,
@@ -153,7 +155,7 @@ const UploadButton = ({
 							role="button"
 							tabIndex={0}
 						>
-							<Icon path={mdiCogOutline} size={1} />
+							<Icon path={iconPath} size={1} />
 						</div>
 					) : (
 						<div className="mb-6 w-[200px]">

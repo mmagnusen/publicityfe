@@ -48,9 +48,9 @@ export const useBilling = () => {
 	const { reportError } = useErrorReport({ functionNamePrefix: "useBilling" });
 	const { authenticatedUser, hasActiveSubscription, isLoggedIn } =
 		useAuthenticatedUser();
-
+	const makeRequest = false;
 	const { data: subscriptionStatusData } = useSWR(
-		isLoggedIn ? "/billing/subscription-status" : null,
+		isLoggedIn && makeRequest ? "/billing/subscription-status" : null,
 		fetcher,
 	);
 

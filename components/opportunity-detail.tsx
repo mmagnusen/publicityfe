@@ -262,7 +262,7 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 			<header className="border-b border-gray-200 px-6 py-4">
 				<div className="mx-auto flex max-w-6xl items-center justify-between">
 					<Link
-						href="/"
+						href="/opportunity"
 						className="text-sm font-medium text-gray-500 transition-colors hover:text-black"
 					>
 						← Back to opportunities

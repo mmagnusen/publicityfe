@@ -1,7 +1,7 @@
 export type ProfileLink = {
 	label: string;
 	href: string;
-	type: "website" | "instagram" | "linkedin" | "twitter";
+	type: "website" | "instagram" | "linkedin" | "facebook" | "twitter";
 };
 
 export type FeaturedIn = {

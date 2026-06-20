@@ -116,6 +116,15 @@ const useTipTapEditor = ({
 			return onBlur?.({ characterCount, wordCount });
 		},
 		onUpdate: ({ editor }) => {
+			if (
+				existingContent != null &&
+				existingContent !== "" &&
+				!lastSyncedContentRef.current &&
+				editor.isEmpty
+			) {
+				return;
+			}
+
 			const { characters, words } = editor.extensionStorage.characterCount;
 
 			const characterCount = characters?.() || 0;

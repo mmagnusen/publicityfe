@@ -249,6 +249,33 @@ export const parseTipTapDocFromApi = (raw: unknown): JSONContent | null => {
 	return isTipTapDoc(value) ? value : null;
 };
 
+const extractPlainTextFromNode = (node: JSONContent): string => {
+	if (node.type === "text" && typeof node.text === "string") {
+		return node.text;
+	}
+
+	if (Array.isArray(node.content)) {
+		return node.content.map(extractPlainTextFromNode).join("");
+	}
+
+	return "";
+};
+
+/** Plain text for display when API stores a TipTap JSON string or doc. */
+export const tipTapApiValueToPlainText = (raw: string | undefined): string => {
+	if (!raw?.trim()) {
+		return "";
+	}
+
+	const doc = parseTipTapDocFromApi(raw);
+	if (doc) {
+		const plain = extractPlainTextFromNode(doc).trim();
+		return plain || raw.trim();
+	}
+
+	return raw.trim();
+};
+
 /** Recover hubs saved when the API received a stringified doc (stored as plain text in one paragraph). */
 export const unwrapMisstoredJsonStringTipTapDoc = (
 	doc: JSONContent,

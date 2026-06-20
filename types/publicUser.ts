@@ -1,3 +1,4 @@
+import type { Tag } from "@customTypes/tag";
 import type { GalleryAsset } from "@hooks/useAdvertisement";
 
 /** Public member profile from `/users/public-user/:username` (no email or auth fields). */
@@ -7,6 +8,7 @@ export type PublicUser = {
 	last_name: string;
 	username: string;
 	is_active: boolean;
+	tags?: Tag[];
 	human_profile: {
 		pk: number;
 		profile_image_url: string;
@@ -17,7 +19,8 @@ export type PublicUser = {
 		linked_in_url: string;
 		personal_website_url: string;
 		bio: string;
-		/** Optional; not always returned by the API but used when present. */
+		tagline?: string;
+		/** Legacy alias; prefer `tagline`. */
 		headline?: string;
 	};
 	customusergalleryasset_set: GalleryAsset[];

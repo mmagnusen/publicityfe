@@ -1,9 +1,14 @@
+import type { MediaOutlet } from "@customTypes/mediaOutlet";
+import type { ApiOpportunity } from "@customTypes/opportunity";
+import { tipTapApiValueToPlainText } from "@lib/tiptap-utils";
+
 export type Opportunity = {
 	id: string;
 	type: string;
 	status: "open" | "closed";
 	title: string;
 	description: string;
+	shortDescription: string;
 	requirements: string[];
 	deadline: string;
 	interviewWindow: string;
@@ -29,26 +34,30 @@ export type Opportunity = {
 	};
 };
 
-const opportunities: Record<string, Opportunity> = {
-	"1": {
-		id: "1",
+type MockTemplate = Pick<
+	Opportunity,
+	| "type"
+	| "requirements"
+	| "deadline"
+	| "interviewWindow"
+	| "articleType"
+	| "location"
+	| "reporter"
+	| "publication"
+>;
+
+const MOCK_TEMPLATES: MockTemplate[] = [
+	{
 		type: "Magazine Article",
-		status: "open",
-		title:
-			"Seeking experts on the future of AI-powered personal branding for a feature in Fast Company",
-		description:
-			"We're putting together an in-depth feature for Fast Company's September issue on how founders, consultants, and creators are using AI tools to build and scale their personal brands. We're looking for practitioners with hands-on experience — not theorists. The piece will run 2,500–3,000 words with expert quotes woven throughout.",
 		requirements: [
-			"Someone actively using AI tools (ChatGPT, Jasper, etc.) in their own personal branding strategy",
-			"A track record of measurable results — follower growth, press placements, speaking gigs",
-			"Comfortable being quoted on the record with their name and company",
-			"Available for a 20–30 min phone interview before 28 June 2026",
+			"Hands-on experience relevant to the topic",
+			"A track record you can speak to on the record",
+			"Available for a 20–30 minute interview",
 		],
 		deadline: "Friday, 28 June 2026",
 		interviewWindow: "16 – 27 June 2026",
 		articleType: "Long-form feature (print + digital)",
 		location: "Remote — phone or video call",
-		matchScore: 94,
 		reporter: {
 			name: "Priya Mehta",
 			title: "Senior Staff Writer",
@@ -67,12 +76,118 @@ const opportunities: Record<string, Opportunity> = {
 			founded: "1995 · New York, NY",
 		},
 	},
+	{
+		type: "Podcast Interview",
+		requirements: [
+			"Clear point of view and concrete examples",
+			"Comfortable with a 45-minute recorded conversation",
+			"Stable internet connection for remote recording",
+		],
+		deadline: "Wednesday, 9 July 2026",
+		interviewWindow: "1 – 8 July 2026",
+		articleType: "45-minute interview episode",
+		location: "Remote — Riverside or Zoom",
+		reporter: {
+			name: "Marcus Chen",
+			title: "Host & Producer",
+			publication: "The Growth Ledger",
+			bio: "Marcus interviews founders and operators building category-defining companies. The show reaches 120k listeners per episode.",
+			profileUrl: "https://example.com/growth-ledger",
+			avatarUrl: "/opportunity/reporter.jpg",
+		},
+		publication: {
+			name: "The Growth Ledger",
+			slug: "TGL",
+			url: "https://example.com/growth-ledger",
+			category: "Business Podcast",
+			monthlyReaders: "480,000 downloads",
+			printCirculation: "N/A",
+			founded: "2019 · Remote",
+		},
+	},
+	{
+		type: "Conference Panel",
+		requirements: [
+			"Subject-matter expert with speaking experience",
+			"Available for a prep call and the live session",
+			"Willing to share practical takeaways, not generic advice",
+		],
+		deadline: "Monday, 21 July 2026",
+		interviewWindow: "14 – 20 July 2026",
+		articleType: "45-minute panel discussion",
+		location: "London, UK — in person",
+		reporter: {
+			name: "Elena Rodriguez",
+			title: "Programme Director",
+			publication: "Future Work Summit",
+			bio: "Elena curates speaker line-ups for Europe's leading future-of-work conference, drawing 2,000 attendees annually.",
+			profileUrl: "https://example.com/future-work-summit",
+			avatarUrl: "/opportunity/reporter.jpg",
+		},
+		publication: {
+			name: "Future Work Summit",
+			slug: "FWS",
+			url: "https://example.com/future-work-summit",
+			category: "Industry Conference",
+			monthlyReaders: "2,000 attendees",
+			printCirculation: "N/A",
+			founded: "2016 · London, UK",
+		},
+	},
+];
+
+const pickMockTemplate = (pk: number): MockTemplate =>
+	MOCK_TEMPLATES[pk % MOCK_TEMPLATES.length] ?? MOCK_TEMPLATES[0];
+
+const publicationSlugFromName = (name: string): string => {
+	const initials = name
+		.split(/\s+/)
+		.filter(Boolean)
+		.map((word) => word[0]?.toUpperCase() ?? "")
+		.join("");
+
+	return initials.slice(0, 3) || "MO";
 };
 
-export function getOpportunity(pk: string): Opportunity | null {
-	return opportunities[pk] ?? null;
-}
+export const mapApiOpportunityToDisplay = (
+	api: ApiOpportunity,
+	mediaOutlet?: MediaOutlet | null,
+): Opportunity => {
+	const template = pickMockTemplate(api.pk);
+	const shortDescription =
+		api.short_description.trim() ||
+		tipTapApiValueToPlainText(api.full_description);
+	const description =
+		tipTapApiValueToPlainText(api.full_description) ||
+		api.short_description.trim();
+	const publicationName =
+		mediaOutlet?.name?.trim() ||
+		api.media_outlet_name?.trim() ||
+		template.publication.name;
+	const publicationUrl =
+		mediaOutlet?.website_url?.trim() || template.publication.url;
 
-export function getAllOpportunityIds(): string[] {
-	return Object.keys(opportunities);
-}
+	return {
+		id: String(api.pk),
+		status: "open",
+		title: api.title,
+		shortDescription,
+		description,
+		matchScore: 70 + (api.pk % 28),
+		...template,
+		reporter: {
+			...template.reporter,
+			publication: publicationName,
+		},
+		publication: {
+			...template.publication,
+			name: publicationName,
+			url: publicationUrl,
+			slug: publicationSlugFromName(publicationName),
+		},
+	};
+};
+
+export const mapApiOpportunitiesToDisplay = (
+	items: ApiOpportunity[],
+): Opportunity[] => items.map((item) => mapApiOpportunityToDisplay(item));
