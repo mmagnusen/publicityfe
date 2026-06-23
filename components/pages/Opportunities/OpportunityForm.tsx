@@ -4,10 +4,12 @@ import { useMemo } from "react";
 import axios from "axios";
 import { Form, Formik } from "formik";
 
+import INPUT_TYPE from "@constants/inputTypes";
 import { useAllMediaOutlets } from "@hooks/useMediaOutlets";
 import { getOpportunityApiErrorMessage } from "@hooks/useOpportunities";
 
 import Button from "@/components/Button";
+import { fieldMessageVariants } from "@/components/FormField/style";
 import Field from "@/components/FormikFields/Field";
 import InputField from "@/components/FormikFields/InputField";
 import SelectField from "@/components/FormikFields/SelectField";
@@ -15,18 +17,21 @@ import TextAreaField from "@/components/FormikFields/TextAreaField";
 import TipTapEditorField from "@/components/FormikFields/TipTapEditorField";
 import Text from "@/components/Text";
 import {
+	applicationDeadlineHourOptions,
+	applicationDeadlineYesNoOptions,
+	hasApplicationDeadlineSelected,
 	mediaOutletsToSelectOptions,
+	normalizeOpportunityFormValuesForSubmit,
 	type OpportunityFormValues,
 	validateFullDescription,
 } from "./opportunityFormValues";
 
-const drfFieldMap: Partial<
-	Record<keyof OpportunityFormValues | "media_outlet", string>
-> = {
+const drfFieldMap: Partial<Record<string, keyof OpportunityFormValues>> = {
 	title: "title",
 	short_description: "short_description",
 	full_description: "full_description",
 	media_outlet: "media_outlet",
+	application_deadline: "application_deadline_date",
 };
 
 const validateOpportunityForm = (values: OpportunityFormValues) => {
@@ -45,8 +50,42 @@ const validateOpportunityForm = (values: OpportunityFormValues) => {
 		errors.full_description = fullDescriptionError;
 	}
 
+	if (hasApplicationDeadlineSelected(values.has_application_deadline)) {
+		if (!values.application_deadline_date.trim()) {
+			errors.application_deadline_date = "Select a date";
+		}
+
+		if (!values.application_deadline_hour) {
+			errors.application_deadline_hour = "Select an hour";
+		}
+	}
+
 	return errors;
 };
+
+function DeadlineFieldFooter({
+	error,
+	helper,
+	isTouched,
+}: {
+	error?: string;
+	helper?: string;
+	isTouched?: boolean;
+}) {
+	if (isTouched && error) {
+		return (
+			<span className={fieldMessageVariants({ kind: "error" })}>{error}</span>
+		);
+	}
+
+	if (helper) {
+		return (
+			<span className={fieldMessageVariants({ kind: "helper" })}>{helper}</span>
+		);
+	}
+
+	return <span className="block min-h-5" aria-hidden />;
+}
 
 type Props = {
 	initialValues: OpportunityFormValues;
@@ -74,6 +113,10 @@ export function OpportunityForm({
 		() => mediaOutletsToSelectOptions(mediaOutlets ?? []),
 		[mediaOutlets],
 	);
+	const deadlineHourOptions = useMemo(
+		() => applicationDeadlineHourOptions(),
+		[],
+	);
 
 	return (
 		<Formik<OpportunityFormValues>
@@ -83,7 +126,7 @@ export function OpportunityForm({
 			onSubmit={async (values, { setFieldError, setStatus }) => {
 				setStatus(undefined);
 				try {
-					await onSubmit(values);
+					await onSubmit(normalizeOpportunityFormValuesForSubmit(values));
 				} catch (error: unknown) {
 					const body = axios.isAxiosError(error)
 						? error.response?.data
@@ -112,78 +155,169 @@ export function OpportunityForm({
 				}
 			}}
 		>
-			{({ status, values }) => (
-				<Form noValidate className="space-y-2">
-					<Field fieldLabel="Title" fieldName="title">
-						<InputField
-							name="title"
-							placeHolder="Pitch your startup"
-							strHelperMessage="Headline shown in opportunity listings"
-						/>
-					</Field>
+			{({ errors, status, touched, setFieldValue, values }) => {
+				const showApplicationDeadlineFields = hasApplicationDeadlineSelected(
+					values.has_application_deadline,
+				);
 
-					<Field fieldLabel="Short description" fieldName="short_description">
-						<TextAreaField
-							name="short_description"
-							placeHolder="Brief summary"
-							strHelperMessage="Shown on cards and search results"
-						/>
-					</Field>
+				return (
+					<Form noValidate className="space-y-2">
+						<Field fieldLabel="Title" fieldName="title">
+							<InputField
+								name="title"
+								placeHolder="Pitch your startup"
+								strHelperMessage="Headline shown in opportunity listings"
+							/>
+						</Field>
 
-					<Field fieldLabel="Media outlet" fieldName="media_outlet">
-						<SelectField
-							arrOptions={mediaOutletOptions}
-							isDisabled={isLoadingMediaOutlets}
-							isSearchable
-							name="media_outlet"
-							placeholder={
-								isLoadingMediaOutlets
-									? "Loading media outlets…"
-									: "Select a media outlet"
-							}
-						/>
-					</Field>
+						<Field fieldLabel="Short description" fieldName="short_description">
+							<TextAreaField
+								name="short_description"
+								placeHolder="Brief summary"
+								strHelperMessage="Shown on cards and search results"
+							/>
+						</Field>
 
-					{mediaOutletsError ? (
-						<Text variant="error">
-							Could not load media outlets. Try refreshing the page.
-						</Text>
-					) : null}
-
-					<TipTapEditorField
-						existingContent={values.full_description.editorJSON}
-						key={`full-description-${initialValues.title}`}
-						name="full_description"
-						renderToolbar
-						strLabel="Full description"
-					/>
-
-					{status ? <Text variant="error">{status}</Text> : null}
-
-					<div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
-						<Button
-							bLoading={isSubmitting}
-							isDisabled={isSubmitting || isDeleting}
-							textTransform="none"
-							type="submit"
+						<Field
+							fieldLabel="Does this opportunity have an application deadline?"
+							fieldName="has_application_deadline"
 						>
-							{submitLabel}
-						</Button>
+							<SelectField
+								arrOptions={applicationDeadlineYesNoOptions}
+								isSearchable={false}
+								name="has_application_deadline"
+								onChangeCallback={(option) => {
+									if (
+										option != null &&
+										!Array.isArray(option) &&
+										"value" in option &&
+										option.value === "no"
+									) {
+										setFieldValue("application_deadline_date", "");
+										setFieldValue("application_deadline_hour", null);
+									}
+								}}
+								placeholder="Select"
+							/>
+						</Field>
 
-						{onDelete ? (
-							<Button
-								isDisabled={isSubmitting || isDeleting}
-								onClick={onDelete}
-								strVariant="red"
-								textTransform="none"
-								type="button"
-							>
-								{isDeleting ? "Deleting…" : "Delete opportunity"}
-							</Button>
+						{showApplicationDeadlineFields ? (
+							<div className="mb-4 grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2 sm:grid-rows-[auto_auto_minmax(1.25rem,auto)]">
+								<label
+									className="flex items-center justify-start sm:col-start-1 sm:row-start-1"
+									htmlFor="application_deadline_date"
+								>
+									Application deadline date
+								</label>
+								<div className="sm:col-start-1 sm:row-start-2">
+									<InputField
+										bCompact
+										bHideInlineMessages
+										id="application_deadline_date"
+										name="application_deadline_date"
+										onChangeCallback={(event) => {
+											if (!event.target.value) {
+												setFieldValue("application_deadline_hour", null);
+											}
+										}}
+										type={INPUT_TYPE.DATE}
+									/>
+								</div>
+								<div className="sm:col-start-1 sm:row-start-3">
+									<DeadlineFieldFooter
+										error={errors.application_deadline_date}
+										helper="Last date to apply"
+										isTouched={touched.application_deadline_date}
+									/>
+								</div>
+
+								<label
+									className="flex items-center justify-start sm:col-start-2 sm:row-start-1"
+									htmlFor="application_deadline_hour"
+								>
+									Application deadline hour
+								</label>
+								<div className="sm:col-start-2 sm:row-start-2">
+									<SelectField
+										arrOptions={deadlineHourOptions}
+										bCompact
+										bHideInlineMessages
+										id="application_deadline_hour"
+										isClearable
+										isSearchable
+										name="application_deadline_hour"
+										onChangeCallback={(option) => {
+											if (option == null || Array.isArray(option)) {
+												setFieldValue("application_deadline_date", "");
+											}
+										}}
+										placeholder="Select hour"
+									/>
+								</div>
+								<div className="sm:col-start-2 sm:row-start-3">
+									<DeadlineFieldFooter
+										error={errors.application_deadline_hour}
+										isTouched={touched.application_deadline_hour}
+									/>
+								</div>
+							</div>
 						) : null}
-					</div>
-				</Form>
-			)}
+
+						<Field fieldLabel="Media outlet" fieldName="media_outlet">
+							<SelectField
+								arrOptions={mediaOutletOptions}
+								isDisabled={isLoadingMediaOutlets}
+								isSearchable
+								name="media_outlet"
+								placeholder={
+									isLoadingMediaOutlets
+										? "Loading media outlets…"
+										: "Select a media outlet"
+								}
+							/>
+						</Field>
+
+						{mediaOutletsError ? (
+							<Text variant="error">
+								Could not load media outlets. Try refreshing the page.
+							</Text>
+						) : null}
+
+						<TipTapEditorField
+							existingContent={values.full_description.editorJSON}
+							key={`full-description-${initialValues.title}`}
+							name="full_description"
+							renderToolbar
+							strLabel="Full description"
+						/>
+
+						{status ? <Text variant="error">{status}</Text> : null}
+
+						<div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center">
+							<Button
+								bLoading={isSubmitting}
+								isDisabled={isSubmitting || isDeleting}
+								textTransform="none"
+								type="submit"
+							>
+								{submitLabel}
+							</Button>
+
+							{onDelete ? (
+								<Button
+									isDisabled={isSubmitting || isDeleting}
+									onClick={onDelete}
+									strVariant="red"
+									textTransform="none"
+									type="button"
+								>
+									{isDeleting ? "Deleting…" : "Delete opportunity"}
+								</Button>
+							) : null}
+						</div>
+					</Form>
+				);
+			}}
 		</Formik>
 	);
 }

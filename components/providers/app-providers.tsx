@@ -1,8 +1,10 @@
 "use client";
 
 import { type ReactNode, useEffect } from "react";
+import { ToastContainer } from "react-toastify";
 
 import { AuthenticatedUserContextProvider } from "@hooks/useAuthenticatedUser";
+import "react-toastify/dist/ReactToastify.css";
 import { LogSnagProvider } from "@logsnag/next";
 import { isPosthogConfigured } from "@util/posthogProductErrorReporting";
 import posthog from "posthog-js";
@@ -45,6 +47,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 			<LogSnagWrapper>
 				<AuthenticatedUserContextProvider>
 					{children}
+					<ToastContainer />
 				</AuthenticatedUserContextProvider>
 			</LogSnagWrapper>
 		</PostHogProvider>

@@ -1,25 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { toast } from "react-toastify";
 import { mdiImageOutline } from "@mdi/js";
 
-import UploadButton, { buildURL } from "@components/UploadButton";
+import UploadButton, {
+	buildURL,
+	resolveBytescaleDisplayUrl,
+} from "@components/UploadButton";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 
-const PROFILE_UPLOAD_PATH = "/uploads/profile";
-
-function resolveAvatarDisplayUrl(url?: string | null): string | null {
-	if (!url?.trim()) {
-		return null;
-	}
-
-	const trimmed = url.trim();
-	if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-		return trimmed;
-	}
-
-	return buildURL({ path: trimmed }) || null;
-}
+const PROFILE_UPLOAD_PATH = "profile";
 
 function ProfileAvatar({
 	name,
@@ -63,8 +54,12 @@ export function ProfileAvatarSection({
 	initialAvatarUrl,
 	profileUsername,
 }: ProfileAvatarSectionProps) {
-	const { authenticatedUser, funcUpdateProfilePicture, profilePicURL } =
-		useAuthenticatedUser();
+	const {
+		authenticatedUser,
+		canUseAuthenticatedApi,
+		funcUpdateProfilePicture,
+		profilePicURL,
+	} = useAuthenticatedUser();
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadedUrl, setUploadedUrl] = useState<string | null>(null);
 
@@ -77,9 +72,9 @@ export function ProfileAvatarSection({
 			return uploadedUrl;
 		}
 		if (isOwner && profilePicURL) {
-			return resolveAvatarDisplayUrl(profilePicURL);
+			return resolveBytescaleDisplayUrl(profilePicURL);
 		}
-		return resolveAvatarDisplayUrl(initialAvatarUrl);
+		return resolveBytescaleDisplayUrl(initialAvatarUrl);
 	}, [uploadedUrl, isOwner, profilePicURL, initialAvatarUrl]);
 
 	const handleUploadComplete = async ({
@@ -92,6 +87,9 @@ export function ProfileAvatarSection({
 		try {
 			await funcUpdateProfilePicture(uploadedFilePath);
 			setUploadedUrl(buildURL({ path: uploadedFilePath }));
+			toast.success("Profile picture updated");
+		} catch {
+			toast.error("Unable to update profile picture");
 		} finally {
 			setIsUploading(false);
 		}
@@ -100,7 +98,7 @@ export function ProfileAvatarSection({
 	return (
 		<div className="relative aspect-square overflow-hidden rounded-2xl bg-gray-100">
 			<ProfileAvatar name={name} imageUrl={displayUrl} />
-			{isOwner ? (
+			{isOwner && canUseAuthenticatedApi ? (
 				<div className="absolute top-3 right-3 z-10 rounded-full bg-white p-1 shadow-md">
 					<UploadButton
 						bUseIcon

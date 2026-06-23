@@ -6,10 +6,16 @@ import { useParams } from "next/navigation";
 
 import { useMediaOutlet } from "@hooks/useMediaOutlets";
 import { useOpportunity } from "@hooks/useOpportunities";
+import { usePublicUser } from "@hooks/usePublicUser";
 
 import { OpportunityDetail } from "@/components/opportunity-detail";
 import Text from "@/components/Text";
-import { mapApiOpportunityToDisplay } from "@/lib/opportunities";
+import {
+	applyCreatorToOpportunity,
+	applyMediaOutletToOpportunity,
+	mapApiOpportunityToDisplay,
+	opportunityCreatorUsername,
+} from "@/lib/opportunities";
 
 export function OpportunityDetailContent() {
 	const params = useParams<{ pk: string }>();
@@ -19,6 +25,13 @@ export function OpportunityDetailContent() {
 		Number.isFinite(pk) && pk > 0 ? pk : null,
 	);
 
+	const creatorUsername = data ? opportunityCreatorUsername(data) : null;
+	const {
+		data: creator,
+		error: creatorError,
+		isLoading: isLoadingCreator,
+	} = usePublicUser(creatorUsername);
+
 	const mediaOutletPk =
 		data?.media_outlet != null && data.media_outlet > 0
 			? data.media_outlet
@@ -26,10 +39,22 @@ export function OpportunityDetailContent() {
 	const { data: mediaOutlet, isLoading: isLoadingMediaOutlet } =
 		useMediaOutlet(mediaOutletPk);
 
-	const opportunity = useMemo(
-		() => (data ? mapApiOpportunityToDisplay(data, mediaOutlet) : null),
-		[data, mediaOutlet],
-	);
+	const opportunity = useMemo(() => {
+		if (!data) {
+			return null;
+		}
+
+		const base = mapApiOpportunityToDisplay(data, mediaOutlet);
+		const withPublication = mediaOutlet
+			? applyMediaOutletToOpportunity(base, mediaOutlet)
+			: base;
+
+		if (creator) {
+			return applyCreatorToOpportunity(withPublication, creator);
+		}
+
+		return withPublication;
+	}, [creator, data, mediaOutlet]);
 
 	if (!Number.isFinite(pk) || pk <= 0) {
 		return (
@@ -39,7 +64,11 @@ export function OpportunityDetailContent() {
 		);
 	}
 
-	if (isLoading || (mediaOutletPk != null && isLoadingMediaOutlet)) {
+	if (
+		isLoading ||
+		(mediaOutletPk != null && isLoadingMediaOutlet) ||
+		(creatorUsername != null && isLoadingCreator)
+	) {
 		return (
 			<div className="flex min-h-full items-center justify-center bg-white px-6 py-16">
 				<Text variant="loading">Loading opportunity…</Text>
@@ -58,6 +87,16 @@ export function OpportunityDetailContent() {
 					{accessDenied
 						? "Could not load this opportunity. You may not have permission to view it."
 						: "Could not load this opportunity. It may not exist or the API is unavailable."}
+				</Text>
+			</div>
+		);
+	}
+
+	if (creatorUsername && !creator && creatorError) {
+		return (
+			<div className="flex min-h-full items-center justify-center bg-white px-6 py-16">
+				<Text variant="error">
+					Could not load the creator profile for this opportunity.
 				</Text>
 			</div>
 		);

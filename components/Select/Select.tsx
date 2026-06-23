@@ -19,11 +19,15 @@ export type SelectOption = {
 
 export type SelectProps = {
 	arrOptions: SelectOption[];
+	bCompact?: boolean;
+	bHideInlineMessages?: boolean;
 	bShowSelectedTick?: boolean;
 	defaultValue?: SelectOption | SelectOption[];
+	id?: string;
 	helperText?: string;
 	placeholder?: string;
 	isDisabled?: boolean;
+	isClearable?: boolean;
 	isMulti?: boolean;
 	isSearchable?: boolean;
 	objValidation?: Validation;
@@ -37,9 +41,13 @@ export type SelectProps = {
 
 const Select = ({
 	arrOptions,
+	bCompact = false,
+	bHideInlineMessages = false,
 	helperText,
+	id,
 	placeholder,
 	isDisabled = false,
+	isClearable = false,
 	isMulti = false,
 	isSearchable = true,
 	onChange,
@@ -68,27 +76,36 @@ const Select = ({
 	const menuPortalTarget =
 		typeof document !== "undefined" ? document.body : undefined;
 
+	const selectControl = (
+		<ReactSelect<SelectOption, boolean, GroupBase<SelectOption>>
+			inputId={id ?? "select"}
+			isClearable={isClearable}
+			isDisabled={isDisabled}
+			isMulti={isMulti}
+			isSearchable={isSearchable}
+			menuPortalTarget={menuPortalTarget}
+			onBlur={onBlur}
+			onChange={onChange}
+			options={arrOptions}
+			placeholder={placeholder}
+			styles={customStyles}
+			value={value}
+			{...props}
+		/>
+	);
+
+	if (bCompact) {
+		return selectControl;
+	}
+
 	return (
 		<section className={labelledFieldVariants()}>
 			<div className={labelRowVariants()}>
-				{strLabel ? <label htmlFor="select">{strLabel}</label> : null}
+				{strLabel ? <label htmlFor={id ?? "select"}>{strLabel}</label> : null}
 			</div>
 			<HelperText>{helperText}</HelperText>
-			<ReactSelect<SelectOption, boolean, GroupBase<SelectOption>>
-				inputId="select"
-				isDisabled={isDisabled}
-				isMulti={isMulti}
-				isSearchable={isSearchable}
-				menuPortalTarget={menuPortalTarget}
-				onBlur={onBlur}
-				onChange={onChange}
-				options={arrOptions}
-				placeholder={placeholder}
-				styles={customStyles}
-				value={value}
-				{...props}
-			/>
-			{objValidation.bIsValid === false ? (
+			{selectControl}
+			{!bHideInlineMessages && objValidation.bIsValid === false ? (
 				<span className={fieldMessageVariants({ kind: "error" })}>
 					{objValidation.strErrorMessage}
 				</span>

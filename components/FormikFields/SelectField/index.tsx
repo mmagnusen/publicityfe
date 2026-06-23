@@ -8,9 +8,16 @@ import type { MultiValue, SingleValue } from "react-select";
 export interface SelectFieldProps
 	extends Omit<SelectProps, "value" | "onChange"> {
 	name: string;
+	onChangeCallback?: (
+		option: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => void;
 }
 
-const SelectField = ({ name, ...restProps }: SelectFieldProps) => {
+const SelectField = ({
+	name,
+	onChangeCallback,
+	...restProps
+}: SelectFieldProps) => {
 	const [field, formikProps, helpers] = useField(name);
 	const { setTouched, setValue } = helpers;
 	const { error, touched } = formikProps;
@@ -19,6 +26,7 @@ const SelectField = ({ name, ...restProps }: SelectFieldProps) => {
 		option: SingleValue<SelectOption> | MultiValue<SelectOption>,
 	) => {
 		setValue(option);
+		onChangeCallback?.(option);
 	};
 
 	const handleBlur = () => {

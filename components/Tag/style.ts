@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const tagVariants = cva(
-	"badge inline-block min-w-fit rounded-3xl px-4 py-1 text-center text-sm font-medium",
+	"badge inline-flex min-h-7 min-w-fit items-center justify-center rounded-3xl px-4 py-0 text-sm font-medium leading-none",
 	{
 		variants: {
 			skin: {

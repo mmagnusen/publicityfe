@@ -134,7 +134,7 @@ export function EditOpportunity() {
 					</Text>
 				) : (
 					<OpportunityForm
-						key={pk}
+						key={`${pk}-${data.application_deadline ?? "none"}`}
 						initialValues={initialValues}
 						isDeleting={isDeleting}
 						isSubmitting={isSubmitting}

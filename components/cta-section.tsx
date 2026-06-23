@@ -28,9 +28,7 @@ export function CtaSection() {
 					</Button>
 				</div>
 
-				<Text variant="caption">
-					No credit card required &bull; 14-day free trial &bull; Cancel anytime
-				</Text>
+				<Text variant="caption">Secure checkout &bull; Cancel anytime</Text>
 			</div>
 		</section>
 	);

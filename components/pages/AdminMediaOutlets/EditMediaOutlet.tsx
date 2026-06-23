@@ -120,7 +120,7 @@ export function EditMediaOutlet() {
 				Edit media outlet
 			</Heading>
 			<Text variant="page-subtitle">
-				Update name and website for this outlet.
+				Update name, website, and founded year for this outlet.
 			</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">

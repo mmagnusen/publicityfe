@@ -19,6 +19,138 @@ export type OpportunityFormValues = {
 	short_description: string;
 	full_description: RichTextContent;
 	media_outlet: SelectOption | null;
+	has_application_deadline: SelectOption | null;
+	application_deadline_date: string;
+	application_deadline_hour: SelectOption | null;
+};
+
+export const applicationDeadlineYesNoOptions: SelectOption[] = [
+	{ label: "Yes, this opportunity has an application deadline", value: "yes" },
+	{
+		label: "No, this opportunity does not have an application deadline",
+		value: "no",
+	},
+];
+
+export const yesApplicationDeadlineOption = (): SelectOption =>
+	applicationDeadlineYesNoOptions.find((option) => option.value === "yes") ??
+	applicationDeadlineYesNoOptions[0];
+
+export const noApplicationDeadlineOption = (): SelectOption =>
+	applicationDeadlineYesNoOptions.find((option) => option.value === "no") ??
+	applicationDeadlineYesNoOptions[1];
+
+export const applicationDeadlineHourOptions = (): SelectOption[] =>
+	Array.from({ length: 24 }, (_, hour) => ({
+		label: `${String(hour).padStart(2, "0")}:00`,
+		value: String(hour),
+	}));
+
+const defaultHasApplicationDeadline = (): SelectOption =>
+	noApplicationDeadlineOption();
+
+export const hasApplicationDeadlineSelected = (
+	value: SelectOption | null,
+): boolean => value?.value === "yes";
+
+export const resolveHasApplicationDeadlineOption = (
+	applicationDeadline: string | null | undefined,
+): SelectOption =>
+	applicationDeadline?.trim()
+		? yesApplicationDeadlineOption()
+		: noApplicationDeadlineOption();
+
+export const normalizeOpportunityFormValuesForSubmit = (
+	values: OpportunityFormValues,
+): OpportunityFormValues => {
+	if (hasApplicationDeadlineSelected(values.has_application_deadline)) {
+		return values;
+	}
+
+	return {
+		...values,
+		has_application_deadline: noApplicationDeadlineOption(),
+		application_deadline_date: "",
+		application_deadline_hour: null,
+	};
+};
+
+export const applicationDeadlineToApiValue = (
+	values: OpportunityFormValues,
+): string | null => {
+	if (!hasApplicationDeadlineSelected(values.has_application_deadline)) {
+		return null;
+	}
+
+	return formDeadlineToApiDateTime(
+		values.application_deadline_date,
+		values.application_deadline_hour,
+	);
+};
+
+const apiDeadlineToFormValues = (
+	raw: string | null | undefined,
+): Pick<
+	OpportunityFormValues,
+	"application_deadline_date" | "application_deadline_hour"
+> => {
+	const trimmed = raw?.trim();
+	if (!trimmed) {
+		return {
+			application_deadline_date: "",
+			application_deadline_hour: null,
+		};
+	}
+
+	const match = trimmed.match(/^(\d{4}-\d{2}-\d{2})T(\d{2})/);
+	if (match) {
+		const hour = Number(match[2]);
+		if (Number.isInteger(hour) && hour >= 0 && hour <= 23) {
+			return {
+				application_deadline_date: match[1],
+				application_deadline_hour: {
+					label: `${match[2]}:00`,
+					value: String(hour),
+				},
+			};
+		}
+	}
+
+	const date = new Date(trimmed);
+	if (Number.isNaN(date.getTime())) {
+		return {
+			application_deadline_date: "",
+			application_deadline_hour: null,
+		};
+	}
+
+	const pad = (value: number) => String(value).padStart(2, "0");
+	const hour = date.getHours();
+
+	return {
+		application_deadline_date: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`,
+		application_deadline_hour: {
+			label: `${pad(hour)}:00`,
+			value: String(hour),
+		},
+	};
+};
+
+const formDeadlineToApiDateTime = (
+	date: string,
+	hour: SelectOption | null,
+): string | null => {
+	const trimmedDate = date.trim();
+	if (!trimmedDate || !hour) {
+		return null;
+	}
+
+	const hourNum = Number(hour.value);
+	if (!Number.isInteger(hourNum) || hourNum < 0 || hourNum > 23) {
+		return null;
+	}
+
+	return `${trimmedDate}T${String(hourNum).padStart(2, "0")}:00:00`;
 };
 
 const tipTapDocHasContent = (json: unknown): boolean => {
@@ -118,30 +250,52 @@ export const defaultOpportunityFormValues = (): OpportunityFormValues => ({
 	short_description: "",
 	full_description: emptyFullDescription(),
 	media_outlet: null,
+	has_application_deadline: defaultHasApplicationDeadline(),
+	application_deadline_date: "",
+	application_deadline_hour: null,
 });
 
 export const opportunityToFormValues = (
 	opportunity: ApiOpportunity,
 	outlets?: MediaOutlet[],
-): OpportunityFormValues => ({
-	title: opportunity.title,
-	short_description: opportunity.short_description,
-	full_description: fullDescriptionToRichText(opportunity.full_description),
-	media_outlet: resolveMediaOutletSelectOption(
-		opportunity.media_outlet,
-		opportunity.media_outlet_name,
-		outlets,
-	),
-});
+): OpportunityFormValues => {
+	const deadlineValues = apiDeadlineToFormValues(
+		opportunity.application_deadline,
+	);
+
+	return {
+		title: opportunity.title,
+		short_description: opportunity.short_description,
+		full_description: fullDescriptionToRichText(opportunity.full_description),
+		media_outlet: resolveMediaOutletSelectOption(
+			opportunity.media_outlet,
+			opportunity.media_outlet_name,
+			outlets,
+		),
+		has_application_deadline: resolveHasApplicationDeadlineOption(
+			opportunity.application_deadline,
+		),
+		...deadlineValues,
+	};
+};
 
 export const formValuesToCreatePayload = (
 	values: OpportunityFormValues,
-): OpportunityCreatePayload => ({
-	title: values.title.trim(),
-	short_description: values.short_description.trim(),
-	full_description: fullDescriptionToApiField(values.full_description),
-	media_outlet: values.media_outlet ? Number(values.media_outlet.value) : null,
-});
+): OpportunityCreatePayload => {
+	const normalizedValues = normalizeOpportunityFormValuesForSubmit(values);
+
+	return {
+		title: normalizedValues.title.trim(),
+		short_description: normalizedValues.short_description.trim(),
+		full_description: fullDescriptionToApiField(
+			normalizedValues.full_description,
+		),
+		media_outlet: normalizedValues.media_outlet
+			? Number(normalizedValues.media_outlet.value)
+			: null,
+		application_deadline: applicationDeadlineToApiValue(normalizedValues),
+	};
+};
 
 export const formValuesToUpdatePayload = (
 	values: OpportunityFormValues,

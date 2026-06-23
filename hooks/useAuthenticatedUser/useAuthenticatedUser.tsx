@@ -13,6 +13,7 @@ import axios from "axios";
 import { isEmpty, isNil, noop } from "lodash-es";
 import { usePathname, useRouter } from "next/navigation";
 
+import { filePathFromBytescalePublicUrl } from "@components/UploadButton";
 import {
 	AUTHENTICATED_USER_COOKIE,
 	AUTHENTICATED_USER_EMAIL_VERIFIED,
@@ -21,6 +22,7 @@ import {
 } from "@constants/cookies";
 import type { ItemToDelete } from "@customTypes/gallery";
 import type { AuthenticatedUser } from "@customTypes/index";
+import type { ProfileHighlightInput } from "@customTypes/profileHighlight";
 import useErrorReport, { REPORT_POSTHOG_ONLY } from "@hooks/useErrorReport";
 import { useLogs } from "@hooks/useLogs";
 import usePosthog from "@hooks/usePosthog";
@@ -109,6 +111,9 @@ const ContextAuthenticatedUser = createContext({
 	emailVerified: null as boolean | null,
 	identityVerified: null as boolean | null,
 	funcAddGalleryImage: noop,
+	funcCreateProfileHighlight: noop,
+	funcDeleteGalleryImage: noop,
+	funcDeleteProfileHighlight: noop,
 	funcLogin: noop,
 	funcLogout: noop,
 	funcRegister: noop,
@@ -116,10 +121,10 @@ const ContextAuthenticatedUser = createContext({
 	funcResetPassword: noop, // from password reset page
 	funcUpdateProfile: noop,
 	funcUpdateProfilePicture: noop,
+	funcUpdateProfileHighlight: noop,
 	funcUpdateUser: noop,
 	funcUpdateUserTags: noop,
 	funcVerifyToken: noop,
-	funcDeleteGalleryImage: noop,
 	hasActiveSubscription: false,
 	isAdmin: false as boolean | undefined,
 	isLoggedIn: false,
@@ -556,10 +561,11 @@ export const AuthenticatedUserContextProvider = ({
 	const funcUpdateProfilePicture = async (uploadedFilePath: string) => {
 		const userHasExistingProfilePicture = !isEmpty(profilePicURL);
 		try {
-			if (userHasExistingProfilePicture) {
-				// next.js endpoint
+			if (userHasExistingProfilePicture && profilePicURL) {
+				const filePath =
+					filePathFromBytescalePublicUrl(profilePicURL) ?? profilePicURL;
 				await axios.post("/api/bytescale", {
-					filePath: profilePicURL,
+					filePath,
 				});
 			}
 			// update human profile in the database
@@ -735,18 +741,59 @@ export const AuthenticatedUserContextProvider = ({
 
 	const funcDeleteGalleryImage = async (asset: ItemToDelete) => {
 		try {
-			// Request to next.js endpoint to delete from bytescale
+			const filePath =
+				filePathFromBytescalePublicUrl(asset.assetUrl) ?? asset.assetUrl;
 			await axios.post("/api/bytescale", {
-				filePath: asset.assetUrl,
+				filePath,
 			});
 
-			// Delete gallery asset from Delphi database
 			await instanceAxios({
 				method: "delete",
 				url: `/users/delete-gallery-asset/${asset.pk}`,
 			});
 		} catch (error: any) {
 			reportError(error, "funcDeleteGalleryImage", REPORT_POSTHOG_ONLY);
+			throw error;
+		}
+	};
+
+	const funcCreateProfileHighlight = async (payload: ProfileHighlightInput) => {
+		try {
+			await instanceAxios({
+				method: "post",
+				url: `/users/create-profile-link`,
+				data: payload,
+			});
+		} catch (error: any) {
+			reportError(error, "funcCreateProfileHighlight", REPORT_POSTHOG_ONLY);
+			throw error;
+		}
+	};
+
+	const funcUpdateProfileHighlight = async (
+		pk: number,
+		payload: ProfileHighlightInput,
+	) => {
+		try {
+			await instanceAxios({
+				method: "patch",
+				url: `/users/profile-link/${pk}`,
+				data: payload,
+			});
+		} catch (error: any) {
+			reportError(error, "funcUpdateProfileHighlight", REPORT_POSTHOG_ONLY);
+			throw error;
+		}
+	};
+
+	const funcDeleteProfileHighlight = async (pk: number) => {
+		try {
+			await instanceAxios({
+				method: "delete",
+				url: `/users/profile-link/${pk}`,
+			});
+		} catch (error: any) {
+			reportError(error, "funcDeleteProfileHighlight", REPORT_POSTHOG_ONLY);
 			throw error;
 		}
 	};
@@ -904,6 +951,7 @@ export const AuthenticatedUserContextProvider = ({
 				emailVerified,
 				identityVerified,
 				funcAddGalleryImage,
+				funcCreateProfileHighlight,
 				funcLogin,
 				funcLogout,
 				funcRegister,
@@ -911,10 +959,12 @@ export const AuthenticatedUserContextProvider = ({
 				funcResetPassword, // from password reset page
 				funcUpdateProfile,
 				funcUpdateProfilePicture,
+				funcUpdateProfileHighlight,
 				funcUpdateUser,
 				funcUpdateUserTags,
 				funcVerifyToken,
 				funcDeleteGalleryImage,
+				funcDeleteProfileHighlight,
 				hasActiveSubscription:
 					authenticatedUser?.hasActiveSubscription ?? false,
 				isAdmin,

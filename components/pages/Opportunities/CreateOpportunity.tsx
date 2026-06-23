@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -24,6 +24,7 @@ export function CreateOpportunity() {
 	const router = useRouter();
 	const { authenticationChecked, isAdmin, isLoggedIn } = useAuthenticatedUser();
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const initialValues = useMemo(() => defaultOpportunityFormValues(), []);
 
 	useEffect(() => {
 		if (authenticationChecked && !isLoggedIn) {
@@ -76,7 +77,7 @@ export function CreateOpportunity() {
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
 				<OpportunityForm
-					initialValues={defaultOpportunityFormValues()}
+					initialValues={initialValues}
 					isSubmitting={isSubmitting}
 					onSubmit={handleSubmit}
 					submitLabel="Create opportunity"

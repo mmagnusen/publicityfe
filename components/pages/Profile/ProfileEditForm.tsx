@@ -20,11 +20,11 @@ import {
 	tagsToSelectOptions,
 } from "@/lib/profileForm";
 
-const humanProfileFieldMap: Partial<
-	Record<keyof ProfileFormValues, keyof ProfileFormValues>
-> = {
+const humanProfileFieldMap: Partial<Record<string, keyof ProfileFormValues>> = {
 	bio: "bio",
+	short_description: "short_description",
 	headline: "headline",
+	tagline: "headline",
 	city: "city",
 	personal_website_url: "personal_website_url",
 	linked_in_url: "linked_in_url",
@@ -80,9 +80,9 @@ export function ProfileEditForm({
 						first_name: values.first_name.trim(),
 						last_name: values.last_name.trim(),
 					});
-					await funcUpdateUserTags(selectOptionsToTagPks(values.tags));
 					await funcUpdateProfile({
 						bio: bioToApiField(values.bio),
+						short_description: bioToApiField(values.short_description),
 						headline: values.headline.trim(),
 						city: values.city.trim(),
 						personal_website_url: values.personal_website_url.trim(),
@@ -90,6 +90,11 @@ export function ProfileEditForm({
 						instagram_url: values.instagram_url.trim(),
 						facebook_url: values.facebook_url.trim(),
 					});
+					try {
+						await funcUpdateUserTags(selectOptionsToTagPks(values.tags));
+					} catch {
+						// Tags use an admin-only endpoint; don't block profile saves.
+					}
 					onSuccess(values);
 				} catch (error: unknown) {
 					setSubmitting(false);
@@ -108,7 +113,7 @@ export function ProfileEditForm({
 									? (key as keyof ProfileFormValues)
 									: key === "tag_pks"
 										? ("tags" as keyof ProfileFormValues)
-										: humanProfileFieldMap[key as keyof ProfileFormValues];
+										: humanProfileFieldMap[key];
 							if (
 								fieldName &&
 								(typeof val === "string" || Array.isArray(val))
@@ -164,6 +169,14 @@ export function ProfileEditForm({
 							Could not load tags. Try refreshing the page.
 						</Text>
 					) : null}
+
+					<TipTapEditorField
+						existingContent={initialValues.short_description.editorJSON}
+						key={`profile-short-description-${profileUsername}-${JSON.stringify(initialValues.short_description.editorJSON)}`}
+						name="short_description"
+						renderToolbar
+						strLabel="Short description"
+					/>
 
 					<TipTapEditorField
 						existingContent={initialValues.bio.editorJSON}

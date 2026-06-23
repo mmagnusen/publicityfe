@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
+import type { ProfileHighlight } from "@customTypes/profileHighlight";
 import type { Tag } from "@customTypes/tag";
+import type { GalleryAsset } from "@hooks/useAdvertisement";
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
@@ -12,10 +13,12 @@ import { HistoryBackLink } from "@/components/history-back-link";
 import { ProfilePageEditButton } from "@/components/pages/Profile/ProfilePageEditButton";
 import { ProfileAvatarSection } from "@/components/profile-avatar-section";
 import { ProfileBioContent } from "@/components/profile-bio-content";
+import { ProfileGallerySection } from "@/components/profile-gallery-section";
+import { ProfileHighlightsSection } from "@/components/profile-highlights-section";
 import Text from "@/components/Text";
 import type { ProfileFormValues } from "@/lib/profileForm";
 import { bioToApiField, profileLinksFromFormValues } from "@/lib/profileForm";
-import type { FounderProfile, ProfileLink } from "@/lib/profiles";
+import type { ProfileLink } from "@/lib/profiles";
 
 function ExternalLinkIcon() {
 	return (
@@ -200,6 +203,7 @@ function LinkIcon({ type }: { type: ProfileLink["type"] }) {
 type LiveProfileDisplay = {
 	displayName: string;
 	tagline: string | null;
+	location: string | null;
 	bio: string | null;
 	links: ProfileLink[];
 	tagNames: string[];
@@ -210,6 +214,7 @@ const buildLiveProfileDisplay = ({
 	displayName,
 	fallbackName,
 	tagline,
+	location,
 	bio,
 	links = [],
 	tags = [],
@@ -218,6 +223,7 @@ const buildLiveProfileDisplay = ({
 	displayName?: string;
 	fallbackName: string;
 	tagline?: string | null;
+	location?: string | null;
 	bio?: string | null;
 	links?: ProfileLink[];
 	tags?: Tag[];
@@ -225,6 +231,7 @@ const buildLiveProfileDisplay = ({
 }): LiveProfileDisplay => ({
 	displayName: displayName ?? fallbackName,
 	tagline: tagline?.trim() || null,
+	location: location?.trim() || null,
 	bio: bio ?? null,
 	links,
 	tagNames: tags.map((tag) => tag.name),
@@ -242,6 +249,7 @@ const liveProfileDisplayFromFormValues = (
 	return {
 		displayName,
 		tagline: values.headline.trim() || null,
+		location: values.city.trim() || null,
 		bio: bioToApiField(values.bio) || null,
 		links: profileLinksFromFormValues(values),
 		tagNames: values.tags.map((tag) => tag.label),
@@ -250,34 +258,43 @@ const liveProfileDisplayFromFormValues = (
 };
 
 type FounderProfileDetailProps = {
-	profile: FounderProfile;
 	displayName?: string;
 	avatarUrl?: string | null;
+	location?: string | null;
+	openToMedia?: boolean;
 	tagline?: string | null;
 	bio?: string | null;
+	gallery?: GalleryAsset[];
+	highlights?: ProfileHighlight[];
 	links?: ProfileLink[];
 	tags?: Tag[];
 	profileUsername: string;
 	profileFormValues: ProfileFormValues;
+	userPk: number;
 };
 
 export function FounderProfileDetail({
-	profile,
 	displayName,
 	avatarUrl,
+	location,
+	openToMedia = false,
 	tagline,
 	bio,
+	gallery = [],
+	highlights = [],
 	links = [],
 	tags = [],
 	profileUsername,
 	profileFormValues,
+	userPk,
 }: FounderProfileDetailProps) {
-	const fallbackName = profile.name;
+	const fallbackName = profileUsername;
 	const [liveProfile, setLiveProfile] = useState<LiveProfileDisplay>(() =>
 		buildLiveProfileDisplay({
 			displayName,
 			fallbackName,
 			tagline,
+			location,
 			bio,
 			links,
 			tags,
@@ -291,13 +308,14 @@ export function FounderProfileDetail({
 				displayName,
 				fallbackName,
 				tagline,
+				location,
 				bio,
 				links,
 				tags,
 				profileFormValues,
 			}),
 		);
-	}, [bio, displayName, fallbackName, links, profileFormValues, tagline, tags]);
+	}, [profileUsername]);
 
 	const name = liveProfile.displayName;
 	const displayTagline = liveProfile.tagline;
@@ -332,10 +350,12 @@ export function FounderProfileDetail({
 						{displayTagline ? (
 							<Text variant="profile-role">{displayTagline}</Text>
 						) : null}
-						<Text variant="profile-location">
-							<MapPinIcon />
-							{profile.location}
-						</Text>
+						{liveProfile.location ? (
+							<Text variant="profile-location">
+								<MapPinIcon />
+								{liveProfile.location}
+							</Text>
+						) : null}
 
 						<Button
 							type="button"
@@ -390,7 +410,7 @@ export function FounderProfileDetail({
 
 					<div>
 						<div className="flex items-center justify-between gap-4">
-							{profile.openToMedia ? (
+							{openToMedia ? (
 								<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
 									<span className="size-1.5 rounded-full bg-violet-500" />
 									Open to media opportunities
@@ -414,63 +434,18 @@ export function FounderProfileDetail({
 							key={liveProfile.bio ?? "empty"}
 						/>
 
-						<section className="mt-10">
-							<Heading level={2} variant="label">
-								Gallery
-							</Heading>
-							<div className="mt-4 grid auto-rows-[120px] grid-cols-2 gap-3 sm:auto-rows-[140px] sm:grid-cols-3">
-								{profile.gallery.map((image) => (
-									<div
-										key={image.src}
-										className={`relative overflow-hidden rounded-2xl bg-gray-100 ${image.className ?? ""}`}
-									>
-										<Image
-											src={image.src}
-											alt={image.alt}
-											fill
-											sizes="(max-width: 640px) 50vw, 240px"
-											className="object-cover"
-										/>
-									</div>
-								))}
-							</div>
-						</section>
+						<ProfileGallerySection
+							displayName={name}
+							initialGallery={gallery}
+							profileUsername={profileUsername}
+							userPk={userPk}
+						/>
 
-						<section className="mt-10">
-							<Heading level={2} variant="label">
-								Featured in
-							</Heading>
-							<ul className="mt-4 divide-y divide-gray-200 rounded-2xl border border-gray-200">
-								{profile.featuredIn.map((item) => (
-									<li key={`${item.publication}-${item.year}`}>
-										<a
-											href={item.url}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="flex items-start gap-4 px-5 py-4 transition-colors hover:bg-gray-50"
-										>
-											<div className="min-w-0 flex-1">
-												<Text variant="sm">
-													<span className="font-semibold text-black">
-														{item.publication}
-													</span>
-													<span className="text-gray-500">
-														{" "}
-														&mdash; &ldquo;{item.title}&rdquo;
-													</span>
-												</Text>
-											</div>
-											<div className="flex shrink-0 items-center gap-3">
-												<span className="text-sm text-gray-400">
-													{item.year}
-												</span>
-												<ExternalLinkIcon />
-											</div>
-										</a>
-									</li>
-								))}
-							</ul>
-						</section>
+						<ProfileHighlightsSection
+							initialHighlights={highlights}
+							profileUsername={profileUsername}
+							userPk={userPk}
+						/>
 					</div>
 				</div>
 			</main>

@@ -15,6 +15,7 @@ import {
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { Navigation } from "@/components/Navigation";
+import { OpportunityFavouriteToggle } from "@/components/OpportunityFavouriteToggle";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import {
@@ -80,7 +81,7 @@ function ListPagination({
 	);
 }
 
-function OpportunityCard({
+export function OpportunityCard({
 	opportunity,
 	showEdit,
 }: {
@@ -91,57 +92,69 @@ function OpportunityCard({
 
 	return (
 		<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-			<Link
-				href={`/opportunity/${opportunity.id}`}
-				className="block min-w-0 flex-1 rounded-2xl border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
-			>
-				<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-					<div className="min-w-0 flex-1">
-						<div className="flex flex-wrap items-center gap-2">
-							<span className="rounded-full bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-								{opportunity.type}
-							</span>
-							<span
-								className={
-									isOpen
-										? "inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-[11px] font-semibold text-green-700"
-										: "inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600"
-								}
-							>
+			<div className="relative min-w-0 flex-1">
+				<div className="absolute right-4 top-4 z-10">
+					<OpportunityFavouriteToggle
+						isFavorited={opportunity.isFavorited}
+						opportunityId={Number(opportunity.id)}
+					/>
+				</div>
+				<Link
+					href={`/opportunity/${opportunity.id}`}
+					className="block rounded-2xl border border-gray-200 bg-white p-6 pr-16 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
+				>
+					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+						<div className="min-w-0 flex-1">
+							<div className="flex flex-wrap items-center gap-2">
+								<span className="rounded-full bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
+									{opportunity.type}
+								</span>
 								<span
 									className={
 										isOpen
-											? "size-1.5 rounded-full bg-green-500"
-											: "size-1.5 rounded-full bg-gray-400"
+											? "inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-[11px] font-semibold text-green-700"
+											: "inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-600"
 									}
-								/>
-								{isOpen ? "Open" : "Closed"}
-							</span>
+								>
+									<span
+										className={
+											isOpen
+												? "size-1.5 rounded-full bg-green-500"
+												: "size-1.5 rounded-full bg-gray-400"
+										}
+									/>
+									{isOpen ? "Open" : "Closed"}
+								</span>
+							</div>
+
+							<Heading level={2} variant="subsection" className="mt-3">
+								{opportunity.title}
+							</Heading>
+
+							<Text variant="card-body" className="mt-2 line-clamp-2">
+								{opportunity.shortDescription}
+							</Text>
+
+							<div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
+								<span>{opportunity.publication.name}</span>
+								<span aria-hidden>·</span>
+								<span>
+									{opportunity.hasApplicationDeadline
+										? `Apply by ${opportunity.deadline}`
+										: "Ongoing — no application deadline"}
+								</span>
+							</div>
 						</div>
 
-						<Heading level={2} variant="subsection" className="mt-3">
-							{opportunity.title}
-						</Heading>
-
-						<Text variant="card-body" className="mt-2 line-clamp-2">
-							{opportunity.shortDescription}
-						</Text>
-
-						<div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
-							<span>{opportunity.publication.name}</span>
-							<span aria-hidden>·</span>
-							<span>Deadline {opportunity.deadline}</span>
+						<div className="shrink-0 rounded-xl border border-violet-100 bg-violet-50/60 px-4 py-3 text-center sm:min-w-[7rem]">
+							<Text variant="detail-label">Match</Text>
+							<p className="mt-1 text-2xl font-bold text-violet-600">
+								{opportunity.matchScore}%
+							</p>
 						</div>
 					</div>
-
-					<div className="shrink-0 rounded-xl border border-violet-100 bg-violet-50/60 px-4 py-3 text-center sm:min-w-[7rem]">
-						<Text variant="detail-label">Match</Text>
-						<p className="mt-1 text-2xl font-bold text-violet-600">
-							{opportunity.matchScore}%
-						</p>
-					</div>
-				</div>
-			</Link>
+				</Link>
+			</div>
 
 			{showEdit ? (
 				<Button
@@ -159,7 +172,7 @@ function OpportunityCard({
 
 export function OpportunitiesList() {
 	const searchParams = useSearchParams();
-	const { authenticationChecked, isAdmin, isLoggedIn } = useAuthenticatedUser();
+	const { authenticationChecked, isLoggedIn } = useAuthenticatedUser();
 
 	const pageFromQuery = Number(searchParams.get("page")) || 1;
 	const currentPage = pageFromQuery >= 1 ? pageFromQuery : 1;
@@ -186,11 +199,6 @@ export function OpportunitiesList() {
 						Browse media opportunities matched to your profile.
 					</Text>
 				</div>
-				{authenticationChecked && isAdmin ? (
-					<Button href="/opportunity/create" textTransform="none">
-						New opportunity
-					</Button>
-				) : null}
 			</div>
 
 			<div className="mt-8">
@@ -220,10 +228,7 @@ export function OpportunitiesList() {
 						<ul className="mt-4 list-none space-y-4">
 							{opportunities.map((opportunity) => (
 								<li key={opportunity.id}>
-									<OpportunityCard
-										opportunity={opportunity}
-										showEdit={authenticationChecked && isAdmin}
-									/>
+									<OpportunityCard opportunity={opportunity} />
 								</li>
 							))}
 						</ul>

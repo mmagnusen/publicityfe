@@ -48,6 +48,11 @@ export function SidebarContent() {
 							Browse opportunities
 						</SidebarNavLink>
 					</li>
+					<li className="py-1">
+						<SidebarNavLink href="/favourites" onNavigate={onNavigate}>
+							Favourites
+						</SidebarNavLink>
+					</li>
 				</ul>
 			</section>
 
@@ -78,6 +83,14 @@ export function SidebarContent() {
 					<ul className="list-none">
 						<li className="py-1">
 							<SidebarNavLink
+								href="/admin/opportunities"
+								onNavigate={onNavigate}
+							>
+								All opportunities
+							</SidebarNavLink>
+						</li>
+						<li className="py-1">
+							<SidebarNavLink
 								href="/admin/media-outlets"
 								onNavigate={onNavigate}
 							>
@@ -98,6 +111,16 @@ export function SidebarContent() {
 					<SectionHeader title="Account" />
 				</div>
 				<ul className="list-none">
+					<li className="py-1">
+						<SidebarNavLink href="/billing" onNavigate={onNavigate}>
+							Billing
+						</SidebarNavLink>
+					</li>
+					<li className="py-1">
+						<SidebarNavLink href="/referrals" onNavigate={onNavigate}>
+							Referrals
+						</SidebarNavLink>
+					</li>
 					<li className="mt-4 border-t border-gray-200 pt-4">
 						<button
 							type="button"

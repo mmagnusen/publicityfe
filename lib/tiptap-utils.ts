@@ -301,3 +301,28 @@ export const unwrapMisstoredJsonStringTipTapDoc = (
 	}
 	return parseTipTapDocFromApi(text) ?? doc;
 };
+
+/** Parse a profile/API rich-text field into TipTap JSON for read-only rendering. */
+export const richTextDocFromApiField = (
+	raw: string | undefined | null,
+): JSONContent | null => {
+	const trimmed = raw?.trim();
+	if (!trimmed) {
+		return null;
+	}
+
+	const parsedDoc = parseTipTapDocFromApi(trimmed);
+	if (parsedDoc) {
+		return unwrapMisstoredJsonStringTipTapDoc(parsedDoc);
+	}
+
+	return {
+		type: "doc",
+		content: [
+			{
+				type: "paragraph",
+				content: [{ type: "text", text: trimmed }],
+			},
+		],
+	};
+};

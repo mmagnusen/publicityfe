@@ -1,21 +1,26 @@
 "use client";
 
+import { useMemo } from "react";
 import axios from "axios";
 import { Form, Formik } from "formik";
 
+import INPUT_TYPE from "@constants/inputTypes";
 import { getMediaOutletApiErrorMessage } from "@hooks/useMediaOutlets";
+import { useAllTags } from "@hooks/useTags";
 
 import Button from "@/components/Button";
 import Field from "@/components/FormikFields/Field";
 import InputField from "@/components/FormikFields/InputField";
+import SelectField from "@/components/FormikFields/SelectField";
 import Text from "@/components/Text";
+import { tagsToSelectOptions } from "@/lib/profileForm";
 import { type MediaOutletFormValues } from "./mediaOutletFormValues";
 
-const drfFieldMap: Partial<
-	Record<keyof MediaOutletFormValues, keyof MediaOutletFormValues>
-> = {
+const drfFieldMap: Partial<Record<string, keyof MediaOutletFormValues>> = {
 	name: "name",
 	website_url: "website_url",
+	founded_year: "founded_year",
+	tag_pks: "tags",
 };
 
 const validateMediaOutletForm = (values: MediaOutletFormValues) => {
@@ -33,6 +38,18 @@ const validateMediaOutletForm = (values: MediaOutletFormValues) => {
 			new URL(websiteUrl);
 		} catch {
 			errors.website_url = "Enter a valid URL";
+		}
+	}
+
+	const foundedYear = values.founded_year.trim();
+	if (foundedYear) {
+		const year = Number(foundedYear);
+		const currentYear = new Date().getFullYear();
+
+		if (!Number.isInteger(year)) {
+			errors.founded_year = "Enter a whole year";
+		} else if (year < 1000 || year > currentYear) {
+			errors.founded_year = `Enter a year between 1000 and ${currentYear}`;
 		}
 	}
 
@@ -56,6 +73,13 @@ export function MediaOutletForm({
 	onDelete,
 	isDeleting,
 }: Props) {
+	const {
+		data: tags,
+		error: tagsError,
+		isLoading: isLoadingTags,
+	} = useAllTags();
+	const tagOptions = useMemo(() => tagsToSelectOptions(tags ?? []), [tags]);
+
 	return (
 		<Formik<MediaOutletFormValues>
 			enableReinitialize
@@ -76,7 +100,7 @@ export function MediaOutletForm({
 						!Array.isArray(body)
 					) {
 						for (const [key, val] of Object.entries(body)) {
-							const fieldName = drfFieldMap[key as keyof MediaOutletFormValues];
+							const fieldName = drfFieldMap[key];
 							if (
 								fieldName &&
 								Array.isArray(val) &&
@@ -110,6 +134,32 @@ export function MediaOutletForm({
 							strHelperMessage="Full URL including https://"
 						/>
 					</Field>
+
+					<Field fieldLabel="Founded year" fieldName="founded_year">
+						<InputField
+							name="founded_year"
+							placeHolder="1995"
+							strHelperMessage="Optional — year the outlet was founded"
+							type={INPUT_TYPE.NUMBER}
+						/>
+					</Field>
+
+					<Field fieldLabel="Tags" fieldName="tags">
+						<SelectField
+							arrOptions={tagOptions}
+							isDisabled={isLoadingTags}
+							isMulti
+							isSearchable
+							name="tags"
+							placeholder={isLoadingTags ? "Loading tags…" : "Select tags"}
+						/>
+					</Field>
+
+					{tagsError ? (
+						<Text variant="error">
+							Could not load tags. Try refreshing the page.
+						</Text>
+					) : null}
 
 					{status ? <Text variant="error">{status}</Text> : null}
 

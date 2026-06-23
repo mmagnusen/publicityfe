@@ -1,9 +1,12 @@
 "use client";
 
-import { type FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Form, Formik, type FormikHelpers } from "formik";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import InputField from "@components/FormikFields/InputField";
+import INPUT_TYPE from "@constants/inputTypes";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import useErrorReport from "@hooks/useErrorReport";
 import { isLikelyNetworkError } from "@util/errorReporting";
@@ -11,6 +14,9 @@ import { parseLoginApiError } from "@util/loginApiErrors";
 
 import Button from "@/components/Button";
 import Text from "@/components/Text";
+import validationSchema, {
+	type LoginFormValues,
+} from "./login-form-validation";
 
 export function LoginForm() {
 	const router = useRouter();
@@ -19,10 +25,7 @@ export function LoginForm() {
 	const { reportError } = useErrorReport({
 		functionNamePrefix: "LoginForm",
 	});
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [error, setError] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [formError, setFormError] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (authenticationChecked && isLoggedIn) {
@@ -30,25 +33,49 @@ export function LoginForm() {
 		}
 	}, [authenticationChecked, isLoggedIn, router]);
 
-	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		setError(null);
-		setIsSubmitting(true);
+	const submitLogin = async (
+		formikValues: LoginFormValues,
+		{ setFieldError }: FormikHelpers<LoginFormValues>,
+	) => {
+		const fallbackMessage =
+			"Unable to sign in. Please check your details and try again.";
+
+		if (authenticationChecked && isLoggedIn) {
+			router.replace("/dashboard");
+			return;
+		}
 
 		try {
-			await funcLogin(email, password);
+			setFormError(null);
+			setFieldError("email", undefined);
+			setFieldError("password", undefined);
+
+			await funcLogin(formikValues.email, formikValues.password);
 			router.replace("/dashboard");
-		} catch (submitError: unknown) {
-			const { formMessage } = parseLoginApiError(submitError);
-			setError(
-				formMessage ??
-					(isLikelyNetworkError(submitError)
+		} catch (error: unknown) {
+			const { formMessage, email, password } = parseLoginApiError(error);
+
+			if (email) {
+				setFieldError("email", email);
+			}
+			if (password) {
+				setFieldError("password", password);
+			}
+			if (formMessage) {
+				setFormError(formMessage);
+			} else if (!email && !password) {
+				setFormError(
+					isLikelyNetworkError(error)
 						? "Unable to reach the server. Check your connection and try again."
-						: "Unable to sign in. Please check your details and try again."),
-			);
-			reportError(submitError, "login_submit");
-		} finally {
-			setIsSubmitting(false);
+						: fallbackMessage,
+				);
+			} else {
+				setFormError(null);
+			}
+
+			reportError(error, "login_email_password_submit", {
+				scrubRequestKeys: ["password"],
+			});
 		}
 	};
 
@@ -57,66 +84,71 @@ export function LoginForm() {
 	}
 
 	return (
-		<form className="space-y-5" onSubmit={handleSubmit}>
-			{error ? (
-				<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-					{error}
-				</div>
-			) : null}
+		<Formik
+			initialValues={{
+				email: "",
+				password: "",
+			}}
+			onSubmit={submitLogin}
+			validationSchema={validationSchema}
+		>
+			{({ isSubmitting, setFieldError }) => {
+				const clearErrorsOnChange = () => {
+					setFormError(null);
+				};
 
-			<div>
-				<label htmlFor="email" className="block text-sm font-medium text-black">
-					Email
-				</label>
-				<input
-					id="email"
-					name="email"
-					type="email"
-					autoComplete="email"
-					required
-					value={email}
-					onChange={(event) => setEmail(event.target.value)}
-					placeholder="you@example.com"
-					className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-gray-400 focus:border-black"
-				/>
-			</div>
+				return (
+					<Form className="space-y-5">
+						{formError ? (
+							<div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+								{formError}
+							</div>
+						) : null}
 
-			<div>
-				<div className="flex items-center justify-between">
-					<label
-						htmlFor="password"
-						className="block text-sm font-medium text-black"
-					>
-						Password
-					</label>
-					<Link
-						href="#"
-						className="text-sm text-gray-500 transition-colors hover:text-black"
-					>
-						Forgot password?
-					</Link>
-				</div>
-				<input
-					id="password"
-					name="password"
-					type="password"
-					autoComplete="current-password"
-					required
-					value={password}
-					onChange={(event) => setPassword(event.target.value)}
-					placeholder="Enter your password"
-					className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-black outline-none transition-colors placeholder:text-gray-400 focus:border-black"
-				/>
-			</div>
+						<InputField
+							name="email"
+							onChangeCallback={() => {
+								clearErrorsOnChange();
+								setFieldError("email", undefined);
+							}}
+							placeHolder="you@example.com"
+							strLabel="Email"
+							type={INPUT_TYPE.EMAIL}
+						/>
 
-			<Button
-				type="submit"
-				bLoading={isSubmitting}
-				isFullWidth
-				textTransform="none"
-			>
-				{isSubmitting ? "Signing in…" : "Sign In"}
-			</Button>
-		</form>
+						<div>
+							<div className="flex items-center justify-between">
+								<span className="text-sm font-medium text-black">Password</span>
+								<Link
+									href="#"
+									className="text-sm text-gray-500 transition-colors hover:text-black"
+								>
+									Forgot password?
+								</Link>
+							</div>
+							<InputField
+								name="password"
+								nstrAutoComplete="current-password"
+								onChangeCallback={() => {
+									clearErrorsOnChange();
+									setFieldError("password", undefined);
+								}}
+								placeHolder="Enter your password"
+								type={INPUT_TYPE.PASSWORD}
+							/>
+						</div>
+
+						<Button
+							type="submit"
+							bLoading={isSubmitting}
+							isFullWidth
+							textTransform="none"
+						>
+							{isSubmitting ? "Signing in…" : "Sign In"}
+						</Button>
+					</Form>
+				);
+			}}
+		</Formik>
 	);
 }

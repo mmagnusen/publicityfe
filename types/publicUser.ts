@@ -1,3 +1,4 @@
+import type { ProfileHighlight } from "@customTypes/profileHighlight";
 import type { Tag } from "@customTypes/tag";
 import type { GalleryAsset } from "@hooks/useAdvertisement";
 
@@ -19,11 +20,13 @@ export type PublicUser = {
 		linked_in_url: string;
 		personal_website_url: string;
 		bio: string;
+		short_description?: string;
 		tagline?: string;
 		/** Legacy alias; prefer `tagline`. */
 		headline?: string;
 	};
 	customusergalleryasset_set: GalleryAsset[];
+	profile_links?: ProfileHighlight[];
 	has_active_subscription: boolean;
 	email_verified: boolean;
 	identity_verified: boolean;

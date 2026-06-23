@@ -16,6 +16,7 @@ export type ProfileFormValues = {
 	first_name: string;
 	last_name: string;
 	bio: RichTextContent;
+	short_description: RichTextContent;
 	headline: string;
 	city: string;
 	personal_website_url: string;
@@ -42,7 +43,7 @@ const tipTapDocHasContent = (json: unknown): boolean => {
 	);
 };
 
-const emptyBio = (): RichTextContent => ({
+const emptyRichText = (): RichTextContent => ({
 	...RichTextDefaultValues,
 	editorJSON: emptyTipTapDoc(),
 });
@@ -62,7 +63,7 @@ const plainTextToTipTapDoc = (text: string): JSONContent => {
 	};
 };
 
-const bioToRichText = (raw: string | undefined): RichTextContent => {
+const richTextFromApiField = (raw: string | undefined): RichTextContent => {
 	const parsedDoc = parseTipTapDocFromApi(raw);
 	if (parsedDoc) {
 		return {
@@ -80,7 +81,7 @@ const bioToRichText = (raw: string | undefined): RichTextContent => {
 		};
 	}
 
-	return emptyBio();
+	return emptyRichText();
 };
 
 export const bioToApiField = (rich: RichTextContent): string => {
@@ -113,7 +114,10 @@ export const profileFormValuesFromPublicUser = (
 ): ProfileFormValues => ({
 	first_name: user.first_name ?? "",
 	last_name: user.last_name ?? "",
-	bio: bioToRichText(user.human_profile?.bio),
+	bio: richTextFromApiField(user.human_profile?.bio),
+	short_description: richTextFromApiField(
+		user.human_profile?.short_description,
+	),
 	headline: user.human_profile?.tagline ?? user.human_profile?.headline ?? "",
 	city: user.human_profile?.city ?? "",
 	personal_website_url: user.human_profile?.personal_website_url ?? "",

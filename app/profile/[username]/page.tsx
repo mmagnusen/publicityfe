@@ -9,7 +9,6 @@ import {
 	profileFormValuesFromPublicUser,
 	profileLinksFromPublicUser,
 } from "@/lib/profileForm";
-import { getProfile } from "@/lib/profiles";
 import {
 	fetchPublicUserByUsername,
 	publicUserDisplayName,
@@ -25,8 +24,7 @@ export async function generateMetadata({
 }: ProfilePageProps): Promise<Metadata> {
 	const { username } = await params;
 	const apiUser = await fetchPublicUserByUsername(decodeURIComponent(username));
-	const mockProfile = apiUser ? getProfile(String(apiUser.pk)) : null;
-	const name = apiUser ? publicUserDisplayName(apiUser) : mockProfile?.name;
+	const name = apiUser ? publicUserDisplayName(apiUser) : null;
 
 	if (!name) {
 		return { title: "Profile not found — Spotlight" };
@@ -35,8 +33,7 @@ export async function generateMetadata({
 	return {
 		title: `${name} — Spotlight`,
 		description:
-			tipTapApiValueToPlainText(apiUser?.human_profile?.bio) ||
-			mockProfile?.bio[0],
+			tipTapApiValueToPlainText(apiUser?.human_profile?.bio) || undefined,
 	};
 }
 
@@ -48,25 +45,22 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 		notFound();
 	}
 
-	const profile = getProfile(String(apiUser.pk));
-
-	if (!profile) {
-		notFound();
-	}
-
 	return (
 		<FounderProfileDetail
-			profile={profile}
 			displayName={publicUserDisplayName(apiUser)}
 			avatarUrl={apiUser.human_profile?.profile_image_url}
+			location={apiUser.human_profile?.city}
 			tagline={
 				apiUser.human_profile?.tagline ?? apiUser.human_profile?.headline
 			}
 			bio={apiUser.human_profile?.bio}
 			links={profileLinksFromPublicUser(apiUser)}
 			tags={apiUser.tags ?? []}
+			gallery={apiUser.customusergalleryasset_set ?? []}
+			highlights={apiUser.profile_links ?? []}
 			profileUsername={apiUser.username}
 			profileFormValues={profileFormValuesFromPublicUser(apiUser)}
+			userPk={apiUser.pk}
 		/>
 	);
 }

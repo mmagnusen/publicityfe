@@ -1,6 +1,15 @@
 import type { MediaOutlet } from "@customTypes/mediaOutlet";
 import type { ApiOpportunity } from "@customTypes/opportunity";
-import { tipTapApiValueToPlainText } from "@lib/tiptap-utils";
+import type { PublicUser } from "@customTypes/publicUser";
+import type { Tag } from "@customTypes/tag";
+import {
+	richTextDocFromApiField,
+	tipTapApiValueToPlainText,
+} from "@lib/tiptap-utils";
+import type { JSONContent } from "@tiptap/react";
+
+import { resolveBytescaleDisplayUrl } from "@/components/UploadButton";
+import { profilePagePath, publicUserDisplayName } from "@/lib/publicUser";
 
 export type Opportunity = {
 	id: string;
@@ -10,16 +19,18 @@ export type Opportunity = {
 	description: string;
 	shortDescription: string;
 	requirements: string[];
+	hasApplicationDeadline: boolean;
 	deadline: string;
 	interviewWindow: string;
 	articleType: string;
 	location: string;
 	matchScore: number;
+	isFavorited: boolean;
 	reporter: {
 		name: string;
 		title: string;
 		publication: string;
-		bio: string;
+		shortDescription: JSONContent | null;
 		profileUrl: string;
 		avatarUrl: string;
 	};
@@ -27,10 +38,8 @@ export type Opportunity = {
 		name: string;
 		slug: string;
 		url: string;
-		category: string;
-		monthlyReaders: string;
-		printCirculation: string;
-		founded: string;
+		foundedYear: number | null;
+		tags: Tag[];
 	};
 };
 
@@ -42,9 +51,9 @@ type MockTemplate = Pick<
 	| "interviewWindow"
 	| "articleType"
 	| "location"
-	| "reporter"
-	| "publication"
 >;
+
+const DEFAULT_REPORTER_AVATAR = "/opportunity/reporter.jpg";
 
 const MOCK_TEMPLATES: MockTemplate[] = [
 	{
@@ -58,23 +67,6 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		interviewWindow: "16 – 27 June 2026",
 		articleType: "Long-form feature (print + digital)",
 		location: "Remote — phone or video call",
-		reporter: {
-			name: "Priya Mehta",
-			title: "Senior Staff Writer",
-			publication: "Fast Company",
-			bio: "Priya covers the intersection of technology and work culture. Her features have appeared in Fast Company, Quartz, and MIT Technology Review.",
-			profileUrl: "https://www.fastcompany.com",
-			avatarUrl: "/opportunity/reporter.jpg",
-		},
-		publication: {
-			name: "Fast Company",
-			slug: "FC",
-			url: "https://www.fastcompany.com",
-			category: "Business & Technology",
-			monthlyReaders: "9.4 million",
-			printCirculation: "725,000 copies",
-			founded: "1995 · New York, NY",
-		},
 	},
 	{
 		type: "Podcast Interview",
@@ -87,23 +79,6 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		interviewWindow: "1 – 8 July 2026",
 		articleType: "45-minute interview episode",
 		location: "Remote — Riverside or Zoom",
-		reporter: {
-			name: "Marcus Chen",
-			title: "Host & Producer",
-			publication: "The Growth Ledger",
-			bio: "Marcus interviews founders and operators building category-defining companies. The show reaches 120k listeners per episode.",
-			profileUrl: "https://example.com/growth-ledger",
-			avatarUrl: "/opportunity/reporter.jpg",
-		},
-		publication: {
-			name: "The Growth Ledger",
-			slug: "TGL",
-			url: "https://example.com/growth-ledger",
-			category: "Business Podcast",
-			monthlyReaders: "480,000 downloads",
-			printCirculation: "N/A",
-			founded: "2019 · Remote",
-		},
 	},
 	{
 		type: "Conference Panel",
@@ -116,28 +91,56 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		interviewWindow: "14 – 20 July 2026",
 		articleType: "45-minute panel discussion",
 		location: "London, UK — in person",
-		reporter: {
-			name: "Elena Rodriguez",
-			title: "Programme Director",
-			publication: "Future Work Summit",
-			bio: "Elena curates speaker line-ups for Europe's leading future-of-work conference, drawing 2,000 attendees annually.",
-			profileUrl: "https://example.com/future-work-summit",
-			avatarUrl: "/opportunity/reporter.jpg",
-		},
-		publication: {
-			name: "Future Work Summit",
-			slug: "FWS",
-			url: "https://example.com/future-work-summit",
-			category: "Industry Conference",
-			monthlyReaders: "2,000 attendees",
-			printCirculation: "N/A",
-			founded: "2016 · London, UK",
-		},
 	},
 ];
 
 const pickMockTemplate = (pk: number): MockTemplate =>
 	MOCK_TEMPLATES[pk % MOCK_TEMPLATES.length] ?? MOCK_TEMPLATES[0];
+
+export const formatApplicationDeadlineDisplay = (
+	applicationDeadline: string | null | undefined,
+): string => {
+	const trimmed = applicationDeadline?.trim();
+	if (!trimmed) {
+		return "";
+	}
+
+	const match = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2})/);
+	if (match) {
+		const [, year, month, day, hour] = match;
+		const date = new Date(
+			Number(year),
+			Number(month) - 1,
+			Number(day),
+			Number(hour),
+		);
+
+		return date.toLocaleString("en-GB", {
+			weekday: "long",
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		});
+	}
+
+	const date = new Date(trimmed);
+	if (Number.isNaN(date.getTime())) {
+		return trimmed;
+	}
+
+	return date.toLocaleString("en-GB", {
+		weekday: "long",
+		day: "numeric",
+		month: "long",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+	});
+};
 
 const publicationSlugFromName = (name: string): string => {
 	const initials = name
@@ -149,44 +152,177 @@ const publicationSlugFromName = (name: string): string => {
 	return initials.slice(0, 3) || "MO";
 };
 
+export const mapMediaOutletToPublication = (
+	outlet: MediaOutlet,
+): Opportunity["publication"] => {
+	const name = outlet.name.trim() || "Publication";
+
+	return {
+		name,
+		slug: publicationSlugFromName(name),
+		url: outlet.website_url.trim(),
+		foundedYear: outlet.founded_year ?? null,
+		tags: outlet.tags ?? [],
+	};
+};
+
+export const publicationFromOpportunityFallback = (
+	name: string,
+	url = "",
+): Opportunity["publication"] => {
+	const trimmedName = name.trim() || "Publication";
+
+	return {
+		name: trimmedName,
+		slug: publicationSlugFromName(trimmedName),
+		url: url.trim(),
+		foundedYear: null,
+		tags: [],
+	};
+};
+
+export const opportunityCreatorUsername = (
+	api: ApiOpportunity,
+): string | null => {
+	const flatUsername = api.creator_username?.trim();
+	if (flatUsername) {
+		return flatUsername;
+	}
+
+	const creator = api.creator;
+	if (creator != null && typeof creator === "object") {
+		const nestedUsername = creator.username?.trim();
+		if (nestedUsername) {
+			return nestedUsername;
+		}
+	}
+
+	return null;
+};
+
+export const opportunityCreatorPk = (api: ApiOpportunity): number | null => {
+	const flatPk = api.creator_pk;
+	if (flatPk != null && flatPk > 0) {
+		return flatPk;
+	}
+
+	const creator = api.creator;
+	if (typeof creator === "number" && creator > 0) {
+		return creator;
+	}
+
+	if (creator != null && typeof creator === "object") {
+		const nestedPk = creator.pk;
+		if (nestedPk != null && nestedPk > 0) {
+			return nestedPk;
+		}
+	}
+
+	return null;
+};
+
+const profileShortDescriptionRichText = (
+	user: PublicUser,
+): JSONContent | null =>
+	richTextDocFromApiField(user.human_profile?.short_description);
+
+export const emptyReporter = (
+	publicationName: string,
+	profileUrl = "",
+): Opportunity["reporter"] => ({
+	name: "",
+	title: "",
+	publication: publicationName,
+	shortDescription: null,
+	profileUrl,
+	avatarUrl: DEFAULT_REPORTER_AVATAR,
+});
+
+export const mapPublicUserToReporter = (
+	user: PublicUser,
+	publicationName: string,
+): Opportunity["reporter"] => {
+	const profile = user.human_profile;
+	const avatarUrl =
+		resolveBytescaleDisplayUrl(profile?.profile_image_url) ||
+		DEFAULT_REPORTER_AVATAR;
+
+	return {
+		name: publicUserDisplayName(user),
+		title: profile?.tagline?.trim() || "",
+		publication: publicationName,
+		shortDescription: profileShortDescriptionRichText(user),
+		profileUrl: profilePagePath(user.username),
+		avatarUrl,
+	};
+};
+
 export const mapApiOpportunityToDisplay = (
 	api: ApiOpportunity,
 	mediaOutlet?: MediaOutlet | null,
 ): Opportunity => {
 	const template = pickMockTemplate(api.pk);
 	const shortDescription =
-		api.short_description.trim() ||
+		api.short_description?.trim() ||
 		tipTapApiValueToPlainText(api.full_description);
 	const description =
 		tipTapApiValueToPlainText(api.full_description) ||
-		api.short_description.trim();
+		api.short_description?.trim() ||
+		"";
 	const publicationName =
-		mediaOutlet?.name?.trim() ||
-		api.media_outlet_name?.trim() ||
-		template.publication.name;
-	const publicationUrl =
-		mediaOutlet?.website_url?.trim() || template.publication.url;
+		mediaOutlet?.name?.trim() || api.media_outlet_name?.trim() || "Publication";
+	const publicationUrl = mediaOutlet?.website_url?.trim() || "";
+	const creatorUsername = opportunityCreatorUsername(api);
+	const publication = mediaOutlet
+		? mapMediaOutletToPublication(mediaOutlet)
+		: publicationFromOpportunityFallback(publicationName, publicationUrl);
+	const applicationDeadline = api.application_deadline?.trim() || null;
+	const hasApplicationDeadline = Boolean(applicationDeadline);
 
 	return {
 		id: String(api.pk),
 		status: "open",
-		title: api.title,
+		title: api.title?.trim() || "Untitled opportunity",
 		shortDescription,
 		description,
 		matchScore: 70 + (api.pk % 28),
 		...template,
+		hasApplicationDeadline,
+		deadline: hasApplicationDeadline
+			? formatApplicationDeadlineDisplay(applicationDeadline)
+			: "",
+		isFavorited: Boolean(api.is_favorited),
+		reporter: emptyReporter(
+			publicationName,
+			creatorUsername ? profilePagePath(creatorUsername) : "",
+		),
+		publication,
+	};
+};
+
+export const applyMediaOutletToOpportunity = (
+	opportunity: Opportunity,
+	mediaOutlet: MediaOutlet,
+): Opportunity => {
+	const publication = mapMediaOutletToPublication(mediaOutlet);
+
+	return {
+		...opportunity,
+		publication,
 		reporter: {
-			...template.reporter,
-			publication: publicationName,
-		},
-		publication: {
-			...template.publication,
-			name: publicationName,
-			url: publicationUrl,
-			slug: publicationSlugFromName(publicationName),
+			...opportunity.reporter,
+			publication: publication.name,
 		},
 	};
 };
+
+export const applyCreatorToOpportunity = (
+	opportunity: Opportunity,
+	creator: PublicUser,
+): Opportunity => ({
+	...opportunity,
+	reporter: mapPublicUserToReporter(creator, opportunity.reporter.publication),
+});
 
 export const mapApiOpportunitiesToDisplay = (
 	items: ApiOpportunity[],

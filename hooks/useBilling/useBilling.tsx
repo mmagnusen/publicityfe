@@ -129,23 +129,21 @@ export const useBilling = () => {
 				case 1:
 					return {
 						id: 1,
-						name: plan.name ?? "Paid account",
+						name: plan.name ?? "Pro",
 						price: {
 							amount: (plan.price_pence ?? 0) / 100,
 							accessLength: `${plan.duration_months ?? 0} months access`,
 							inPence: plan.price_pence ?? 0,
 						},
-						tagline: "Everything you need to find your perfect room/housemate",
+						tagline: "Full access to everything Spotlight has to offer.",
 						benefits: [
-							"View all listings",
-							"Post room wanted/offered listings",
-							"Save favourite listings",
-							"Daily email alerts for new rooms",
-							"Create a rich profile",
-							"Verify your profile",
-							"Unlimited messages to anyone on Delphi",
-							"Your listings are reposted on instagram for extra visibility (optional)",
-							"Priority customer support",
+							"Unlimited opportunity matches",
+							"AI-powered smart matching",
+							"Priority profile placement",
+							"Real-time instant alerts",
+							"Analytics & visibility dashboard",
+							"Dedicated media relations support",
+							"No commission on paid opportunities",
 						],
 						badge: {
 							theme: "green",
@@ -160,7 +158,7 @@ export const useBilling = () => {
 									>
 										<Button borderRadius="pill" isFullWidth>
 											<span className={ctaButtonVariants()}>
-												Get premium access
+												Get Pro access
 											</span>
 										</Button>
 									</Link>
@@ -194,7 +192,7 @@ export const useBilling = () => {
 									<Link href={`/pricing/payment/${plan.id}`} passHref>
 										<Button borderRadius="pill" isFullWidth>
 											<span className={ctaButtonVariants()}>
-												Get premium access
+												Get Pro access
 											</span>
 										</Button>
 									</Link>

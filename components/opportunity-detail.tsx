@@ -2,10 +2,40 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import RichTextRenderer from "@components/RichTextRenderer";
+
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
+import { OpportunityFavouriteToggle } from "@/components/OpportunityFavouriteToggle";
+import Tag from "@/components/Tag";
 import Text from "@/components/Text";
 import type { Opportunity } from "@/lib/opportunities";
+
+function ReporterAvatar({
+	name,
+	avatarUrl,
+}: {
+	name: string;
+	avatarUrl: string;
+}) {
+	if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+		return (
+			// Profile images come from Bytescale CDN URLs — not in next/image config.
+			// eslint-disable-next-line @next/next/no-img-element
+			<img src={avatarUrl} alt={name} className="size-full object-cover" />
+		);
+	}
+
+	return (
+		<Image
+			src={avatarUrl}
+			alt={name}
+			fill
+			sizes="64px"
+			className="object-cover"
+		/>
+	);
+}
 
 function CheckIcon() {
 	return (
@@ -43,26 +73,6 @@ function ExternalLinkIcon() {
 	);
 }
 
-function ClockIcon() {
-	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Clock</title>
-			<circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
-			<path
-				d="M10 6v4l2.5 2.5"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinecap="round"
-			/>
-		</svg>
-	);
-}
-
 function CalendarIcon() {
 	return (
 		<svg
@@ -88,142 +98,6 @@ function CalendarIcon() {
 				strokeLinecap="round"
 			/>
 		</svg>
-	);
-}
-
-function BookIcon() {
-	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Book</title>
-			<path
-				d="M4 4h5a2 2 0 0 1 2 2v10H6a2 2 0 0 0-2 2V4Zm6 2h5a2 2 0 0 1 2 2v8h-7V6Z"
-				stroke="currentColor"
-				strokeWidth="1.5"
-				strokeLinejoin="round"
-			/>
-		</svg>
-	);
-}
-
-function MapPinIcon() {
-	return (
-		<svg
-			viewBox="0 0 20 20"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Location</title>
-			<path
-				d="M10 17s5-4.5 5-9a5 5 0 1 0-10 0c0 4.5 5 9 5 9Z"
-				stroke="currentColor"
-				strokeWidth="1.5"
-			/>
-			<circle cx="10" cy="8" r="1.5" fill="currentColor" />
-		</svg>
-	);
-}
-
-function GlobeIcon() {
-	return (
-		<svg
-			viewBox="0 0 16 16"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Globe</title>
-			<circle cx="8" cy="8" r="6" stroke="currentColor" strokeWidth="1.25" />
-			<path
-				d="M2 8h12M8 2c2 2 2 10 0 12M8 2c-2 2-2 10 0 12"
-				stroke="currentColor"
-				strokeWidth="1.25"
-			/>
-		</svg>
-	);
-}
-
-function UsersIcon() {
-	return (
-		<svg
-			viewBox="0 0 16 16"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Readers</title>
-			<circle cx="6" cy="5" r="2" stroke="currentColor" strokeWidth="1.25" />
-			<path
-				d="M2 13c0-2.2 1.8-4 4-4s4 1.8 4 4"
-				stroke="currentColor"
-				strokeWidth="1.25"
-				strokeLinecap="round"
-			/>
-			<circle
-				cx="11.5"
-				cy="5.5"
-				r="1.5"
-				stroke="currentColor"
-				strokeWidth="1.25"
-			/>
-			<path
-				d="M10 13c.3-1.5 1.4-2.5 3-2.5"
-				stroke="currentColor"
-				strokeWidth="1.25"
-				strokeLinecap="round"
-			/>
-		</svg>
-	);
-}
-
-function NewspaperIcon() {
-	return (
-		<svg
-			viewBox="0 0 16 16"
-			fill="none"
-			className="size-4 text-gray-400"
-			aria-hidden
-		>
-			<title>Newspaper</title>
-			<rect
-				x="2"
-				y="3"
-				width="12"
-				height="10"
-				rx="1"
-				stroke="currentColor"
-				strokeWidth="1.25"
-			/>
-			<path
-				d="M5 6h4M5 9h6"
-				stroke="currentColor"
-				strokeWidth="1.25"
-				strokeLinecap="round"
-			/>
-		</svg>
-	);
-}
-
-function DetailCard({
-	icon,
-	label,
-	value,
-}: {
-	icon: ReactNode;
-	label: string;
-	value: string;
-}) {
-	return (
-		<div className="rounded-xl border border-gray-200 bg-white p-4">
-			<div className="mb-3">{icon}</div>
-			<Text variant="detail-label">{label}</Text>
-			<Text variant="detail-value">{value}</Text>
-		</div>
 	);
 }
 
@@ -256,6 +130,7 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 		/^https?:\/\//,
 		"",
 	);
+	const showPublicationDomain = publicationDomain.length > 0;
 
 	return (
 		<div className="min-h-full bg-white font-sans">
@@ -289,6 +164,22 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 							</span>
 						</div>
 
+						<p className="mt-3 flex items-center gap-2 text-sm text-gray-600">
+							<CalendarIcon />
+							{opportunity.hasApplicationDeadline ? (
+								<>
+									Application deadline:{" "}
+									<span className="font-medium text-gray-900">
+										{opportunity.deadline}
+									</span>
+								</>
+							) : (
+								<span className="font-medium text-gray-900">
+									Ongoing — no application deadline
+								</span>
+							)}
+						</p>
+
 						<Heading level={1} variant="page-detail">
 							{opportunity.title}
 						</Heading>
@@ -314,30 +205,7 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 							</ul>
 						</div>
 
-						<div className="mt-6 grid gap-4 sm:grid-cols-2">
-							<DetailCard
-								icon={<ClockIcon />}
-								label="Deadline"
-								value={opportunity.deadline}
-							/>
-							<DetailCard
-								icon={<CalendarIcon />}
-								label="Interview window"
-								value={opportunity.interviewWindow}
-							/>
-							<DetailCard
-								icon={<BookIcon />}
-								label="Article type"
-								value={opportunity.articleType}
-							/>
-							<DetailCard
-								icon={<MapPinIcon />}
-								label="Location"
-								value={opportunity.location}
-							/>
-						</div>
-
-						<div className="mt-8 flex flex-col gap-3 sm:flex-row">
+						<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
 							<Button type="button" borderRadius="large" textTransform="none">
 								<span className="inline-flex items-center justify-center gap-2">
 									<svg
@@ -382,6 +250,11 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 									Pass
 								</span>
 							</Button>
+							<OpportunityFavouriteToggle
+								isFavorited={opportunity.isFavorited}
+								opportunityId={Number(opportunity.id)}
+								variant="button"
+							/>
 						</div>
 					</div>
 
@@ -390,24 +263,28 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 							<div className="h-16 bg-linear-to-r from-violet-100 via-fuchsia-50 to-orange-50" />
 							<div className="px-6 pb-6">
 								<div className="-mt-8 relative mx-auto size-16 overflow-hidden rounded-full border-4 border-white bg-gray-200">
-									<Image
-										src={opportunity.reporter.avatarUrl}
-										alt={opportunity.reporter.name}
-										fill
-										sizes="64px"
-										className="object-cover"
+									<ReporterAvatar
+										name={opportunity.reporter.name}
+										avatarUrl={opportunity.reporter.avatarUrl}
 									/>
 								</div>
 								<div className="mt-4 text-center">
 									<Heading level={3}>{opportunity.reporter.name}</Heading>
-									<Text variant="reporter-title">
-										{opportunity.reporter.title}
-									</Text>
+									{opportunity.reporter.title ? (
+										<Text variant="reporter-title">
+											{opportunity.reporter.title}
+										</Text>
+									) : null}
 									<Text variant="reporter-publication">
 										{opportunity.reporter.publication}
 									</Text>
 								</div>
-								<Text variant="reporter-bio">{opportunity.reporter.bio}</Text>
+								{opportunity.reporter.shortDescription ? (
+									<RichTextRenderer
+										className="mt-4 text-center text-sm leading-relaxed text-gray-500 [&_p]:text-center [&_p]:text-sm [&_p]:text-gray-500"
+										richText={opportunity.reporter.shortDescription}
+									/>
+								) : null}
 								<a
 									href={opportunity.reporter.profileUrl}
 									target="_blank"
@@ -429,61 +306,48 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 									<Text variant="publication-name">
 										{opportunity.publication.name}
 									</Text>
-									<Text variant="publication-domain">{publicationDomain}</Text>
+									{showPublicationDomain ? (
+										<Text variant="publication-domain">
+											{publicationDomain}
+										</Text>
+									) : null}
 								</div>
 							</div>
 
-							<div className="mt-5 space-y-4">
-								<PublicationStat
-									icon={<GlobeIcon />}
-									label="Category"
-									value={opportunity.publication.category}
-								/>
-								<PublicationStat
-									icon={<UsersIcon />}
-									label="Monthly readers"
-									value={opportunity.publication.monthlyReaders}
-								/>
-								<PublicationStat
-									icon={<NewspaperIcon />}
-									label="Print circulation"
-									value={opportunity.publication.printCirculation}
-								/>
-								<PublicationStat
-									icon={<CalendarIcon />}
-									label="Founded"
-									value={opportunity.publication.founded}
-								/>
-							</div>
+							{opportunity.publication.foundedYear != null ? (
+								<div className="mt-5 space-y-4">
+									<PublicationStat
+										icon={<CalendarIcon />}
+										label="Founded"
+										value={String(opportunity.publication.foundedYear)}
+									/>
+								</div>
+							) : null}
 
-							<a
-								href={opportunity.publication.url}
-								target="_blank"
-								rel="noopener noreferrer"
-								className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gray-50"
-							>
-								Visit publication
-								<ExternalLinkIcon />
-							</a>
-						</div>
+							{opportunity.publication.tags.length > 0 ? (
+								<div className="mt-5">
+									<Text variant="detail-label">Tags</Text>
+									<ul className="mt-2 flex flex-wrap gap-2">
+										{opportunity.publication.tags.map((tag) => (
+											<li key={tag.pk}>
+												<Tag skin="alt">{tag.name}</Tag>
+											</li>
+										))}
+									</ul>
+								</div>
+							) : null}
 
-						<div className="rounded-2xl border border-violet-100 bg-violet-50/60 p-6">
-							<Text variant="sidebar-heading">Your match score</Text>
-							<Text variant="match-score">
-								<span className="text-3xl font-bold text-violet-600">
-									{opportunity.matchScore}%
-								</span>{" "}
-								<span className="text-sm text-gray-500">compatibility</span>
-							</Text>
-							<div className="mt-4 h-2 overflow-hidden rounded-full bg-violet-100">
-								<div
-									className="h-full rounded-full bg-linear-to-r from-violet-500 to-fuchsia-500"
-									style={{ width: `${opportunity.matchScore}%` }}
-								/>
-							</div>
-							<Text variant="sidebar-footnote">
-								Based on your profile, expertise tags, and past placements.
-							</Text>
+							{opportunity.publication.url ? (
+								<a
+									href={opportunity.publication.url}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-2.5 text-sm font-semibold text-black transition-colors hover:bg-gray-50"
+								>
+									Visit publication
+									<ExternalLinkIcon />
+								</a>
+							) : null}
 						</div>
 					</aside>
 				</div>

@@ -25,7 +25,9 @@ import {
 } from "../FormField/style";
 
 export type InputProps = {
+	bCompact?: boolean;
 	bDisabled?: boolean;
+	bHideInlineMessages?: boolean;
 	bIsLoading?: boolean;
 	id?: string;
 	maxLength?: number;
@@ -49,7 +51,9 @@ export type InputProps = {
 const Input = forwardRef<HTMLInputElement, InputProps>(
 	(
 		{
+			bCompact = false,
 			bDisabled = false,
+			bHideInlineMessages = false,
 			bIsLoading = false,
 			id,
 			maxLength,
@@ -88,6 +92,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 		const getType = () => {
 			if (type === INPUT_TYPE.EMAIL) return INPUT_TYPE.EMAIL;
 			if (type === INPUT_TYPE.NUMBER) return INPUT_TYPE.NUMBER;
+			if (type === INPUT_TYPE.DATE) return INPUT_TYPE.DATE;
 			if (type === INPUT_TYPE.PASSWORD) {
 				return bShowPassword ? INPUT_TYPE.TEXT : INPUT_TYPE.PASSWORD;
 			}
@@ -99,6 +104,88 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 			: showInvalidBorder
 				? "invalid"
 				: "valid";
+
+		const inputControl = (
+			<section className={inputWrapperVariants()}>
+				{bIsLoading ? (
+					<Skeleton height="40px" width="100%" />
+				) : (
+					<>
+						{hasPrefix ? (
+							<span className={inputPrefixVariants()}>
+								{prefixIconPath ? (
+									<Icon path={prefixIconPath} size={0.8} />
+								) : (
+									prefix
+								)}
+							</span>
+						) : null}
+						<input
+							ref={ref}
+							autoComplete={nstrAutoComplete}
+							className={inputControlVariants({
+								state: inputState,
+								withPrefix: hasPrefix,
+							})}
+							disabled={bDisabled}
+							id={id ?? getType()}
+							maxLength={maxLength}
+							onBlur={onBlur}
+							onChange={onChange}
+							onFocus={onFocus}
+							onKeyDown={onKeyDown}
+							onKeyPress={onKeyPress}
+							placeholder={getPlaceholder()}
+							type={getType()}
+							value={value}
+						/>
+					</>
+				)}
+				{type === INPUT_TYPE.PASSWORD ? (
+					<div
+						className={showPasswordIconVariants()}
+						onClick={() => setShowPassword((prevState) => !prevState)}
+						onKeyDown={() => void 0}
+						role="button"
+						tabIndex={0}
+					>
+						<Icon
+							horizontal
+							path={bShowPassword ? mdiEye : mdiEyeOff}
+							rotate={180}
+							size={1}
+							title="Toggle password visibility"
+							vertical
+						/>
+					</div>
+				) : null}
+				{!bHideInlineMessages &&
+				maxLength &&
+				(value?.length ?? 0) >= maxLength ? (
+					<span className={fieldMessageVariants({ kind: "error" })}>
+						{`Maxmimum ${maxLength} characters`}
+					</span>
+				) : null}
+				{!bHideInlineMessages && hasValidationMessage ? (
+					<span
+						className={fieldMessageVariants({
+							kind: objValidation.bMutedMessage ? "helper" : "error",
+						})}
+					>
+						{objValidation.strErrorMessage}
+					</span>
+				) : null}
+				{!bHideInlineMessages && !hasValidationMessage && strHelperMessage ? (
+					<span className={fieldMessageVariants({ kind: "helper" })}>
+						{strHelperMessage}
+					</span>
+				) : null}
+			</section>
+		);
+
+		if (bCompact) {
+			return inputControl;
+		}
 
 		return (
 			<div className={labelledFieldVariants()}>
@@ -124,79 +211,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 						</div>
 					) : null}
 				</div>
-				<section className={inputWrapperVariants()}>
-					{bIsLoading ? (
-						<Skeleton height="40px" width="100%" />
-					) : (
-						<>
-							{hasPrefix ? (
-								<span className={inputPrefixVariants()}>
-									{prefixIconPath ? (
-										<Icon path={prefixIconPath} size={0.8} />
-									) : (
-										prefix
-									)}
-								</span>
-							) : null}
-							<input
-								ref={ref}
-								autoComplete={nstrAutoComplete}
-								className={inputControlVariants({
-									state: inputState,
-									withPrefix: hasPrefix,
-								})}
-								disabled={bDisabled}
-								id={id ?? getType()}
-								maxLength={maxLength}
-								onBlur={onBlur}
-								onChange={onChange}
-								onFocus={onFocus}
-								onKeyDown={onKeyDown}
-								onKeyPress={onKeyPress}
-								placeholder={getPlaceholder()}
-								type={getType()}
-								value={value}
-							/>
-						</>
-					)}
-					{type === INPUT_TYPE.PASSWORD ? (
-						<div
-							className={showPasswordIconVariants()}
-							onClick={() => setShowPassword((prevState) => !prevState)}
-							onKeyDown={() => void 0}
-							role="button"
-							tabIndex={0}
-						>
-							<Icon
-								horizontal
-								path={bShowPassword ? mdiEye : mdiEyeOff}
-								rotate={180}
-								size={1}
-								title="Toggle password visibility"
-								vertical
-							/>
-						</div>
-					) : null}
-					{maxLength && (value?.length ?? 0) >= maxLength ? (
-						<span className={fieldMessageVariants({ kind: "error" })}>
-							{`Maxmimum ${maxLength} characters`}
-						</span>
-					) : null}
-					{hasValidationMessage ? (
-						<span
-							className={fieldMessageVariants({
-								kind: objValidation.bMutedMessage ? "helper" : "error",
-							})}
-						>
-							{objValidation.strErrorMessage}
-						</span>
-					) : null}
-					{!hasValidationMessage && strHelperMessage ? (
-						<span className={fieldMessageVariants({ kind: "helper" })}>
-							{strHelperMessage}
-						</span>
-					) : null}
-				</section>
+				{inputControl}
 			</div>
 		);
 	},

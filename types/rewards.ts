@@ -1,9 +1,8 @@
 /** GET /rewards/summary — authenticated */
 export type RewardsSummary = {
 	referral_code: string;
-	reward_points: number;
-	/** Total points ever credited (e.g. referrals + bonuses); current balance may be lower after redemptions. */
-	lifetime_points_earned: number;
+	/** Total referral credits ever earned, in pence. */
+	lifetime_referral_credits_pence: number;
 	signups_with_your_code: number;
 	qualifying_upgrades_rewarded: number;
 };
