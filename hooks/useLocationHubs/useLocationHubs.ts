@@ -89,7 +89,7 @@ export const fetchPublicLocationHubsIndexPage = async (
 	return normalizeLocationHubListResponse(data);
 };
 
-/** Public read — no auth required. */
+/** Public read- no auth required. */
 export const fetchLocationHubBySlug = async (
 	slug: string,
 ): Promise<LocationHub> => {

@@ -141,7 +141,7 @@ export function OpportunityCard({
 								<span>
 									{opportunity.hasApplicationDeadline
 										? `Apply by ${opportunity.deadline}`
-										: "Ongoing — no application deadline"}
+										: "Ongoing- no application deadline"}
 								</span>
 							</div>
 						</div>

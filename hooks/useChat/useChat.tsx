@@ -2095,7 +2095,7 @@ export const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 						: Number(threadPkParam[0]);
 				if (Number.isNaN(threadPk)) return;
 
-				// User just closed the panel; URL hasn't updated yet — don't reopen
+				// User just closed the panel; URL hasn't updated yet- don't reopen
 				if (threadPanelJustClosedRef.current) {
 					threadPanelJustClosedRef.current = false;
 					return;

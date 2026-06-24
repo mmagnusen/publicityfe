@@ -9,6 +9,7 @@ import Heading from "@/components/Heading";
 import { OpportunityFavouriteToggle } from "@/components/OpportunityFavouriteToggle";
 import Tag from "@/components/Tag";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import type { Opportunity } from "@/lib/opportunities";
 
 function ReporterAvatar({
@@ -20,7 +21,7 @@ function ReporterAvatar({
 }) {
 	if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
 		return (
-			// Profile images come from Bytescale CDN URLs — not in next/image config.
+			// Profile images come from Bytescale CDN URLs- not in next/image config.
 			// eslint-disable-next-line @next/next/no-img-element
 			<img src={avatarUrl} alt={name} className="size-full object-cover" />
 		);
@@ -146,7 +147,7 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 						href="/"
 						className="text-lg font-semibold tracking-tight text-black"
 					>
-						Spotlight
+						{TRADING_NAME}
 					</Link>
 				</div>
 			</header>
@@ -175,7 +176,7 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 								</>
 							) : (
 								<span className="font-medium text-gray-900">
-									Ongoing — no application deadline
+									Ongoing- no application deadline
 								</span>
 							)}
 						</p>

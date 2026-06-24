@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const words = ["interviews", "podcasts", "panels", "magazine features"];
+const words = ["interviews", "podcasts", "panels", "magazines"];
 
 const longestWord = words.reduce((longest, word) =>
 	word.length > longest.length ? word : longest,

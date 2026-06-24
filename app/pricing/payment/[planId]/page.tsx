@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 
 import { PricingPaymentContent } from "@/components/pricing-payment-content";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Checkout — Spotlight",
-	description: "Complete your Spotlight Pro subscription payment securely.",
+	title: `Checkout- ${TRADING_NAME}`,
+	description: `Complete your ${TRADING_NAME} Pro subscription payment securely.`,
 };
 
 type Props = {

@@ -119,7 +119,7 @@ const profiles: Record<string, FounderProfile> = {
 			{
 				publication: "Refinery29",
 				title:
-					"Why Gen Z Is Ditching Alcohol — and What Brands Are Doing About It",
+					"Why Gen Z Is Ditching Alcohol- and What Brands Are Doing About It",
 				year: "2024",
 				url: "https://www.refinery29.com",
 			},

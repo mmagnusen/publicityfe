@@ -6,6 +6,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Text from "@/components/Text";
 import Tooltip from "@/components/Tooltip";
+import { TRADING_NAME } from "@/constants/tradingName";
 import { buildProPlanCtaHref, DEFAULT_PAID_PLAN_ID } from "@/lib/pricing";
 
 function CheckIcon({ className }: { className?: string }) {
@@ -155,7 +156,7 @@ export function PricingPlans({
 				</div>
 
 				<Text variant="plan-description-muted">
-					Full access to everything Spotlight has to offer.
+					Full access to everything ${TRADING_NAME} has to offer.
 				</Text>
 
 				<ul className="relative mt-8 flex flex-1 flex-col gap-3">

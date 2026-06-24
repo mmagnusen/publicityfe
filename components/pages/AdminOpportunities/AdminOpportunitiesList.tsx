@@ -17,6 +17,7 @@ import Heading from "@/components/Heading";
 import { OpportunityCard } from "@/components/opportunities-list";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import { mapApiOpportunitiesToDisplay } from "@/lib/opportunities";
 
 function ListPagination({
@@ -126,7 +127,7 @@ export function AdminOpportunitiesList() {
 						All opportunities
 					</Heading>
 					<Text variant="page-subtitle">
-						Manage every opportunity in Spotlight.
+						Manage every opportunity in ${TRADING_NAME}.
 					</Text>
 				</div>
 				<Button href="/opportunity/create" textTransform="none">

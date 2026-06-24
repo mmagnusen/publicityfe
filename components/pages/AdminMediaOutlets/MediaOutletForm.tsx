@@ -139,7 +139,7 @@ export function MediaOutletForm({
 						<InputField
 							name="founded_year"
 							placeHolder="1995"
-							strHelperMessage="Optional — year the outlet was founded"
+							strHelperMessage="Optional- year the outlet was founded"
 							type={INPUT_TYPE.NUMBER}
 						/>
 					</Field>

@@ -9,7 +9,7 @@ export type AdminModerationMessageFields = {
 export type AdminChatModerationChannelMessage = ChatMessage &
 	AdminModerationMessageFields;
 
-/** GET /chat/admin/messages?type=thread — may include channel context from parent. */
+/** GET /chat/admin/messages?type=thread- may include channel context from parent. */
 export type AdminChatModerationThreadMessage = ThreadMessage &
 	AdminModerationMessageFields & {
 		channel?: Channel;
@@ -32,7 +32,7 @@ export type AdminChatMessagesThreadResponse = {
 	results: AdminChatModerationThreadMessage[];
 };
 
-/** GET /chat/admin/channels/<channel_pk>/messages — staff channel history (no last-read). */
+/** GET /chat/admin/channels/<channel_pk>/messages- staff channel history (no last-read). */
 export type AdminChannelMessagesResponse = {
 	count: number;
 	next: string | null;
@@ -47,7 +47,7 @@ export type AdminThreadParentSummary = Pick<
 	"pk" | "content" | "sender" | "timestamp" | "num_replies"
 >;
 
-/** GET /chat/admin/threads/<chat_message_pk>/messages — staff thread history (no last-read). */
+/** GET /chat/admin/threads/<chat_message_pk>/messages- staff thread history (no last-read). */
 export type AdminThreadMessagesResponse = {
 	count: number;
 	next: string | null;
@@ -57,7 +57,7 @@ export type AdminThreadMessagesResponse = {
 	channel: Channel;
 };
 
-/** GET /chat/admin/users/<user_pk>/channels — channels the user has contributed to. */
+/** GET /chat/admin/users/<user_pk>/channels- channels the user has contributed to. */
 export type AdminUserContributedChannel = Channel & {
 	last_message_at?: string | null;
 	channel_message_count?: number;

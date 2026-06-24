@@ -4,9 +4,10 @@ import type { Metadata } from "next";
 
 import { OpportunitiesList } from "@/components/opportunities-list";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Opportunities — Spotlight",
+	title: `Opportunities- ${TRADING_NAME}`,
 	description: "Browse media opportunities matched to your profile.",
 };
 

@@ -23,7 +23,7 @@ function ProfileAvatar({
 
 	if (imageUrl?.trim()) {
 		return (
-			// Profile images come from Bytescale CDN URLs — not in next/image config.
+			// Profile images come from Bytescale CDN URLs- not in next/image config.
 			// eslint-disable-next-line @next/next/no-img-element
 			<img
 				src={imageUrl.trim()}

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { BillingContent } from "@/components/billing-content";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Billing — Spotlight",
-	description:
-		"Manage your Spotlight subscription, payment method, and invoices.",
+	title: `Billing- ${TRADING_NAME}`,
+	description: `Manage your ${TRADING_NAME} subscription, payment method, and invoices.`,
 };
 
 export default function BillingPage() {

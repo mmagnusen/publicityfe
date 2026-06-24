@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 
 import { PricingConfirmationContent } from "@/components/pricing-confirmation-content";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Payment confirmation — Spotlight",
-	description: "Your Spotlight subscription payment confirmation.",
+	title: `Payment confirmation- ${TRADING_NAME}`,
+	description: `Your ${TRADING_NAME} subscription payment confirmation.`,
 };
 
 export default function PricingConfirmationPage() {

@@ -9,6 +9,7 @@ import { useCrispChatWidget } from "@hooks/useCrispChatWidget";
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 type Props = {
 	hasActiveSubscription: boolean;
@@ -88,7 +89,7 @@ export function DashboardBillingSupport({ hasActiveSubscription }: Props) {
 						</Heading>
 						<p className="mt-2 max-w-2xl text-[0.9375rem] leading-relaxed text-gray-600">
 							Our support team is here to help you with any questions about your
-							account, opportunities, or getting started on Spotlight.
+							account, opportunities, or getting started on ${TRADING_NAME}.
 						</p>
 						<div className="mt-4">
 							<Button onClick={openLiveChat} textTransform="none" type="button">

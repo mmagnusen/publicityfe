@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 
 import { MediaOutletsList } from "@/components/pages/AdminMediaOutlets/MediaOutletsList";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Media outlets — Admin — Spotlight",
-	description: "Manage media outlets in Spotlight.",
+	title: `Media outlets- Admin- ${TRADING_NAME}`,
+	description: `Manage media outlets in ${TRADING_NAME}.`,
 };
 
 export default function AdminMediaOutletsPage() {

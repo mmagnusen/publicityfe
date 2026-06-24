@@ -66,7 +66,7 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		deadline: "Friday, 28 June 2026",
 		interviewWindow: "16 – 27 June 2026",
 		articleType: "Long-form feature (print + digital)",
-		location: "Remote — phone or video call",
+		location: "Remote- phone or video call",
 	},
 	{
 		type: "Podcast Interview",
@@ -78,7 +78,7 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		deadline: "Wednesday, 9 July 2026",
 		interviewWindow: "1 – 8 July 2026",
 		articleType: "45-minute interview episode",
-		location: "Remote — Riverside or Zoom",
+		location: "Remote- Riverside or Zoom",
 	},
 	{
 		type: "Conference Panel",
@@ -90,7 +90,7 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		deadline: "Monday, 21 July 2026",
 		interviewWindow: "14 – 20 July 2026",
 		articleType: "45-minute panel discussion",
-		location: "London, UK — in person",
+		location: "London, UK- in person",
 	},
 ];
 

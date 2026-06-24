@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { FounderProfileDetail } from "@/components/founder-profile-detail";
+import { TRADING_NAME } from "@/constants/tradingName";
 import {
 	profileFormValuesFromPublicUser,
 	profileLinksFromPublicUser,
@@ -27,11 +28,11 @@ export async function generateMetadata({
 	const name = apiUser ? publicUserDisplayName(apiUser) : null;
 
 	if (!name) {
-		return { title: "Profile not found — Spotlight" };
+		return { title: `Profile not found- ${TRADING_NAME}` };
 	}
 
 	return {
-		title: `${name} — Spotlight`,
+		title: `${name}- ${TRADING_NAME}`,
 		description:
 			tipTapApiValueToPlainText(apiUser?.human_profile?.bio) || undefined,
 	};

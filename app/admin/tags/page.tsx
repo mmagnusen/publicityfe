@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 
 import { TagsList } from "@/components/pages/AdminTags/TagsList";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Tags — Admin — Spotlight",
-	description: "Manage tags in Spotlight.",
+	title: `Tags- Admin- ${TRADING_NAME}`,
+	description: `Manage tags in ${TRADING_NAME}.`,
 };
 
 export default function AdminTagsPage() {

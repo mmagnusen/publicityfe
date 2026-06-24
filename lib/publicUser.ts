@@ -17,7 +17,7 @@ export const profilePagePath = (username: string) =>
 const getApiBackendUrl = (): string | undefined =>
 	process.env.API_BACKEND_URL?.replace(/\/+$/, "");
 
-/** Server-side fetch by username — used for `/profile/[username]` pages. */
+/** Server-side fetch by username- used for `/profile/[username]` pages. */
 export async function fetchPublicUserByUsername(
 	username: string,
 ): Promise<PublicUser | null> {

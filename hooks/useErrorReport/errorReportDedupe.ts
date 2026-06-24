@@ -58,7 +58,7 @@ export const tryClaimErrorReportSlot = (key: string): boolean => {
 	return true;
 };
 
-/** Test helper — clears the in-memory dedupe cache. */
+/** Test helper- clears the in-memory dedupe cache. */
 export const resetErrorReportDedupeForTests = (): void => {
 	recentReports.clear();
 };

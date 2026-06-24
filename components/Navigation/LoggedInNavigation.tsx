@@ -22,6 +22,12 @@ export function LoggedInNavigation() {
 					>
 						Dashboard
 					</Link>
+					<Link
+						href="/pricing"
+						className="text-sm text-gray-500 transition-colors hover:text-black"
+					>
+						Pricing
+					</Link>
 					<Button
 						type="button"
 						strVariant="transparentWithBorder"

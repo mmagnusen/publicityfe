@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 
 import { AuthPageShell } from "@/components/auth-page-shell";
 import { RegisterForm } from "@/components/register-form";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Create Account — Spotlight",
-	description: "Create your Spotlight account and start landing opportunities.",
+	title: `Create Account- ${TRADING_NAME}`,
+	description: `Create your ${TRADING_NAME} account and start landing opportunities.`,
 };
 
 export default function RegisterPage() {

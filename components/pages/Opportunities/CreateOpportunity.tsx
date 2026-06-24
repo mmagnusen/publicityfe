@@ -13,6 +13,7 @@ import {
 import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import { OpportunityForm } from "./OpportunityForm";
 import {
 	defaultOpportunityFormValues,
@@ -72,7 +73,7 @@ export function CreateOpportunity() {
 				New opportunity
 			</Heading>
 			<Text variant="page-subtitle">
-				Create a media opportunity for Spotlight users.
+				Create a media opportunity for ${TRADING_NAME} users.
 			</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">

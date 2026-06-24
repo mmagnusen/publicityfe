@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { TRADING_NAME } from "@/constants/tradingName";
+
 function LogoIcon() {
 	return (
 		<div className="flex size-8 items-center justify-center rounded-lg bg-black">
@@ -22,7 +24,7 @@ export function LogoLink() {
 		<Link href="/" className="flex items-center gap-2.5">
 			<LogoIcon />
 			<span className="text-lg font-semibold tracking-tight text-black">
-				Spotlight
+				{TRADING_NAME}
 			</span>
 		</Link>
 	);

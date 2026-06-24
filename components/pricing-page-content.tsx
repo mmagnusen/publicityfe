@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 
 import { CtaSection } from "@/components/cta-section";
+import { Footer } from "@/components/Footer";
 import Heading from "@/components/Heading";
 import { Navigation } from "@/components/Navigation";
 import { PricingPlans } from "@/components/pricing-section";
@@ -49,12 +50,13 @@ export function PricingPageContent() {
 
 					<p className="mt-10 text-center text-sm text-gray-500">
 						All plans include access to the public opportunity board. Cancel
-						anytime — no hidden fees.
+						anytime- no hidden fees.
 					</p>
 				</div>
 			</main>
 
 			<CtaSection />
+			<Footer />
 		</div>
 	);
 }

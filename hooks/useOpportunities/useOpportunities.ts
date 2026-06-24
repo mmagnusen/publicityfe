@@ -14,13 +14,13 @@ import { instanceAxios } from "@util/instanceAxios";
 
 export const OPPORTUNITIES_BASE = "/opportunities";
 
-/** Public catalog — no auth required. */
+/** Public catalog- no auth required. */
 export const OPPORTUNITIES_LIST_PATH = `${OPPORTUNITIES_BASE}/opportunities`;
 
 export const opportunityDetailPath = (pk: number) =>
 	`${OPPORTUNITIES_BASE}/single-opportunity/${pk}`;
 
-/** Staff CRUD — requires admin auth. */
+/** Staff CRUD- requires admin auth. */
 export const OPPORTUNITIES_ADMIN_LIST_PATH = `${OPPORTUNITIES_BASE}/admin/opportunities`;
 
 export const opportunityAdminDetailPath = (pk: number) =>
@@ -29,7 +29,7 @@ export const opportunityAdminDetailPath = (pk: number) =>
 /** Opportunities created by the authenticated user. */
 export const MY_OPPORTUNITIES_PATH = `${OPPORTUNITIES_BASE}/my-opportunities`;
 
-/** Favourites — requires auth. */
+/** Favourites- requires auth. */
 export const OPPORTUNITY_SET_FAVORITE_PATH = `${OPPORTUNITIES_BASE}/set-favorite`;
 export const OPPORTUNITY_FETCH_MY_FAVORITES_PATH = `${OPPORTUNITIES_BASE}/fetch-my-favorites`;
 

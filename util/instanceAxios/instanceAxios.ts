@@ -47,7 +47,7 @@ const verifyEmailTransportRetryCondition = (error: unknown): boolean => {
 	return isLikelyNetworkError(error);
 };
 
-/** GET/HEAD chat reads only — do not retry POST sends (duplicate messages). */
+/** GET/HEAD chat reads only- do not retry POST sends (duplicate messages). */
 const chatTransportRetryCondition = (error: unknown): boolean => {
 	if (isAbortLikeError(error)) return false;
 	if (!axios.isAxiosError(error)) return false;
@@ -127,7 +127,7 @@ const hardClearAuthCookies = (): void => {
 	}
 };
 
-/** Wrong password on login can return 401 while an old JWT is still attached — do not clear the session. */
+/** Wrong password on login can return 401 while an old JWT is still attached- do not clear the session. */
 
 instanceAxios.interceptors.response.use(
 	(response) => response,

@@ -139,7 +139,7 @@ export function DashboardContent() {
 										<p className="mt-2 text-sm text-gray-500">
 											{opportunity.hasApplicationDeadline
 												? `Apply by ${opportunity.deadline}`
-												: "Ongoing — no application deadline"}
+												: "Ongoing- no application deadline"}
 										</p>
 									</div>
 									{isAdmin ? (

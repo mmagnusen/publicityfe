@@ -1,4 +1,4 @@
-/** GET /rewards/summary — authenticated */
+/** GET /rewards/summary- authenticated */
 export type RewardsSummary = {
 	referral_code: string;
 	/** Total referral credits ever earned, in pence. */
@@ -9,7 +9,7 @@ export type RewardsSummary = {
 
 /**
  * One person who registered with your referral code.
- * GET /rewards/referrals — authenticated (see docs/frontend-rewards.md).
+ * GET /rewards/referrals- authenticated (see docs/frontend-rewards.md).
  */
 export type ReferralSignupDetail = {
 	referee_pk: number;
@@ -29,7 +29,7 @@ export type RewardsReferralsResponse = {
 	referrals: ReferralSignupDetail[];
 };
 
-/** GET /rewards/referral-activity — authenticated, paginated (DRF). */
+/** GET /rewards/referral-activity- authenticated, paginated (DRF). */
 export type ReferralActivityReferee = {
 	display_name: string;
 };
@@ -49,7 +49,7 @@ export type ReferralActivityPaginatedResponse = {
 	results: ReferralActivityItem[];
 };
 
-/** GET /rewards/admin/referral-activity — JWT + staff only, CustomPagination (`page`, `per_page`). */
+/** GET /rewards/admin/referral-activity- JWT + staff only, CustomPagination (`page`, `per_page`). */
 export type AdminReferralActivityReferrer = {
 	id: number;
 	email: string;

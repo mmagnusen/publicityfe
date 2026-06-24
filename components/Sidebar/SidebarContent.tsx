@@ -102,6 +102,11 @@ export function SidebarContent() {
 								Tags
 							</SidebarNavLink>
 						</li>
+						<li className="py-1">
+							<SidebarNavLink href="/admin/waitlist" onNavigate={onNavigate}>
+								Waitlist
+							</SidebarNavLink>
+						</li>
 					</ul>
 				</section>
 			) : null}
@@ -111,6 +116,11 @@ export function SidebarContent() {
 					<SectionHeader title="Account" />
 				</div>
 				<ul className="list-none">
+					<li className="py-1">
+						<SidebarNavLink href="/pricing" onNavigate={onNavigate}>
+							Pricing
+						</SidebarNavLink>
+					</li>
 					<li className="py-1">
 						<SidebarNavLink href="/billing" onNavigate={onNavigate}>
 							Billing

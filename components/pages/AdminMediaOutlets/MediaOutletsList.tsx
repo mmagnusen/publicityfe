@@ -16,6 +16,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 function formatDate(value: string | undefined) {
 	if (!value) {
@@ -137,7 +138,7 @@ export function MediaOutletsList() {
 						Media outlets
 					</Heading>
 					<Text variant="page-subtitle">
-						Manage media outlets available in Spotlight.
+						Manage media outlets available in ${TRADING_NAME}.
 					</Text>
 				</div>
 				<Button href="/admin/media-outlets/create" textTransform="none">

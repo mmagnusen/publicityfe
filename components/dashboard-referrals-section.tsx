@@ -19,6 +19,7 @@ import Icon from "@mdi/react";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import type { RewardsSummary } from "@/types/rewards";
 import fetcher from "@/util/fetcher";
 
@@ -104,13 +105,13 @@ export function DashboardReferralsSection({
 	}, [referralCode, shareBaseUrl]);
 
 	const mailtoHref = inviteLink
-		? `mailto:?subject=${encodeURIComponent("Join me on Spotlight")}&body=${encodeURIComponent(`Use my referral link: ${inviteLink}`)}`
+		? `mailto:?subject=${encodeURIComponent(`Join me on ${TRADING_NAME}`)}&body=${encodeURIComponent(`Use my referral link: ${inviteLink}`)}`
 		: "#";
 	const whatsappHref = inviteLink
-		? `https://wa.me/?text=${encodeURIComponent(`Join me on Spotlight: ${inviteLink}`)}`
+		? `https://wa.me/?text=${encodeURIComponent(`Join me on ${TRADING_NAME}: ${inviteLink}`)}`
 		: "#";
 	const twitterHref = inviteLink
-		? `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join me on Spotlight ${inviteLink}`)}`
+		? `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Join me on ${TRADING_NAME} ${inviteLink}`)}`
 		: "#";
 	const facebookHref = inviteLink
 		? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteLink)}`
@@ -177,8 +178,8 @@ export function DashboardReferralsSection({
 							Refer a friend
 						</Heading>
 						<p className="mt-1 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
-							Invite friends to join Spotlight and earn referral credits when
-							they upgrade.
+							Invite friends to join ${TRADING_NAME} and earn referral credits
+							when they upgrade.
 						</p>
 					</div>
 				</div>

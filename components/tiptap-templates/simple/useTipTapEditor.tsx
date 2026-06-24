@@ -140,7 +140,7 @@ const useTipTapEditor = ({
 	});
 
 	// useEditor only applies `content` on mount. Read-only views (e.g. listing detail
-	// after SWR refetch) pass new existingContent without remounting — sync here instead.
+	// after SWR refetch) pass new existingContent without remounting- sync here instead.
 	const lastSyncedContentRef = useRef<string | null>(null);
 
 	useEffect(() => {

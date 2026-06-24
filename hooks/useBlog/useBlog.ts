@@ -20,7 +20,7 @@ export type DelphiBlogPost = {
 	updated_at?: string;
 	excerpt: string;
 	meta_description: string;
-	/** Short SERP title; `<title>` only — on-page H1 uses `title`. */
+	/** Short SERP title; `<title>` only- on-page H1 uses `title`. */
 	meta_title?: string;
 	image_alt?: string;
 	pk?: number;

@@ -18,7 +18,7 @@ export const setUnauthorizedHandler = (next: UnauthorizedHandler | null) => {
 };
 
 /**
- * Called when an authenticated request (JWT was sent) returns 401 — e.g. deactivated
+ * Called when an authenticated request (JWT was sent) returns 401- e.g. deactivated
  * account, revoked user, or invalid token while the client still holds a session.
  * @returns false if no handler ran (e.g. Strict Mode gap) so the caller can hard-reset.
  */

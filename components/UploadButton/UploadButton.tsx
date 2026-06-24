@@ -27,7 +27,7 @@ export const buildURL = ({
 	});
 };
 
-/** CDN URL for display — accepts a full URL or a Bytescale storage path. */
+/** CDN URL for display- accepts a full URL or a Bytescale storage path. */
 export const resolveBytescaleDisplayUrl = (
 	urlOrPath?: string | null,
 ): string | null => {

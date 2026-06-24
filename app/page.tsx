@@ -1,31 +1,13 @@
-"use client";
+import type { Metadata } from "next";
 
-import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
+import { ComingSoonContent } from "@/components/coming-soon-content";
+import { TRADING_NAME } from "@/constants/tradingName";
 
-import { CreatorsSection } from "@/components/creators-section";
-import { CtaSection } from "@/components/cta-section";
-import { FeaturesSection } from "@/components/features-section";
-import { GallerySection } from "@/components/gallery-section";
-import { HeroSection } from "@/components/hero-section";
-import { HowItWorksSection } from "@/components/how-it-works-section";
-import { Navigation } from "@/components/Navigation";
-import { PricingSection } from "@/components/pricing-section";
-import { TrustedBySection } from "@/components/trusted-by-section";
+export const metadata: Metadata = {
+	title: `${TRADING_NAME}- Coming soon`,
+	description: `${TRADING_NAME} is launching soon. Join the waitlist to hear when we're live.`,
+};
 
-export default function Home() {
-	const { isLoggedIn } = useAuthenticatedUser();
-
-	return (
-		<div className="min-h-full bg-white font-sans">
-			<Navigation isLoggedIn={isLoggedIn} />
-			<HeroSection />
-			<TrustedBySection />
-			<GallerySection />
-			<FeaturesSection />
-			<HowItWorksSection />
-			<CreatorsSection />
-			<PricingSection />
-			<CtaSection />
-		</div>
-	);
+export default function Page() {
+	return <ComingSoonContent />;
 }

@@ -61,7 +61,7 @@ export const deleteShopItem = async (id: number): Promise<void> => {
 	await instanceAxios.delete(`/shop/items/${id}`);
 };
 
-/** POST /shop/items/:id/purchase-with-points — authenticated */
+/** POST /shop/items/:id/purchase-with-points- authenticated */
 export type PurchaseWithPointsResponse = {
 	order_id?: number | string;
 	points_spent?: number;

@@ -4,10 +4,11 @@ import type { Metadata } from "next";
 
 import { AuthPageShell } from "@/components/auth-page-shell";
 import { LoginForm } from "@/components/login-form";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: "Sign In — Spotlight",
-	description: "Sign in to your Spotlight account.",
+	title: `Sign In- ${TRADING_NAME}`,
+	description: `Sign in to your ${TRADING_NAME} account.`,
 };
 
 export default function LoginPage() {

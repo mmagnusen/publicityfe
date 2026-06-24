@@ -137,7 +137,7 @@ export function ProfileGallerySection({
 								key={asset.pk}
 								className="relative h-full overflow-hidden rounded-2xl bg-gray-100"
 							>
-								{/* Gallery images come from Bytescale CDN URLs — not in next/image config. */}
+								{/* Gallery images come from Bytescale CDN URLs- not in next/image config. */}
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
 									src={imageUrl}

@@ -33,7 +33,7 @@ function JournalistCard({ user }: { user: PublicUser }) {
 			className="relative aspect-4/5 overflow-hidden rounded-xl sm:rounded-2xl"
 		>
 			{imageUrl ? (
-				// Profile images come from Bytescale CDN URLs — not in next/image config.
+				// Profile images come from Bytescale CDN URLs- not in next/image config.
 				// eslint-disable-next-line @next/next/no-img-element
 				<img src={imageUrl} alt={name} className="size-full object-cover" />
 			) : (

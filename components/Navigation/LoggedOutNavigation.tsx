@@ -32,6 +32,12 @@ export function LoggedOutNavigation() {
 				</nav>
 
 				<div className="flex items-center gap-3">
+					<Link
+						href="/pricing"
+						className="text-sm text-gray-500 transition-colors hover:text-black md:hidden"
+					>
+						Pricing
+					</Link>
 					<Button
 						href="/login"
 						strVariant="transparentWithBorder"

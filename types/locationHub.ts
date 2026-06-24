@@ -30,7 +30,7 @@ export type LocationHub = {
 export type LocationHubCreatePayload = {
 	slug: string;
 	title: string;
-	/** TipTap doc object — not a JSON string (hub uses JSONField, unlike ad TextField). */
+	/** TipTap doc object- not a JSON string (hub uses JSONField, unlike ad TextField). */
 	neighbourhood_description?: JSONContent;
 	meta_title?: string;
 	meta_description?: string;

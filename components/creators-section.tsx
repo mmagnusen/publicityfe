@@ -3,6 +3,7 @@ import Image from "next/image";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 function CheckIcon() {
 	return (
@@ -85,8 +86,8 @@ export function CreatorsSection() {
 					<Heading level={2}>Built for Creators &amp; Businesses</Heading>
 					<Text variant="section-lead-relaxed">
 						Whether you&apos;re a solopreneur, startup founder, or established
-						brand, Spotlight helps you build authority and reach your target
-						audience through strategic media placements.
+						brand, ${TRADING_NAME} helps you build authority and reach your
+						target audience through strategic media placements.
 					</Text>
 
 					<ul className="mt-8 space-y-5">

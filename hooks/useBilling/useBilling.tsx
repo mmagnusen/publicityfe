@@ -10,6 +10,7 @@ import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import useErrorReport, { REPORT_POSTHOG_ONLY } from "@hooks/useErrorReport";
 import { instanceAxios } from "@util/instanceAxios";
 
+import { TRADING_NAME } from "@/constants/tradingName";
 import fetcher from "@/util/fetcher";
 
 /** Backend encodes lifetime premium as this duration (see billing UI). */
@@ -135,7 +136,7 @@ export const useBilling = () => {
 							accessLength: `${plan.duration_months ?? 0} months access`,
 							inPence: plan.price_pence ?? 0,
 						},
-						tagline: "Full access to everything Spotlight has to offer.",
+						tagline: `Full access to everything ${TRADING_NAME} has to offer.`,
 						benefits: [
 							"Unlimited opportunity matches",
 							"AI-powered smart matching",

@@ -101,7 +101,7 @@ const mapValidPromoResponse = (
 };
 
 /**
- * Calls the public validate API. Does not throw on HTTP errors — returns `{ valid: false }`.
+ * Calls the public validate API. Does not throw on HTTP errors- returns `{ valid: false }`.
  */
 export const validatePromoCode = async (
 	promoCode: string,
@@ -146,7 +146,7 @@ export type UsePromoCodeOptions = {
 	/** When true, validate the resolved promo code (query → cookie) and expose `validation` (default: false). */
 	validate?: boolean;
 	/**
-	 * When true with `validate`, only run validation if `queryParam` is present in the URL — not when the code exists only in the cookie (default: false).
+	 * When true with `validate`, only run validation if `queryParam` is present in the URL- not when the code exists only in the cookie (default: false).
 	 */
 	validateOnlyFromQuery?: boolean;
 	/** Query string key (default: `promo_code`). */

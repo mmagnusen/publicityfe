@@ -16,6 +16,7 @@ import { ProfileBioContent } from "@/components/profile-bio-content";
 import { ProfileGallerySection } from "@/components/profile-gallery-section";
 import { ProfileHighlightsSection } from "@/components/profile-highlights-section";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import type { ProfileFormValues } from "@/lib/profileForm";
 import { bioToApiField, profileLinksFromFormValues } from "@/lib/profileForm";
 import type { ProfileLink } from "@/lib/profiles";
@@ -330,7 +331,7 @@ export function FounderProfileDetail({
 						href="/"
 						className="text-lg font-semibold tracking-tight text-black"
 					>
-						Spotlight
+						{TRADING_NAME}
 					</Link>
 				</div>
 			</header>

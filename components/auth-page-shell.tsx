@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import Heading from "@/components/Heading";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 
 function LogoIcon() {
 	return (
@@ -40,7 +41,7 @@ export function AuthPageShell({
 				<Link href="/" className="inline-flex items-center gap-2.5">
 					<LogoIcon />
 					<span className="text-lg font-semibold tracking-tight text-black">
-						Spotlight
+						{TRADING_NAME}
 					</span>
 				</Link>
 			</header>

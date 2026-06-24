@@ -1,4 +1,4 @@
-/** Staff reports admin API — aligns with GET /reports/fetch-admin-reports list items. */
+/** Staff reports admin API- aligns with GET /reports/fetch-admin-reports list items. */
 
 export type AdminReportTarget =
 	| { type: "wanted_ad"; id: number }

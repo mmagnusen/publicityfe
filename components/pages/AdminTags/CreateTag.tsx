@@ -10,6 +10,7 @@ import { createTag, revalidateTagLists } from "@hooks/useTags";
 import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import { TagForm } from "./TagForm";
 import {
 	defaultTagFormValues,
@@ -67,7 +68,7 @@ export function CreateTag() {
 			<Heading level={1} variant="page-lg">
 				New tag
 			</Heading>
-			<Text variant="page-subtitle">Add a tag to Spotlight.</Text>
+			<Text variant="page-subtitle">Add a tag to ${TRADING_NAME}.</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
 				<TagForm

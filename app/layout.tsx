@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
 import { AppProviders } from "@/components/providers/app-providers";
+import { TRADING_NAME } from "@/constants/tradingName";
 import "./tiptap-variables.css";
 import "./tiptap-keyframes.css";
 import "./tiptap.css";
@@ -19,7 +20,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Spotlight — Promote yourself on interviews",
+	title: `${TRADING_NAME}- Promote yourself on interviews`,
 	description:
 		"Connect with journalists, podcast hosts, and event organizers actively looking for experts like you.",
 };
