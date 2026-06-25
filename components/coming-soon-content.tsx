@@ -8,6 +8,7 @@ import useErrorReport from "@hooks/useErrorReport";
 import usePosthog from "@hooks/usePosthog";
 
 import Button from "@/components/Button";
+import { ComingSoonFooter } from "@/components/coming-soon-footer";
 import InputField from "@/components/FormikFields/InputField";
 import Heading from "@/components/Heading";
 import { LogoLink } from "@/components/Navigation/LogoLink";
@@ -145,6 +146,7 @@ export function ComingSoonContent() {
 					</Text>
 				</div>
 			</main>
+			<ComingSoonFooter />
 		</div>
 	);
 }
