@@ -38,7 +38,7 @@ export function CreateOpportunity() {
 		try {
 			await createOpportunity(formValuesToCreatePayload(values));
 			await revalidateOpportunityLists();
-			await router.push("/opportunity");
+			await router.push("/dashboard");
 		} finally {
 			setIsSubmitting(false);
 		}

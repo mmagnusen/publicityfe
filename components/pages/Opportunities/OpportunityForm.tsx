@@ -23,11 +23,13 @@ import {
 	mediaOutletsToSelectOptions,
 	normalizeOpportunityFormValuesForSubmit,
 	type OpportunityFormValues,
+	opportunityTypeOptions,
 	validateFullDescription,
 } from "./opportunityFormValues";
 
 const drfFieldMap: Partial<Record<string, keyof OpportunityFormValues>> = {
 	title: "title",
+	type: "type",
 	short_description: "short_description",
 	full_description: "full_description",
 	media_outlet: "media_outlet",
@@ -39,6 +41,10 @@ const validateOpportunityForm = (values: OpportunityFormValues) => {
 
 	if (!values.title.trim()) {
 		errors.title = "Title is required";
+	}
+
+	if (!values.type) {
+		errors.type = "Type is required";
 	}
 
 	if (!values.short_description.trim()) {
@@ -117,6 +123,7 @@ export function OpportunityForm({
 		() => applicationDeadlineHourOptions(),
 		[],
 	);
+	const typeOptions = useMemo(() => opportunityTypeOptions(), []);
 
 	return (
 		<Formik<OpportunityFormValues>
@@ -167,6 +174,15 @@ export function OpportunityForm({
 								name="title"
 								placeHolder="Pitch your startup"
 								strHelperMessage="Headline shown in opportunity listings"
+							/>
+						</Field>
+
+						<Field fieldLabel="Type" fieldName="type">
+							<SelectField
+								arrOptions={typeOptions}
+								isSearchable={false}
+								name="type"
+								placeholder="Select a type"
 							/>
 						</Field>
 

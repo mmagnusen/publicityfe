@@ -221,34 +221,10 @@ export function OpportunityDetail({ opportunity }: OpportunityDetailProps) {
 											stroke="currentColor"
 											strokeWidth="1.5"
 											strokeLinecap="round"
-											strokeLinejoin="round"
+											// strokeLinejoin="round"
 										/>
 									</svg>
 									Apply now
-								</span>
-							</Button>
-							<Button
-								type="button"
-								strVariant="transparentWithBorder"
-								borderRadius="large"
-								textTransform="none"
-							>
-								<span className="inline-flex items-center justify-center gap-2">
-									<svg
-										viewBox="0 0 16 16"
-										fill="none"
-										className="size-4"
-										aria-hidden
-									>
-										<title>Pass</title>
-										<path
-											d="M4 4l8 8M12 4l-8 8"
-											stroke="currentColor"
-											strokeWidth="1.5"
-											strokeLinecap="round"
-										/>
-									</svg>
-									Pass
 								</span>
 							</Button>
 							<OpportunityFavouriteToggle

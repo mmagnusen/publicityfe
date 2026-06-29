@@ -1,6 +1,7 @@
 export type ApiOpportunity = {
 	pk: number;
 	title: string;
+	type?: string | null;
 	short_description: string;
 	full_description: string;
 	media_outlet: number | null;
@@ -23,6 +24,7 @@ export type OpportunitiesPaginatedResponse = {
 
 export type OpportunityCreatePayload = {
 	title: string;
+	type?: string;
 	short_description: string;
 	full_description: string;
 	media_outlet?: number | null;

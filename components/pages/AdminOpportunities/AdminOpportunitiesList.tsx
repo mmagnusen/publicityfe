@@ -14,11 +14,10 @@ import {
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
-import { OpportunityCard } from "@/components/opportunities-list";
+import { OpportunityCardWithCreator } from "@/components/opportunities-list";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import { TRADING_NAME } from "@/constants/tradingName";
-import { mapApiOpportunitiesToDisplay } from "@/lib/opportunities";
 
 function ListPagination({
 	currentPage,
@@ -90,10 +89,6 @@ export function AdminOpportunitiesList() {
 
 	const { data, error, isLoading } = useAdminOpportunities(currentPage);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
-	const opportunities = useMemo(
-		() => mapApiOpportunitiesToDisplay(list.results),
-		[list.results],
-	);
 
 	const accessDenied = axios.isAxiosError(error)
 		? error.response?.status === 401 || error.response?.status === 403
@@ -127,7 +122,7 @@ export function AdminOpportunitiesList() {
 						All opportunities
 					</Heading>
 					<Text variant="page-subtitle">
-						Manage every opportunity in ${TRADING_NAME}.
+						Manage every opportunity in {TRADING_NAME}.
 					</Text>
 				</div>
 				<Button href="/opportunity/create" textTransform="none">
@@ -148,7 +143,7 @@ export function AdminOpportunitiesList() {
 								: "Could not load opportunities. Check the API is available and try again."}
 						</Text>
 					</div>
-				) : opportunities.length === 0 ? (
+				) : list.results.length === 0 ? (
 					<div className="rounded-2xl border border-gray-200 bg-white p-6">
 						<Text variant="center-sm">No opportunities yet.</Text>
 					</div>
@@ -158,9 +153,9 @@ export function AdminOpportunitiesList() {
 							{list.count} opportunit{list.count === 1 ? "y" : "ies"}
 						</Text>
 						<ul className="mt-4 list-none space-y-4">
-							{opportunities.map((opportunity) => (
-								<li key={opportunity.id}>
-									<OpportunityCard opportunity={opportunity} showEdit />
+							{list.results.map((api) => (
+								<li key={api.pk}>
+									<OpportunityCardWithCreator api={api} showEdit />
 								</li>
 							))}
 						</ul>

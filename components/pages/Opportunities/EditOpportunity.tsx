@@ -59,7 +59,7 @@ export function EditOpportunity() {
 			await patchOpportunity(pk, formValuesToUpdatePayload(values));
 			await revalidateOpportunityDetailCaches(pk);
 			await revalidateOpportunityLists();
-			await router.push("/opportunity");
+			await router.push("/dashboard");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -78,7 +78,7 @@ export function EditOpportunity() {
 		try {
 			await deleteOpportunity(pk);
 			await revalidateOpportunityLists();
-			await router.push("/opportunity");
+			await router.push("/dashboard");
 		} finally {
 			setIsDeleting(false);
 		}

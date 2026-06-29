@@ -20,6 +20,7 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Text from "@/components/Text";
 import { TRADING_NAME } from "@/constants/tradingName";
+import { cn } from "@/lib/cn";
 import type { RewardsSummary } from "@/types/rewards";
 import fetcher from "@/util/fetcher";
 
@@ -69,13 +70,17 @@ function MetricCard({
 }
 
 type Props = {
+	className?: string;
 	fallbackReferralCode?: string;
 	isLoggedIn: boolean;
+	showViewAllLink?: boolean;
 };
 
 export function DashboardReferralsSection({
+	className,
 	fallbackReferralCode = "",
 	isLoggedIn,
+	showViewAllLink = true,
 }: Props) {
 	const { data: summary, error: summaryError } = useSWR<RewardsSummary>(
 		isLoggedIn ? "/rewards/summary" : null,
@@ -132,7 +137,12 @@ export function DashboardReferralsSection({
 
 	if (!referralCode) {
 		return (
-			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
+			<div
+				className={cn(
+					"mt-8 rounded-2xl border border-gray-200 bg-white p-6",
+					className,
+				)}
+			>
 				<Heading level={2} variant="subsection">
 					Refer a friend
 				</Heading>
@@ -152,7 +162,12 @@ export function DashboardReferralsSection({
 	}
 
 	return (
-		<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
+		<div
+			className={cn(
+				"mt-8 rounded-2xl border border-gray-200 bg-white p-6",
+				className,
+			)}
+		>
 			{summaryError ? (
 				<Text variant="error" className="mb-4">
 					Unable to load referral stats. Your link is still available below.
@@ -178,14 +193,16 @@ export function DashboardReferralsSection({
 							Refer a friend
 						</Heading>
 						<p className="mt-1 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
-							Invite friends to join ${TRADING_NAME} and earn referral credits
+							Invite friends to join {TRADING_NAME} and earn referral credits
 							when they upgrade.
 						</p>
 					</div>
 				</div>
-				<Button href="/referrals" size="small" textTransform="none">
-					View all referrals
-				</Button>
+				{showViewAllLink ? (
+					<Button href="/referrals" size="small" textTransform="none">
+						View all referrals
+					</Button>
+				) : null}
 			</div>
 
 			<div className="mt-5 grid gap-3 sm:grid-cols-3">

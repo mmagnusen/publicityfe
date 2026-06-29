@@ -4,6 +4,6 @@
  */
 export const FEATURED_JOURNALIST_USERNAMES: string[] = [
 	"marcuschen",
-	"marcuschen",
-	"marcuschen",
+	"mishacove",
+	"marilynmags",
 ];

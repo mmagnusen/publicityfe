@@ -9,6 +9,10 @@ import {
 import type { JSONContent } from "@tiptap/react";
 
 import { resolveBytescaleDisplayUrl } from "@/components/UploadButton";
+import {
+	DEFAULT_OPPORTUNITY_TYPE,
+	opportunityTypeLabel,
+} from "@/constants/opportunityTypes";
 import { profilePagePath, publicUserDisplayName } from "@/lib/publicUser";
 
 export type Opportunity = {
@@ -45,19 +49,13 @@ export type Opportunity = {
 
 type MockTemplate = Pick<
 	Opportunity,
-	| "type"
-	| "requirements"
-	| "deadline"
-	| "interviewWindow"
-	| "articleType"
-	| "location"
+	"requirements" | "deadline" | "interviewWindow" | "articleType" | "location"
 >;
 
 const DEFAULT_REPORTER_AVATAR = "/opportunity/reporter.jpg";
 
 const MOCK_TEMPLATES: MockTemplate[] = [
 	{
-		type: "Magazine Article",
 		requirements: [
 			"Hands-on experience relevant to the topic",
 			"A track record you can speak to on the record",
@@ -69,7 +67,6 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		location: "Remote- phone or video call",
 	},
 	{
-		type: "Podcast Interview",
 		requirements: [
 			"Clear point of view and concrete examples",
 			"Comfortable with a 45-minute recorded conversation",
@@ -81,7 +78,6 @@ const MOCK_TEMPLATES: MockTemplate[] = [
 		location: "Remote- Riverside or Zoom",
 	},
 	{
-		type: "Conference Panel",
 		requirements: [
 			"Subject-matter expert with speaking experience",
 			"Available for a prep call and the live session",
@@ -283,6 +279,7 @@ export const mapApiOpportunityToDisplay = (
 		id: String(api.pk),
 		status: "open",
 		title: api.title?.trim() || "Untitled opportunity",
+		type: opportunityTypeLabel(api.type ?? DEFAULT_OPPORTUNITY_TYPE),
 		shortDescription,
 		description,
 		matchScore: 70 + (api.pk % 28),

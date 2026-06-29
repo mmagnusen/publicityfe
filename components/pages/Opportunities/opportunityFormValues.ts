@@ -14,8 +14,15 @@ import {
 	unwrapMisstoredJsonStringTipTapDoc,
 } from "@lib/tiptap-utils";
 
+import {
+	DEFAULT_OPPORTUNITY_TYPE,
+	opportunityTypeSelectOptions,
+	resolveOpportunityTypeOption,
+} from "@/constants/opportunityTypes";
+
 export type OpportunityFormValues = {
 	title: string;
+	type: SelectOption | null;
 	short_description: string;
 	full_description: RichTextContent;
 	media_outlet: SelectOption | null;
@@ -23,6 +30,12 @@ export type OpportunityFormValues = {
 	application_deadline_date: string;
 	application_deadline_hour: SelectOption | null;
 };
+
+export const opportunityTypeOptions = (): SelectOption[] =>
+	opportunityTypeSelectOptions();
+
+export const defaultOpportunityTypeOption = (): SelectOption =>
+	resolveOpportunityTypeOption(DEFAULT_OPPORTUNITY_TYPE);
 
 export const applicationDeadlineYesNoOptions: SelectOption[] = [
 	{ label: "Yes, this opportunity has an application deadline", value: "yes" },
@@ -247,6 +260,7 @@ const fullDescriptionToApiField = (rich: RichTextContent): string => {
 
 export const defaultOpportunityFormValues = (): OpportunityFormValues => ({
 	title: "",
+	type: defaultOpportunityTypeOption(),
 	short_description: "",
 	full_description: emptyFullDescription(),
 	media_outlet: null,
@@ -265,6 +279,7 @@ export const opportunityToFormValues = (
 
 	return {
 		title: opportunity.title,
+		type: resolveOpportunityTypeOption(opportunity.type),
 		short_description: opportunity.short_description,
 		full_description: fullDescriptionToRichText(opportunity.full_description),
 		media_outlet: resolveMediaOutletSelectOption(
@@ -286,6 +301,7 @@ export const formValuesToCreatePayload = (
 
 	return {
 		title: normalizedValues.title.trim(),
+		type: normalizedValues.type?.value ?? DEFAULT_OPPORTUNITY_TYPE,
 		short_description: normalizedValues.short_description.trim(),
 		full_description: fullDescriptionToApiField(
 			normalizedValues.full_description,

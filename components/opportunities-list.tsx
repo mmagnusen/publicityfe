@@ -2,15 +2,18 @@
 
 import { useMemo } from "react";
 import axios from "axios";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import type { ApiOpportunity } from "@customTypes/opportunity";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
 	normalizeOpportunityListResponse,
 	OPPORTUNITIES_PER_PAGE,
 	useOpportunities,
 } from "@hooks/useOpportunities";
+import { usePublicUser } from "@hooks/usePublicUser";
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
@@ -19,8 +22,10 @@ import { OpportunityFavouriteToggle } from "@/components/OpportunityFavouriteTog
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import {
-	mapApiOpportunitiesToDisplay,
+	applyCreatorToOpportunity,
+	mapApiOpportunityToDisplay,
 	type Opportunity,
+	opportunityCreatorUsername,
 } from "@/lib/opportunities";
 
 function ListPagination({
@@ -81,6 +86,55 @@ function ListPagination({
 	);
 }
 
+function CreatorAvatar({
+	name,
+	avatarUrl,
+}: {
+	name: string;
+	avatarUrl: string;
+}) {
+	const label = name.trim() || "Creator";
+
+	if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+		return (
+			// Profile images come from Bytescale CDN URLs — not in next/image config.
+			// eslint-disable-next-line @next/next/no-img-element
+			<img src={avatarUrl} alt={label} className="size-full object-cover" />
+		);
+	}
+
+	return (
+		<Image
+			src={avatarUrl}
+			alt={label}
+			fill
+			sizes="48px"
+			className="object-cover"
+		/>
+	);
+}
+
+export function OpportunityCardWithCreator({
+	api,
+	showEdit,
+}: {
+	api: ApiOpportunity;
+	showEdit?: boolean;
+}) {
+	const creatorUsername = opportunityCreatorUsername(api);
+	const { data: creator } = usePublicUser(creatorUsername);
+
+	const opportunity = useMemo(() => {
+		const base = mapApiOpportunityToDisplay(api);
+		if (creator) {
+			return applyCreatorToOpportunity(base, creator);
+		}
+		return base;
+	}, [api, creator]);
+
+	return <OpportunityCard opportunity={opportunity} showEdit={showEdit} />;
+}
+
 export function OpportunityCard({
 	opportunity,
 	showEdit,
@@ -103,7 +157,13 @@ export function OpportunityCard({
 					href={`/opportunity/${opportunity.id}`}
 					className="block rounded-2xl border border-gray-200 bg-white p-6 pr-16 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
 				>
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+					<div className="flex min-w-0 flex-1 gap-4">
+						<div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-gray-200 bg-gray-100">
+							<CreatorAvatar
+								name={opportunity.reporter.name}
+								avatarUrl={opportunity.reporter.avatarUrl}
+							/>
+						</div>
 						<div className="min-w-0 flex-1">
 							<div className="flex flex-wrap items-center gap-2">
 								<span className="rounded-full bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
@@ -145,13 +205,6 @@ export function OpportunityCard({
 								</span>
 							</div>
 						</div>
-
-						<div className="shrink-0 rounded-xl border border-violet-100 bg-violet-50/60 px-4 py-3 text-center sm:min-w-[7rem]">
-							<Text variant="detail-label">Match</Text>
-							<p className="mt-1 text-2xl font-bold text-violet-600">
-								{opportunity.matchScore}%
-							</p>
-						</div>
 					</div>
 				</Link>
 			</div>
@@ -179,10 +232,6 @@ export function OpportunitiesList() {
 
 	const { data, error, isLoading } = useOpportunities(currentPage);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
-	const opportunities = useMemo(
-		() => mapApiOpportunitiesToDisplay(list.results),
-		[list.results],
-	);
 
 	const accessDenied = axios.isAxiosError(error)
 		? error.response?.status === 401 || error.response?.status === 403
@@ -214,7 +263,7 @@ export function OpportunitiesList() {
 								: "Could not load opportunities. Check the API is available and try again."}
 						</Text>
 					</div>
-				) : opportunities.length === 0 ? (
+				) : list.results.length === 0 ? (
 					<div className="rounded-2xl border border-gray-200 bg-white p-6">
 						<Text variant="center-sm">
 							No opportunities available right now.
@@ -226,9 +275,9 @@ export function OpportunitiesList() {
 							{list.count} opportunit{list.count === 1 ? "y" : "ies"}
 						</Text>
 						<ul className="mt-4 list-none space-y-4">
-							{opportunities.map((opportunity) => (
-								<li key={opportunity.id}>
-									<OpportunityCard opportunity={opportunity} />
+							{list.results.map((api) => (
+								<li key={api.pk}>
+									<OpportunityCardWithCreator api={api} />
 								</li>
 							))}
 						</ul>
