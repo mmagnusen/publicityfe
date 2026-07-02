@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { mdiFacebook, mdiInstagram } from "@mdi/js";
+import { mdiInstagram, mdiLinkedin } from "@mdi/js";
 import Icon from "@mdi/react";
 
 import { LogoLink } from "@/components/Navigation/LogoLink";
 import {
-	FACEBOOK_PROFILE_URL,
 	INSTAGRAM_PROFILE_URL,
+	LINKEDIN_PROFILE_URL,
 	SITE_NAME,
 } from "@/constants/socialMedia";
 
@@ -19,14 +19,14 @@ const footerLinks = [
 
 const socialLinks = [
 	{
-		href: FACEBOOK_PROFILE_URL,
-		icon: mdiFacebook,
-		label: "Facebook",
-	},
-	{
 		href: INSTAGRAM_PROFILE_URL,
 		icon: mdiInstagram,
 		label: "Instagram",
+	},
+	{
+		href: LINKEDIN_PROFILE_URL,
+		icon: mdiLinkedin,
+		label: "LinkedIn",
 	},
 ] as const;
 

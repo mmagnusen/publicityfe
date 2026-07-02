@@ -70,7 +70,7 @@ export function HeroSection() {
 				</Text>
 
 				<Button
-					href="#get-started"
+					href="/register"
 					borderRadius="pill"
 					size="large"
 					textTransform="none"

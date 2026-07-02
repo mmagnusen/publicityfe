@@ -1,3 +1,5 @@
+import type { Tag } from "@customTypes/tag";
+
 export type ApiOpportunity = {
 	pk: number;
 	title: string;
@@ -6,6 +8,7 @@ export type ApiOpportunity = {
 	full_description: string;
 	media_outlet: number | null;
 	media_outlet_name?: string | null;
+	tags?: Tag[];
 	creator?: number | { pk?: number | null; username?: string | null } | null;
 	creator_pk?: number | null;
 	creator_username?: string | null;

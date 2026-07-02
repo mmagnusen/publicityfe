@@ -30,6 +30,7 @@ export type Opportunity = {
 	location: string;
 	matchScore: number;
 	isFavorited: boolean;
+	createdAt: string | null;
 	reporter: {
 		name: string;
 		title: string;
@@ -165,6 +166,7 @@ export const mapMediaOutletToPublication = (
 export const publicationFromOpportunityFallback = (
 	name: string,
 	url = "",
+	tags: Tag[] = [],
 ): Opportunity["publication"] => {
 	const trimmedName = name.trim() || "Publication";
 
@@ -173,7 +175,7 @@ export const publicationFromOpportunityFallback = (
 		slug: publicationSlugFromName(trimmedName),
 		url: url.trim(),
 		foundedYear: null,
-		tags: [],
+		tags,
 	};
 };
 
@@ -269,9 +271,17 @@ export const mapApiOpportunityToDisplay = (
 		mediaOutlet?.name?.trim() || api.media_outlet_name?.trim() || "Publication";
 	const publicationUrl = mediaOutlet?.website_url?.trim() || "";
 	const creatorUsername = opportunityCreatorUsername(api);
+	const apiTags = api.tags ?? [];
 	const publication = mediaOutlet
-		? mapMediaOutletToPublication(mediaOutlet)
-		: publicationFromOpportunityFallback(publicationName, publicationUrl);
+		? {
+				...mapMediaOutletToPublication(mediaOutlet),
+				tags: mediaOutlet.tags?.length ? mediaOutlet.tags : apiTags,
+			}
+		: publicationFromOpportunityFallback(
+				publicationName,
+				publicationUrl,
+				apiTags,
+			);
 	const applicationDeadline = api.application_deadline?.trim() || null;
 	const hasApplicationDeadline = Boolean(applicationDeadline);
 
@@ -289,6 +299,7 @@ export const mapApiOpportunityToDisplay = (
 			? formatApplicationDeadlineDisplay(applicationDeadline)
 			: "",
 		isFavorited: Boolean(api.is_favorited),
+		createdAt: api.created_at?.trim() || null,
 		reporter: emptyReporter(
 			publicationName,
 			creatorUsername ? profilePagePath(creatorUsername) : "",

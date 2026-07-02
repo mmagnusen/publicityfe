@@ -4,13 +4,18 @@ import { useMemo } from "react";
 import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import type { ApiOpportunity } from "@customTypes/opportunity";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
+import type { OpportunityListSort } from "@hooks/useOpportunities";
 import {
+	buildOpportunitiesPageHref,
+	getOpportunityApiErrorMessage,
 	normalizeOpportunityListResponse,
 	OPPORTUNITIES_PER_PAGE,
+	parseSortFromSearchParams,
+	parseTagPksFromSearchParams,
 	useOpportunities,
 } from "@hooks/useOpportunities";
 import { usePublicUser } from "@hooks/usePublicUser";
@@ -18,8 +23,11 @@ import { usePublicUser } from "@hooks/usePublicUser";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { Navigation } from "@/components/Navigation";
+import { NewTodayTag } from "@/components/new-today-tag";
 import { OpportunityFavouriteToggle } from "@/components/OpportunityFavouriteToggle";
+import { OpportunityListFilters } from "@/components/opportunity-tag-filter";
 import { SidebarLayout } from "@/components/Sidebar";
+import Tag from "@/components/Tag";
 import Text from "@/components/Text";
 import {
 	applyCreatorToOpportunity,
@@ -27,12 +35,17 @@ import {
 	type Opportunity,
 	opportunityCreatorUsername,
 } from "@/lib/opportunities";
+import { isOpportunityNewToday } from "@/lib/opportunityNewToday";
 
 function ListPagination({
 	currentPage,
+	sort,
+	tagPks,
 	totalCount,
 }: {
 	currentPage: number;
+	sort: OpportunityListSort;
+	tagPks: number[];
 	totalCount: number;
 }) {
 	const totalPages = Math.max(
@@ -45,10 +58,12 @@ function ListPagination({
 	}
 
 	const prevHref =
-		currentPage > 1 ? `/opportunity?page=${currentPage - 1}` : undefined;
+		currentPage > 1
+			? buildOpportunitiesPageHref(currentPage - 1, tagPks, sort)
+			: undefined;
 	const nextHref =
 		currentPage < totalPages
-			? `/opportunity?page=${currentPage + 1}`
+			? buildOpportunitiesPageHref(currentPage + 1, tagPks, sort)
 			: undefined;
 
 	return (
@@ -97,7 +112,7 @@ function CreatorAvatar({
 
 	if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
 		return (
-			// Profile images come from Bytescale CDN URLs — not in next/image config.
+			// Profile images come from Bytescale CDN URLs - not in next/image config.
 			// eslint-disable-next-line @next/next/no-img-element
 			<img src={avatarUrl} alt={label} className="size-full object-cover" />
 		);
@@ -143,11 +158,13 @@ export function OpportunityCard({
 	showEdit?: boolean;
 }) {
 	const isOpen = opportunity.status === "open";
+	const showNewTodayBadge = isOpportunityNewToday(opportunity.createdAt);
 
 	return (
 		<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 			<div className="relative min-w-0 flex-1">
-				<div className="absolute right-4 top-4 z-10">
+				<div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+					{showNewTodayBadge ? <NewTodayTag /> : null}
 					<OpportunityFavouriteToggle
 						isFavorited={opportunity.isFavorited}
 						opportunityId={Number(opportunity.id)}
@@ -169,6 +186,11 @@ export function OpportunityCard({
 								<span className="rounded-full bg-violet-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
 									{opportunity.type}
 								</span>
+								{opportunity.publication.tags.map((tag) => (
+									<Tag key={tag.pk} skin="alt">
+										{tag.name}
+									</Tag>
+								))}
 								<span
 									className={
 										isOpen
@@ -224,18 +246,40 @@ export function OpportunityCard({
 }
 
 export function OpportunitiesList() {
+	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { authenticationChecked, isLoggedIn } = useAuthenticatedUser();
 
 	const pageFromQuery = Number(searchParams.get("page")) || 1;
 	const currentPage = pageFromQuery >= 1 ? pageFromQuery : 1;
+	const selectedTagPks = useMemo(
+		() => parseTagPksFromSearchParams(searchParams),
+		[searchParams],
+	);
+	const selectedSort = useMemo(
+		() => parseSortFromSearchParams(searchParams),
+		[searchParams],
+	);
 
-	const { data, error, isLoading } = useOpportunities(currentPage);
+	const { data, error, isLoading } = useOpportunities(
+		currentPage,
+		OPPORTUNITIES_PER_PAGE,
+		selectedTagPks,
+		selectedSort,
+	);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
 
 	const accessDenied = axios.isAxiosError(error)
 		? error.response?.status === 401 || error.response?.status === 403
 		: false;
+
+	const handleTagFilterChange = (tagPks: number[]) => {
+		router.push(buildOpportunitiesPageHref(1, tagPks, selectedSort));
+	};
+
+	const handleSortChange = (sort: OpportunityListSort) => {
+		router.push(buildOpportunitiesPageHref(1, selectedTagPks, sort));
+	};
 
 	const listContent = (
 		<>
@@ -250,6 +294,15 @@ export function OpportunitiesList() {
 				</div>
 			</div>
 
+			<div className="mt-6">
+				<OpportunityListFilters
+					onSelectedSortChange={handleSortChange}
+					onSelectedTagPksChange={handleTagFilterChange}
+					selectedSort={selectedSort}
+					selectedTagPks={selectedTagPks}
+				/>
+			</div>
+
 			<div className="mt-8">
 				{isLoading && !data ? (
 					<div className="rounded-2xl border border-gray-200 bg-white p-6">
@@ -260,13 +313,15 @@ export function OpportunitiesList() {
 						<Text variant="error">
 							{accessDenied
 								? "Could not load opportunities. You may not have permission to view this page."
-								: "Could not load opportunities. Check the API is available and try again."}
+								: getOpportunityApiErrorMessage(error)}
 						</Text>
 					</div>
 				) : list.results.length === 0 ? (
 					<div className="rounded-2xl border border-gray-200 bg-white p-6">
 						<Text variant="center-sm">
-							No opportunities available right now.
+							{selectedTagPks.length > 0
+								? "No opportunities match the selected tags."
+								: "No opportunities available right now."}
 						</Text>
 					</div>
 				) : (
@@ -281,7 +336,12 @@ export function OpportunitiesList() {
 								</li>
 							))}
 						</ul>
-						<ListPagination currentPage={currentPage} totalCount={list.count} />
+						<ListPagination
+							currentPage={currentPage}
+							sort={selectedSort}
+							tagPks={selectedTagPks}
+							totalCount={list.count}
+						/>
 					</>
 				)}
 			</div>

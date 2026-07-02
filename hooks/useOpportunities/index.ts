@@ -1,6 +1,9 @@
+export type { OpportunityListSort } from "./useOpportunities";
 export {
 	adminOpportunitiesListKey,
+	buildOpportunitiesPageHref,
 	createOpportunity,
+	DEFAULT_OPPORTUNITY_LIST_SORT,
 	deleteOpportunity,
 	extractOpportunityFromFavoriteItem,
 	getOpportunityApiErrorMessage,
@@ -19,6 +22,8 @@ export {
 	opportunitiesListKey,
 	opportunityAdminDetailPath,
 	opportunityDetailPath,
+	parseSortFromSearchParams,
+	parseTagPksFromSearchParams,
 	patchOpportunity,
 	revalidateOpportunityDetailCaches,
 	revalidateOpportunityLists,

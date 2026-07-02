@@ -16,7 +16,7 @@ export function CtaSection() {
 				</Text>
 
 				<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-					<Button href="#get-started" strVariant="white" textTransform="none">
+					<Button href="/register" strVariant="white" textTransform="none">
 						Get Started Free
 					</Button>
 					<Button

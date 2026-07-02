@@ -35,12 +35,83 @@ export const OPPORTUNITY_FETCH_MY_FAVORITES_PATH = `${OPPORTUNITIES_BASE}/fetch-
 
 export const OPPORTUNITIES_PER_PAGE = 20;
 
-export const opportunitiesListKey = (page: number, perPage: number) => {
+export type OpportunityListSort = "newest" | "deadline";
+
+export const DEFAULT_OPPORTUNITY_LIST_SORT: OpportunityListSort = "newest";
+
+const appendTagsToSearchParams = (
+	query: URLSearchParams,
+	tagPks: number[],
+): void => {
+	if (tagPks.length > 0) {
+		query.set("tags", tagPks.join(","));
+	}
+};
+
+const appendSortToSearchParams = (
+	query: URLSearchParams,
+	sort: OpportunityListSort,
+): void => {
+	if (sort !== DEFAULT_OPPORTUNITY_LIST_SORT) {
+		query.set("sort", sort);
+	}
+};
+
+export const parseTagPksFromSearchParams = (
+	searchParams: Pick<URLSearchParams, "get" | "getAll">,
+): number[] => {
+	const repeated = searchParams.getAll("tags");
+	const rawValues =
+		repeated.length > 1
+			? repeated
+			: (repeated[0]?.split(",") ?? []).filter(Boolean);
+
+	const unique = new Set<number>();
+	for (const value of rawValues) {
+		const pk = Number(value.trim());
+		if (Number.isFinite(pk) && pk > 0) {
+			unique.add(pk);
+		}
+	}
+
+	return [...unique].sort((a, b) => a - b);
+};
+
+export const parseSortFromSearchParams = (
+	searchParams: Pick<URLSearchParams, "get">,
+): OpportunityListSort => {
+	const sort = searchParams.get("sort");
+	return sort === "deadline" ? "deadline" : "newest";
+};
+
+export const opportunitiesListKey = (
+	page: number,
+	perPage: number,
+	tagPks: number[] = [],
+	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
+) => {
 	const query = new URLSearchParams({
 		page: String(page),
 		per_page: String(perPage),
 	});
+	appendTagsToSearchParams(query, tagPks);
+	query.set("sort", sort);
 	return `${OPPORTUNITIES_LIST_PATH}?${query.toString()}`;
+};
+
+export const buildOpportunitiesPageHref = (
+	page: number,
+	tagPks: number[] = [],
+	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
+): string => {
+	const query = new URLSearchParams();
+	if (page > 1) {
+		query.set("page", String(page));
+	}
+	appendTagsToSearchParams(query, tagPks);
+	appendSortToSearchParams(query, sort);
+	const queryString = query.toString();
+	return queryString ? `/opportunity?${queryString}` : "/opportunity";
 };
 
 export const adminOpportunitiesListKey = (page: number, perPage: number) => {
@@ -149,6 +220,7 @@ export const extractOpportunityFromFavoriteItem = (
 			creator_username: nested.creator_username,
 			application_deadline: nested.application_deadline,
 			is_favorited: true,
+			tags: nested.tags,
 			created_at: nested.created_at,
 			updated_at: nested.updated_at,
 		};
@@ -184,9 +256,11 @@ export const normalizeFavoriteOpportunitiesResponse = (
 export const useOpportunities = (
 	page: number,
 	perPage: number = OPPORTUNITIES_PER_PAGE,
+	tagPks: number[] = [],
+	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
 ) => {
 	return useSWR<OpportunitiesPaginatedResponse>(
-		opportunitiesListKey(page, perPage),
+		opportunitiesListKey(page, perPage, tagPks, sort),
 		fetcher,
 		{ revalidateOnMount: true },
 	);

@@ -66,9 +66,7 @@ type PricingPlansProps = {
 	freeCtaHref?: string;
 };
 
-export function PricingPlans({
-	freeCtaHref = "#get-started",
-}: PricingPlansProps) {
+export function PricingPlans({ freeCtaHref = "/register" }: PricingPlansProps) {
 	const { hasActiveSubscription, isLoggedIn } = useAuthenticatedUser();
 	const proCtaHref = buildProPlanCtaHref(isLoggedIn, DEFAULT_PAID_PLAN_ID);
 

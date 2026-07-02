@@ -4,7 +4,7 @@ import { ApplicationsContent } from "@/components/applications-content";
 import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: `Applications — ${TRADING_NAME}`,
+	title: `Applications - ${TRADING_NAME}`,
 	description: "Track your opportunity applications.",
 };
 
