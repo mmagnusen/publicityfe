@@ -107,6 +107,11 @@ export function SidebarContent() {
 								Waitlist
 							</SidebarNavLink>
 						</li>
+						<li className="py-1">
+							<SidebarNavLink href="/admin/users" onNavigate={onNavigate}>
+								Users
+							</SidebarNavLink>
+						</li>
 					</ul>
 				</section>
 			) : null}
