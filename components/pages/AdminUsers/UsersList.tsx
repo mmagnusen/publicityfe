@@ -15,7 +15,7 @@ import {
 } from "@hooks/useAdminUsers";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import { debounce } from "lodash";
-import type { SingleValue } from "react-select";
+import type { MultiValue, SingleValue } from "react-select";
 
 import Heading from "@/components/Heading";
 import Input from "@/components/Input";
@@ -24,7 +24,6 @@ import { SidebarLayout } from "@/components/Sidebar";
 import Tag from "@/components/Tag";
 import Text from "@/components/Text";
 import { resolveBytescaleDisplayUrl } from "@/components/UploadButton";
-import { profilePagePath } from "@/lib/publicUser";
 
 const USER_STATUS_OPTIONS: SelectOption[] = [
 	{ label: "All users", value: "" },
@@ -125,12 +124,12 @@ function UserAvatar({ user }: { user: User }) {
 
 function UserRow({ user }: { user: User }) {
 	const isActive = user.is_active !== false;
-	const profileHref = profilePagePath(user.username);
+	const adminUserHref = `/admin/users/${user.pk}`;
 
 	return (
 		<li>
 			<Link
-				href={profileHref}
+				href={adminUserHref}
 				className="grid grid-cols-[2.5rem_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.2fr)_6rem_minmax(0,1fr)] items-center gap-4 py-4 text-sm transition-colors hover:bg-gray-50/80"
 			>
 				<UserAvatar user={user} />
@@ -216,8 +215,11 @@ export function UsersList() {
 		);
 	}
 
-	const handleStatusChange = (value: SingleValue<SelectOption>) => {
-		router.push(buildAdminUsersPageHref(1, searchQuery, value?.value ?? ""));
+	const handleStatusChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		const option = Array.isArray(value) ? value[0] : value;
+		router.push(buildAdminUsersPageHref(1, searchQuery, option?.value ?? ""));
 	};
 
 	return (

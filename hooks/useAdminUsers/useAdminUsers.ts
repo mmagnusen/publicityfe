@@ -1,10 +1,16 @@
 import useSWR from "swr";
 
-import type { AdminUsersPaginatedResponse } from "@customTypes/adminUser";
+import type {
+	AdminUserDetail,
+	AdminUsersPaginatedResponse,
+} from "@customTypes/adminUser";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import fetcher from "@util/fetcher";
 
 export const ADMIN_USER_SEARCH_PATH = "/users/admin-user-search";
+
+export const adminUserDetailPath = (pk: number) =>
+	`/users/admin-user-detail/${pk}`;
 
 export const ADMIN_USERS_PER_PAGE = 20;
 
@@ -78,6 +84,20 @@ export const useAdminUsers = (
 				q: searchValue || undefined,
 				status: statusValue || undefined,
 			}),
+		{ revalidateOnMount: true },
+	);
+};
+
+export const useAdminUser = (pk: number | null) => {
+	const { isAdmin, isLoggedIn } = useAuthenticatedUser();
+	const detailPath =
+		pk != null && Number.isFinite(pk) && pk > 0
+			? adminUserDetailPath(pk)
+			: null;
+
+	return useSWR<AdminUserDetail>(
+		isLoggedIn && isAdmin && detailPath ? detailPath : null,
+		fetcher,
 		{ revalidateOnMount: true },
 	);
 };
