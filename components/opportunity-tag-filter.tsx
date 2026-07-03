@@ -15,6 +15,12 @@ const sortOptions: SelectOption[] = [
 	{ label: "Deadline soonest", value: "deadline" },
 ];
 
+function isMultiSelectValue(
+	value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+): value is MultiValue<SelectOption> {
+	return Array.isArray(value);
+}
+
 type Props = {
 	selectedSort: OpportunityListSort;
 	selectedTagPks: number[];
@@ -44,11 +50,21 @@ export function OpportunityListFilters({
 		[selectedSort],
 	);
 
-	const handleTagChange = (value: MultiValue<SelectOption>) => {
-		onSelectedTagPksChange(selectOptionsToTagPks([...value]));
+	const handleTagChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		const selected = isMultiSelectValue(value) ? value : [];
+		onSelectedTagPksChange(selectOptionsToTagPks([...selected]));
 	};
 
-	const handleSortChange = (value: SingleValue<SelectOption>) => {
+	const handleSortChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		if (isMultiSelectValue(value)) {
+			onSelectedSortChange("newest");
+			return;
+		}
+
 		if (value?.value === "deadline") {
 			onSelectedSortChange("deadline");
 			return;
