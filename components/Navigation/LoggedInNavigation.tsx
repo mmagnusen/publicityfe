@@ -7,6 +7,9 @@ import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import Button from "@/components/Button";
 import { LogoLink } from "./LogoLink";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 export function LoggedInNavigation() {
 	const { funcLogout } = useAuthenticatedUser();
 
@@ -22,12 +25,14 @@ export function LoggedInNavigation() {
 					>
 						Dashboard
 					</Link>
-					<Link
-						href="/pricing"
-						className="text-sm text-gray-500 transition-colors hover:text-black"
-					>
-						Pricing
-					</Link>
+					{isPricingReleased ? (
+						<Link
+							href="/pricing"
+							className="text-sm text-gray-500 transition-colors hover:text-black"
+						>
+							Pricing
+						</Link>
+					) : null}
 					<Button
 						type="button"
 						strVariant="transparentWithBorder"

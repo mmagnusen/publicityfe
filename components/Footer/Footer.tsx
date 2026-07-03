@@ -9,10 +9,13 @@ import {
 	SITE_NAME,
 } from "@/constants/socialMedia";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 const footerLinks = [
 	{ href: "/about-us", label: "About us" },
 	{ href: "/contact-us", label: "Contact us" },
-	{ href: "/pricing", label: "Pricing" },
+	...(isPricingReleased ? [{ href: "/pricing", label: "Pricing" }] : []),
 	{ href: "/terms-and-conditions", label: "Terms and conditions" },
 	{ href: "/privacy-policy", label: "Privacy policy" },
 ] as const;

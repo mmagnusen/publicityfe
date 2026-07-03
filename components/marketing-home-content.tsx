@@ -13,6 +13,9 @@ import { Navigation } from "@/components/Navigation";
 import { PricingSection } from "@/components/pricing-section";
 import { TrustedBySection } from "@/components/trusted-by-section";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 export function MarketingHomeContent() {
 	const { isLoggedIn } = useAuthenticatedUser();
 
@@ -25,7 +28,7 @@ export function MarketingHomeContent() {
 			<FeaturesSection />
 			<HowItWorksSection />
 			<CreatorsSection />
-			<PricingSection />
+			{isPricingReleased ? <PricingSection /> : null}
 			<CtaSection />
 			<Footer />
 		</div>

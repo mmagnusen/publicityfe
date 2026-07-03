@@ -28,36 +28,43 @@ function CheckIcon() {
 
 const images = [
 	{
-		src: "/creators/audience.jpg",
-		alt: "Large audience seated in an auditorium",
+		src: "/creators/media-interview.png",
+		alt: "Woman being interviewed on camera in a studio with bookshelves",
 	},
 	{
-		src: "/creators/studio.jpg",
-		alt: "Professional recording studio with microphone and headphones",
+		src: "/creators/house-and-garden-cover.png",
+		alt: "House & Garden magazine cover featuring a luxurious living room interior",
 	},
 	{
-		src: "/creators/camera.jpg",
-		alt: "Professional video camera being operated",
+		src: "/creators/podcast-studio.png",
+		alt: "Man wearing headphones recording a podcast in a professional studio",
 	},
 	{
-		src: "/creators/panel.jpg",
+		src: "https://picsum.photos/seed/getfeatured-panel/480/480",
 		alt: "Panel discussion on stage with seated speakers",
 	},
-];
+] as const;
+
+const masonryColumns = [
+	images.filter((_, index) => index % 2 === 0),
+	images.filter((_, index) => index % 2 === 1),
+] as const;
 
 const benefits = [
 	{
 		title: "Verified Opportunities",
 		description:
-			"All opportunities are vetted to ensure quality and legitimacy",
+			"Every opportunity on the platform is vetted before it goes live - so you're only pitching to real journalists, genuine podcast hosts and legitimate event organisers.",
 	},
 	{
-		title: "Expert Support",
-		description: "Dedicated media relations team to help you succeed",
+		title: "Simple, Flat Pricing",
+		description:
+			"One monthly subscription. No commission, no hidden fees, no percentage taken from speaking fees or deals. What you earn is yours.",
 	},
 	{
-		title: "No Commission Fees",
-		description: "Keep 100% of your earnings from paid speaking opportunities",
+		title: "New Opportunities Every Week",
+		description:
+			"Fresh press, podcast, panel and speaking opportunities added regularly - so there's always something worth pitching for, whatever your industry.",
 	},
 ];
 
@@ -66,28 +73,37 @@ export function CreatorsSection() {
 		<section className="bg-gray-50 px-6 py-20 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
 				<div className="grid grid-cols-2 gap-3 sm:gap-4">
-					{images.map((image) => (
+					{masonryColumns.map((column, columnIndex) => (
 						<div
-							key={image.src}
-							className="relative aspect-4/3 overflow-hidden rounded-2xl"
+							key={columnIndex === 0 ? "left" : "right"}
+							className={`flex flex-col gap-3 sm:gap-4 ${columnIndex === 1 ? "pt-8 sm:pt-12" : ""}`}
 						>
-							<Image
-								src={image.src}
-								alt={image.alt}
-								fill
-								sizes="(max-width: 1024px) 45vw, 280px"
-								className="object-cover"
-							/>
+							{column.map((image) => (
+								<div
+									key={image.src}
+									className="relative aspect-square overflow-hidden rounded-2xl"
+								>
+									<Image
+										src={image.src}
+										alt={image.alt}
+										fill
+										sizes="(max-width: 1024px) 45vw, 280px"
+										className="object-cover"
+									/>
+								</div>
+							))}
 						</div>
 					))}
 				</div>
 
 				<div>
-					<Heading level={2}>Built for Creators &amp; Businesses</Heading>
+					<Heading level={2}>
+						You&apos;ve built something great. Let&apos;s make sure people know.
+					</Heading>
 					<Text variant="section-lead-relaxed">
-						Whether you&apos;re a solopreneur, startup founder, or established
-						brand, ${TRADING_NAME} helps you build authority and reach your
-						target audience through strategic media placements.
+						Whether you&apos;re a founder, freelancer, creative, consultant or
+						expert in your field - {TRADING_NAME} helps you build your profile,
+						grow your authority and get in front of the right audiences.
 					</Text>
 
 					<ul className="mt-8 space-y-5">

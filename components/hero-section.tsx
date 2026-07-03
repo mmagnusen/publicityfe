@@ -3,32 +3,6 @@ import Heading from "@/components/Heading";
 import { RotatingWord } from "@/components/rotating-word";
 import Text from "@/components/Text";
 
-function MegaphoneIcon() {
-	return (
-		<svg
-			viewBox="0 0 16 16"
-			fill="none"
-			className="size-3.5 shrink-0 text-blue-500"
-			aria-hidden
-		>
-			<title>Megaphone</title>
-			<path d="M2 5.5v5L5.5 12V4L2 5.5Z" fill="currentColor" />
-			<path
-				d="M5.5 4L11 2v12l-5.5-2V4Z"
-				stroke="currentColor"
-				strokeWidth="1"
-				fill="none"
-			/>
-			<path
-				d="M12.5 5.5c1 1 1 4 0 5"
-				stroke="currentColor"
-				strokeWidth="1.25"
-				strokeLinecap="round"
-			/>
-		</svg>
-	);
-}
-
 function ArrowIcon() {
 	return (
 		<svg viewBox="0 0 16 16" fill="none" className="size-4" aria-hidden>
@@ -46,16 +20,10 @@ function ArrowIcon() {
 
 export function HeroSection() {
 	return (
-		<section className="bg-white px-6 pt-12 pb-24 sm:pt-16 sm:pb-32">
+		<section className="bg-white px-6 pt-12 pb-20 sm:pt-16 sm:pb-28">
 			<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-				<div className="mb-8 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50/80 px-4 py-1.5 text-sm">
-					<MegaphoneIcon />
-					<span>
-						<span className="font-semibold text-black">
-							127 new opportunities
-						</span>{" "}
-						<span className="text-gray-500">added today</span>
-					</span>
+				<div className="mb-8 inline-flex items-center rounded-full border border-gray-200 bg-gray-50/80 px-4 py-1.5 text-sm font-semibold text-black">
+					⚡ Early access now open
 				</div>
 
 				<Heading level={1} variant="hero">
@@ -82,7 +50,7 @@ export function HeroSection() {
 					</span>
 				</Button>
 
-				<Text variant="hero-note">Pause or cancel service anytime.</Text>
+				<Text variant="hero-note">No credit card required.</Text>
 			</div>
 		</section>
 	);

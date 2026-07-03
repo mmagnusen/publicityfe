@@ -6,19 +6,19 @@ const steps = [
 		number: 1,
 		title: "Create Your Profile",
 		description:
-			"Tell us about your expertise, experience, and the topics you're passionate about. Add your media kit and portfolio.",
+			"Your profile is your media CV. Add your expertise, background, industry, social links and any previous press coverage - so when a journalist or podcast host sees your pitch, they already know you're the right fit.",
 	},
 	{
 		number: 2,
-		title: "Get Matched",
+		title: "Browse Opportunities",
 		description:
-			"Our AI scans thousands of opportunities daily and matches you with relevant press, podcasts, and panels.",
+			"Every week, new opportunities land on the platform from journalists, podcast hosts, editors and event organisers actively looking for experts like you.",
 	},
 	{
 		number: 3,
-		title: "Land Opportunities",
+		title: "Pitch and Get Featured",
 		description:
-			"Review, accept, and manage your bookings. We handle the logistics so you can focus on sharing your expertise.",
+			"Found an opportunity that fits? Send your pitch in minutes. If selected, you'll hear directly from the outlet - and your next feature begins.",
 	},
 ];
 
@@ -27,7 +27,7 @@ export function HowItWorksSection() {
 		<section id="how-it-works" className="bg-white px-6 py-20 sm:py-24">
 			<div className="mx-auto max-w-5xl">
 				<div className="text-center">
-					<Heading level={2}>Simple, Fast, Effective</Heading>
+					<Heading level={2}>How it Works</Heading>
 					<Text variant="section-lead">
 						Get started in minutes and start landing opportunities today
 					</Text>

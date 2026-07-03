@@ -3,10 +3,13 @@ import Link from "next/link";
 import Button from "@/components/Button";
 import { LogoLink } from "./LogoLink";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 const navLinks = [
 	{ href: "#features", label: "Features" },
 	{ href: "#how-it-works", label: "How it Works" },
-	{ href: "/pricing", label: "Pricing" },
+	...(isPricingReleased ? [{ href: "/pricing", label: "Pricing" }] : []),
 	{ href: "/opportunity", label: "Opportunities" },
 ];
 
@@ -32,12 +35,14 @@ export function LoggedOutNavigation() {
 				</nav>
 
 				<div className="flex items-center gap-3">
-					<Link
-						href="/pricing"
-						className="text-sm text-gray-500 transition-colors hover:text-black md:hidden"
-					>
-						Pricing
-					</Link>
+					{isPricingReleased ? (
+						<Link
+							href="/pricing"
+							className="text-sm text-gray-500 transition-colors hover:text-black md:hidden"
+						>
+							Pricing
+						</Link>
+					) : null}
 					<Button
 						href="/login"
 						strVariant="transparentWithBorder"

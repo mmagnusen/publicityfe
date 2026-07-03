@@ -121,36 +121,42 @@ function LightningIcon() {
 const features = [
 	{
 		icon: MicrophoneIcon,
+		iconClassName: "bg-violet-500 text-white",
 		title: "Podcast Placements",
 		description:
 			"Get matched with podcasters looking for guests in your niche. Automated pitching and follow-up management.",
 	},
 	{
 		icon: NewspaperIcon,
+		iconClassName: "bg-pink-500 text-white",
 		title: "Press Coverage",
 		description:
 			"Connect with journalists seeking expert sources and story contributors for major publications.",
 	},
 	{
 		icon: PeopleIcon,
+		iconClassName: "bg-emerald-500 text-white",
 		title: "Panel & Speaking",
 		description:
 			"Discover conference panels, webinars, and speaking opportunities that align with your expertise.",
 	},
 	{
 		icon: TargetIcon,
+		iconClassName: "bg-cyan-500 text-white",
 		title: "Smart Matching",
 		description:
 			"AI-powered recommendations ensure you only see opportunities that match your profile and goals.",
 	},
 	{
 		icon: ChartIcon,
+		iconClassName: "bg-purple-500 text-white",
 		title: "Analytics Dashboard",
 		description:
 			"Track your visibility metrics, response rates, and measure your growing influence over time.",
 	},
 	{
 		icon: LightningIcon,
+		iconClassName: "bg-orange-500 text-white",
 		title: "Instant Alerts",
 		description:
 			"Never miss an opportunity. Get real-time notifications for time-sensitive media requests.",
@@ -178,7 +184,9 @@ export function FeaturesSection() {
 								key={feature.title}
 								className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm"
 							>
-								<div className="flex size-10 items-center justify-center rounded-xl bg-gray-100 text-black">
+								<div
+									className={`flex size-10 items-center justify-center rounded-xl ${feature.iconClassName}`}
+								>
 									<Icon />
 								</div>
 								<Heading level={3} variant="card-mt-4">

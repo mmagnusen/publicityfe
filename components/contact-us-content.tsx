@@ -56,8 +56,7 @@ export function ContactUsContent() {
 		}
 	};
 
-	const supportEmail =
-		process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "hello@joindelphi.co";
+	const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
 
 	return (
 		<div className="min-h-full bg-white font-sans">
@@ -69,7 +68,7 @@ export function ContactUsContent() {
 						Contact us
 					</Heading>
 					<Text variant="page-subtitle" className="mt-3">
-						Questions about ${TRADING_NAME}, your account, or an opportunity?
+						Questions about {TRADING_NAME}, your account, or an opportunity?
 						We&apos;re here to help.
 					</Text>
 

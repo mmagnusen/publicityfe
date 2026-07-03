@@ -40,7 +40,7 @@ import Text from "@/components/Text";
 export function TrustedBySection() {
 	return (
 		<section className="border-t border-b border-gray-200 bg-white px-6 py-12 sm:py-14">
-			<Text variant="trusted-by">Trusted by creators at</Text>
+			<Text variant="trusted-by">Land coverage in publications like</Text>
 
 			<ul className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-12 md:gap-x-14">
 				{brands.map((brand) => (
