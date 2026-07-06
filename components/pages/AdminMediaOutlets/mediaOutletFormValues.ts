@@ -11,6 +11,7 @@ export type MediaOutletFormValues = {
 	name: string;
 	website_url: string;
 	founded_year: string;
+	image_url: string;
 	tags: SelectOption[];
 };
 
@@ -18,6 +19,7 @@ export const defaultMediaOutletFormValues = (): MediaOutletFormValues => ({
 	name: "",
 	website_url: "",
 	founded_year: "",
+	image_url: "",
 	tags: [],
 });
 
@@ -30,6 +32,7 @@ export const mediaOutletToFormValues = (
 		outlet.founded_year != null && outlet.founded_year > 0
 			? String(outlet.founded_year)
 			: "",
+	image_url: outlet.image_url?.trim() ?? "",
 	tags: tagsToSelectOptions(outlet.tags),
 });
 
@@ -54,4 +57,7 @@ export const formValuesToCreatePayload = (
 
 export const formValuesToUpdatePayload = (
 	values: MediaOutletFormValues,
-): MediaOutletUpdatePayload => formValuesToCreatePayload(values);
+): MediaOutletUpdatePayload => ({
+	...formValuesToCreatePayload(values),
+	image_url: values.image_url.trim() || null,
+});

@@ -8,12 +8,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import type { ApiOpportunity } from "@customTypes/opportunity";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
-import type { OpportunityListSort } from "@hooks/useOpportunities";
+import type {
+	OpportunityListAppliedFilter,
+	OpportunityListSort,
+} from "@hooks/useOpportunities";
 import {
 	buildOpportunitiesPageHref,
 	getOpportunityApiErrorMessage,
 	normalizeOpportunityListResponse,
 	OPPORTUNITIES_PER_PAGE,
+	parseAppliedFromSearchParams,
 	parseSortFromSearchParams,
 	parseTagPksFromSearchParams,
 	useOpportunities,
@@ -38,11 +42,13 @@ import {
 import { isOpportunityNewToday } from "@/lib/opportunityNewToday";
 
 function ListPagination({
+	applied,
 	currentPage,
 	sort,
 	tagPks,
 	totalCount,
 }: {
+	applied: OpportunityListAppliedFilter;
 	currentPage: number;
 	sort: OpportunityListSort;
 	tagPks: number[];
@@ -59,11 +65,11 @@ function ListPagination({
 
 	const prevHref =
 		currentPage > 1
-			? buildOpportunitiesPageHref(currentPage - 1, tagPks, sort)
+			? buildOpportunitiesPageHref(currentPage - 1, tagPks, sort, applied)
 			: undefined;
 	const nextHref =
 		currentPage < totalPages
-			? buildOpportunitiesPageHref(currentPage + 1, tagPks, sort)
+			? buildOpportunitiesPageHref(currentPage + 1, tagPks, sort, applied)
 			: undefined;
 
 	return (
@@ -224,6 +230,11 @@ export function OpportunityCard({
 									/>
 									{isOpen ? "Open" : "Closed"}
 								</span>
+								{opportunity.hasAppliedByCurrentUser ? (
+									<span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-700">
+										Applied
+									</span>
+								) : null}
 							</div>
 
 							<Heading level={2} variant="subsection" className="mt-3">
@@ -277,12 +288,17 @@ export function OpportunitiesList() {
 		() => parseSortFromSearchParams(searchParams),
 		[searchParams],
 	);
+	const selectedApplied = useMemo(
+		() => parseAppliedFromSearchParams(searchParams),
+		[searchParams],
+	);
 
 	const { data, error, isLoading } = useOpportunities(
 		currentPage,
 		OPPORTUNITIES_PER_PAGE,
 		selectedTagPks,
 		selectedSort,
+		selectedApplied,
 	);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
 
@@ -291,11 +307,21 @@ export function OpportunitiesList() {
 		: false;
 
 	const handleTagFilterChange = (tagPks: number[]) => {
-		router.push(buildOpportunitiesPageHref(1, tagPks, selectedSort));
+		router.push(
+			buildOpportunitiesPageHref(1, tagPks, selectedSort, selectedApplied),
+		);
 	};
 
 	const handleSortChange = (sort: OpportunityListSort) => {
-		router.push(buildOpportunitiesPageHref(1, selectedTagPks, sort));
+		router.push(
+			buildOpportunitiesPageHref(1, selectedTagPks, sort, selectedApplied),
+		);
+	};
+
+	const handleAppliedChange = (applied: OpportunityListAppliedFilter) => {
+		router.push(
+			buildOpportunitiesPageHref(1, selectedTagPks, selectedSort, applied),
+		);
 	};
 
 	const listContent = (
@@ -313,10 +339,13 @@ export function OpportunitiesList() {
 
 			<div className="mt-6">
 				<OpportunityListFilters
+					onSelectedAppliedChange={handleAppliedChange}
 					onSelectedSortChange={handleSortChange}
 					onSelectedTagPksChange={handleTagFilterChange}
+					selectedApplied={selectedApplied}
 					selectedSort={selectedSort}
 					selectedTagPks={selectedTagPks}
+					showAppliedFilter={isLoggedIn}
 				/>
 			</div>
 
@@ -336,8 +365,8 @@ export function OpportunitiesList() {
 				) : list.results.length === 0 ? (
 					<div className="rounded-2xl border border-gray-200 bg-white p-6">
 						<Text variant="center-sm">
-							{selectedTagPks.length > 0
-								? "No opportunities match the selected tags."
+							{selectedTagPks.length > 0 || selectedApplied
+								? "No opportunities match your filters."
 								: "No opportunities available right now."}
 						</Text>
 					</div>
@@ -354,6 +383,7 @@ export function OpportunitiesList() {
 							))}
 						</ul>
 						<ListPagination
+							applied={selectedApplied}
 							currentPage={currentPage}
 							sort={selectedSort}
 							tagPks={selectedTagPks}

@@ -13,13 +13,19 @@ import Field from "@/components/FormikFields/Field";
 import InputField from "@/components/FormikFields/InputField";
 import SelectField from "@/components/FormikFields/SelectField";
 import Text from "@/components/Text";
+import UploadButton, {
+	resolveBytescaleDisplayUrl,
+} from "@/components/UploadButton";
 import { tagsToSelectOptions } from "@/lib/profileForm";
 import { type MediaOutletFormValues } from "./mediaOutletFormValues";
+
+const MEDIA_OUTLET_IMAGE_UPLOAD_PATH = "media-outlets";
 
 const drfFieldMap: Partial<Record<string, keyof MediaOutletFormValues>> = {
 	name: "name",
 	website_url: "website_url",
 	founded_year: "founded_year",
+	image_url: "image_url",
 	tag_pks: "tags",
 };
 
@@ -60,6 +66,9 @@ type Props = {
 	initialValues: MediaOutletFormValues;
 	onSubmit: (values: MediaOutletFormValues) => Promise<void>;
 	isSubmitting: boolean;
+	isUploadingImage?: boolean;
+	onImageUpload?: (imageUrl: string) => Promise<void>;
+	showImageUpload?: boolean;
 	submitLabel: string;
 	onDelete?: () => void;
 	isDeleting?: boolean;
@@ -69,6 +78,9 @@ export function MediaOutletForm({
 	initialValues,
 	onSubmit,
 	isSubmitting,
+	isUploadingImage = false,
+	onImageUpload,
+	showImageUpload = false,
 	submitLabel,
 	onDelete,
 	isDeleting,
@@ -117,7 +129,7 @@ export function MediaOutletForm({
 				}
 			}}
 		>
-			{({ status }) => (
+			{({ setFieldValue, status, values }) => (
 				<Form noValidate className="space-y-2">
 					<Field fieldLabel="Name" fieldName="name">
 						<InputField
@@ -143,6 +155,56 @@ export function MediaOutletForm({
 							type={INPUT_TYPE.NUMBER}
 						/>
 					</Field>
+
+					{showImageUpload ? (
+						<Field fieldLabel="Image" fieldName="image_url">
+							{values.image_url ? (
+								<div className="mb-4 aspect-square w-full max-w-xs overflow-hidden rounded-xl border border-gray-200">
+									{/* Media outlet images come from Bytescale CDN URLs. */}
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img
+										alt={`${values.name.trim() || "Media outlet"} image preview`}
+										className="block size-full object-cover"
+										src={resolveBytescaleDisplayUrl(values.image_url) ?? ""}
+									/>
+								</div>
+							) : null}
+							<UploadButton
+								isLoading={isUploadingImage}
+								onComplete={async ({ uploadedFilePath }) => {
+									if (!onImageUpload) {
+										setFieldValue("image_url", uploadedFilePath);
+										return;
+									}
+
+									try {
+										await onImageUpload(uploadedFilePath);
+										setFieldValue("image_url", uploadedFilePath);
+									} catch {
+										// Error feedback is handled by onImageUpload.
+									}
+								}}
+								options={{
+									editor: {
+										images: {
+											crop: true,
+											cropRatio: 1,
+											cropShape: "rect",
+										},
+									},
+									mimeTypes: ["image/*"],
+								}}
+								path={MEDIA_OUTLET_IMAGE_UPLOAD_PATH}
+								uploadButtonText={
+									values.image_url ? "Replace image" : "Upload image"
+								}
+							/>
+							<Text variant="caption" className="mt-2">
+								Upload a square image. Images are saved automatically when
+								uploaded.
+							</Text>
+						</Field>
+					) : null}
 
 					<Field fieldLabel="Tags" fieldName="tags">
 						<SelectField

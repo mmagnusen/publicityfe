@@ -59,6 +59,34 @@ function CheckIcon() {
 	);
 }
 
+function PublicationAvatar({
+	imageUrl,
+	name,
+	slug,
+}: {
+	imageUrl: string | null;
+	name: string;
+	slug: string;
+}) {
+	if (imageUrl) {
+		return (
+			// Media outlet images come from Bytescale CDN URLs- not in next/image config.
+			// eslint-disable-next-line @next/next/no-img-element
+			<img
+				alt={name}
+				className="h-11 w-auto max-w-24 shrink-0 rounded-lg object-contain"
+				src={imageUrl}
+			/>
+		);
+	}
+
+	return (
+		<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-black text-xs font-bold text-white">
+			{slug}
+		</div>
+	);
+}
+
 function ExternalLinkIcon() {
 	return (
 		<svg viewBox="0 0 16 16" fill="none" className="size-3.5" aria-hidden>
@@ -165,6 +193,11 @@ function OpportunityDetailBody({
 						/>
 						{isOpen ? "Open" : "Closed"}
 					</span>
+					{opportunity.hasAppliedByCurrentUser ? (
+						<span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-blue-700">
+							Applied
+						</span>
+					) : null}
 				</div>
 
 				<p className="mt-3 flex items-center gap-2 text-sm text-gray-600">
@@ -208,30 +241,49 @@ function OpportunityDetailBody({
 
 				{showActions ? (
 					<div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-						<Button
-							href={`/opportunity/${opportunity.id}/apply`}
-							borderRadius="large"
-							textTransform="none"
-						>
-							<span className="inline-flex items-center justify-center gap-2">
+						{opportunity.hasAppliedByCurrentUser ? (
+							<div className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm font-medium text-blue-800">
 								<svg
 									viewBox="0 0 16 16"
 									fill="none"
-									className="size-4"
+									className="size-4 shrink-0"
 									aria-hidden
 								>
-									<title>Apply</title>
+									<title>Applied</title>
 									<path
 										d="M4 8l3 3 5-6"
 										stroke="currentColor"
 										strokeWidth="1.5"
 										strokeLinecap="round"
-										// strokeLinejoin="round"
 									/>
 								</svg>
-								Apply now
-							</span>
-						</Button>
+								You&apos;ve already applied for this opportunity
+							</div>
+						) : (
+							<Button
+								href={`/opportunity/${opportunity.id}/apply`}
+								borderRadius="large"
+								textTransform="none"
+							>
+								<span className="inline-flex items-center justify-center gap-2">
+									<svg
+										viewBox="0 0 16 16"
+										fill="none"
+										className="size-4"
+										aria-hidden
+									>
+										<title>Apply</title>
+										<path
+											d="M4 8l3 3 5-6"
+											stroke="currentColor"
+											strokeWidth="1.5"
+											strokeLinecap="round"
+										/>
+									</svg>
+									Apply now
+								</span>
+							</Button>
+						)}
 						<OpportunityFavouriteToggle
 							isFavorited={opportunity.isFavorited}
 							opportunityId={Number(opportunity.id)}
@@ -282,9 +334,11 @@ function OpportunityDetailBody({
 
 				<div className="rounded-2xl border border-gray-200 bg-white p-6">
 					<div className="flex items-center gap-3">
-						<div className="flex size-10 items-center justify-center rounded-lg bg-black text-xs font-bold text-white">
-							{opportunity.publication.slug}
-						</div>
+						<PublicationAvatar
+							imageUrl={opportunity.publication.imageUrl}
+							name={opportunity.publication.name}
+							slug={opportunity.publication.slug}
+						/>
 						<div>
 							<Text variant="publication-name">
 								{opportunity.publication.name}

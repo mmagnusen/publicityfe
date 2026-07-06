@@ -37,6 +37,8 @@ export const OPPORTUNITIES_PER_PAGE = 20;
 
 export type OpportunityListSort = "newest" | "deadline";
 
+export type OpportunityListAppliedFilter = "" | "true" | "false";
+
 export type AdminOpportunityStatus =
 	| "submitted"
 	| "approved"
@@ -108,6 +110,15 @@ const appendSortToSearchParams = (
 	}
 };
 
+const appendAppliedToSearchParams = (
+	query: URLSearchParams,
+	applied: OpportunityListAppliedFilter,
+): void => {
+	if (applied === "true" || applied === "false") {
+		query.set("applied", applied);
+	}
+};
+
 export const parseTagPksFromSearchParams = (
 	searchParams: Pick<URLSearchParams, "get" | "getAll">,
 ): number[] => {
@@ -133,6 +144,17 @@ export const parseSortFromSearchParams = (
 ): OpportunityListSort => {
 	const sort = searchParams.get("sort");
 	return sort === "deadline" ? "deadline" : "newest";
+};
+
+export const parseAppliedFromSearchParams = (
+	searchParams: Pick<URLSearchParams, "get">,
+): OpportunityListAppliedFilter => {
+	const applied = searchParams.get("applied");
+	if (applied === "true" || applied === "false") {
+		return applied;
+	}
+
+	return "";
 };
 
 export const parseAdminOpportunityStatusFromSearchParams = (
@@ -164,6 +186,7 @@ export const opportunitiesListKey = (
 	perPage: number,
 	tagPks: number[] = [],
 	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
+	applied: OpportunityListAppliedFilter = "",
 ) => {
 	const query = new URLSearchParams({
 		page: String(page),
@@ -171,6 +194,7 @@ export const opportunitiesListKey = (
 	});
 	appendTagsToSearchParams(query, tagPks);
 	query.set("sort", sort);
+	appendAppliedToSearchParams(query, applied);
 	return `${OPPORTUNITIES_LIST_PATH}?${query.toString()}`;
 };
 
@@ -178,6 +202,7 @@ export const buildOpportunitiesPageHref = (
 	page: number,
 	tagPks: number[] = [],
 	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
+	applied: OpportunityListAppliedFilter = "",
 ): string => {
 	const query = new URLSearchParams();
 	if (page > 1) {
@@ -185,6 +210,7 @@ export const buildOpportunitiesPageHref = (
 	}
 	appendTagsToSearchParams(query, tagPks);
 	appendSortToSearchParams(query, sort);
+	appendAppliedToSearchParams(query, applied);
 	const queryString = query.toString();
 	return queryString ? `/opportunity?${queryString}` : "/opportunity";
 };
@@ -340,9 +366,10 @@ export const useOpportunities = (
 	perPage: number = OPPORTUNITIES_PER_PAGE,
 	tagPks: number[] = [],
 	sort: OpportunityListSort = DEFAULT_OPPORTUNITY_LIST_SORT,
+	applied: OpportunityListAppliedFilter = "",
 ) => {
 	return useSWR<OpportunitiesPaginatedResponse>(
-		opportunitiesListKey(page, perPage, tagPks, sort),
+		opportunitiesListKey(page, perPage, tagPks, sort, applied),
 		fetcher,
 		{ revalidateOnMount: true },
 	);

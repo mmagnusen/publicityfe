@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
+	normalizeMyApplicationsResponse,
+	useMyApplications,
+} from "@hooks/useMyApplications";
+import {
 	normalizeFavoriteOpportunitiesResponse,
 	normalizeOpportunityListResponse,
 	useMyFavouriteOpportunities,
@@ -57,6 +61,12 @@ export function DashboardContent() {
 	} = useAuthenticatedUser();
 	const { data, isLoading } = useMyOpportunities(1);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
+	const { data: applicationsData, isLoading: isLoadingApplications } =
+		useMyApplications(1);
+	const applicationsList = useMemo(
+		() => normalizeMyApplicationsResponse(applicationsData),
+		[applicationsData],
+	);
 	const { data: favouritesData, isLoading: isLoadingFavourites } =
 		useMyFavouriteOpportunities(1);
 	const favouritesList = useMemo(
@@ -100,7 +110,11 @@ export function DashboardContent() {
 				<DashboardStatLink
 					href="/applications"
 					label="Applications"
-					value={0}
+					value={
+						isLoadingApplications && !applicationsData
+							? "…"
+							: applicationsList.count
+					}
 				/>
 				<DashboardStatLink
 					href="/favourites"
@@ -133,10 +147,12 @@ export function DashboardContent() {
 
 			<DashboardAddOpportunitySection />
 
-			<DashboardReferralsSection
-				fallbackReferralCode={authenticatedUser.referral_code}
-				isLoggedIn={isLoggedIn}
-			/>
+			{isPricingReleased ? (
+				<DashboardReferralsSection
+					fallbackReferralCode={authenticatedUser.referral_code}
+					isLoggedIn={isLoggedIn}
+				/>
+			) : null}
 
 			{isPricingReleased ? (
 				<DashboardBillingSupport

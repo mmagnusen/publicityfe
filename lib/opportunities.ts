@@ -30,6 +30,7 @@ export type Opportunity = {
 	location: string;
 	matchScore: number;
 	isFavorited: boolean;
+	hasAppliedByCurrentUser: boolean;
 	createdAt: string | null;
 	reporter: {
 		name: string;
@@ -43,6 +44,7 @@ export type Opportunity = {
 		name: string;
 		slug: string;
 		url: string;
+		imageUrl: string | null;
 		foundedYear: number | null;
 		tags: Tag[];
 	};
@@ -158,6 +160,7 @@ export const mapMediaOutletToPublication = (
 		name,
 		slug: publicationSlugFromName(name),
 		url: outlet.website_url.trim(),
+		imageUrl: resolveBytescaleDisplayUrl(outlet.image_url),
 		foundedYear: outlet.founded_year ?? null,
 		tags: outlet.tags ?? [],
 	};
@@ -174,6 +177,7 @@ export const publicationFromOpportunityFallback = (
 		name: trimmedName,
 		slug: publicationSlugFromName(trimmedName),
 		url: url.trim(),
+		imageUrl: null,
 		foundedYear: null,
 		tags,
 	};
@@ -299,6 +303,7 @@ export const mapApiOpportunityToDisplay = (
 			? formatApplicationDeadlineDisplay(applicationDeadline)
 			: "",
 		isFavorited: Boolean(api.is_favorited),
+		hasAppliedByCurrentUser: Boolean(api.has_applied_by_current_user),
 		createdAt: api.created_at?.trim() || null,
 		reporter: emptyReporter(
 			publicationName,

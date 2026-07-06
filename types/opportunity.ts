@@ -14,6 +14,7 @@ export type ApiOpportunity = {
 	creator_username?: string | null;
 	application_deadline?: string | null;
 	is_favorited?: boolean;
+	has_applied_by_current_user?: boolean;
 	status?: string | null;
 	created_at?: string;
 	updated_at?: string;

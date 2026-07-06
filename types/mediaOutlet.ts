@@ -5,6 +5,7 @@ export type MediaOutlet = {
 	name: string;
 	website_url: string;
 	founded_year?: number | null;
+	image_url?: string | null;
 	tags?: Tag[];
 	created_at?: string;
 	updated_at?: string;
@@ -24,4 +25,6 @@ export type MediaOutletCreatePayload = {
 	tag_pks?: number[];
 };
 
-export type MediaOutletUpdatePayload = Partial<MediaOutletCreatePayload>;
+export type MediaOutletUpdatePayload = Partial<MediaOutletCreatePayload> & {
+	image_url?: string | null;
+};

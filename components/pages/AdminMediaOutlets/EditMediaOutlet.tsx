@@ -3,11 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import { mutate } from "swr";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
 	deleteMediaOutlet,
+	getMediaOutletApiErrorMessage,
 	mediaOutletDetailPath,
 	patchMediaOutlet,
 	revalidateMediaOutletLists,
@@ -36,6 +38,7 @@ export function EditMediaOutlet() {
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [isUploadingImage, setIsUploadingImage] = useState(false);
 
 	const initialValues = useMemo(
 		() => (data ? mediaOutletToFormValues(data) : null),
@@ -61,6 +64,25 @@ export function EditMediaOutlet() {
 			await router.push("/admin/media-outlets");
 		} finally {
 			setIsSubmitting(false);
+		}
+	};
+
+	const handleImageUpload = async (imageUrl: string) => {
+		if (!Number.isFinite(pk) || pk <= 0) {
+			return;
+		}
+
+		setIsUploadingImage(true);
+		try {
+			await patchMediaOutlet(pk, { image_url: imageUrl });
+			await mutate(mediaOutletDetailPath(pk));
+			await revalidateMediaOutletLists();
+			toast.success("Image saved.");
+		} catch (error) {
+			toast.error(getMediaOutletApiErrorMessage(error));
+			throw error;
+		} finally {
+			setIsUploadingImage(false);
 		}
 	};
 
@@ -137,8 +159,11 @@ export function EditMediaOutlet() {
 						initialValues={initialValues}
 						isDeleting={isDeleting}
 						isSubmitting={isSubmitting}
+						isUploadingImage={isUploadingImage}
 						onDelete={handleDelete}
+						onImageUpload={handleImageUpload}
 						onSubmit={handleSubmit}
+						showImageUpload
 						submitLabel="Save changes"
 					/>
 				)}

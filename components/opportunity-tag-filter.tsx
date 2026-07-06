@@ -2,7 +2,10 @@
 
 import { useMemo } from "react";
 
-import type { OpportunityListSort } from "@hooks/useOpportunities";
+import type {
+	OpportunityListAppliedFilter,
+	OpportunityListSort,
+} from "@hooks/useOpportunities";
 import { useAllTags } from "@hooks/useTags";
 import type { MultiValue, SingleValue } from "react-select";
 
@@ -15,6 +18,12 @@ const sortOptions: SelectOption[] = [
 	{ label: "Deadline soonest", value: "deadline" },
 ];
 
+const appliedOptions: SelectOption[] = [
+	{ label: "All opportunities", value: "" },
+	{ label: "Applied", value: "true" },
+	{ label: "Not applied", value: "false" },
+];
+
 function isMultiSelectValue(
 	value: SingleValue<SelectOption> | MultiValue<SelectOption>,
 ): value is MultiValue<SelectOption> {
@@ -22,17 +31,23 @@ function isMultiSelectValue(
 }
 
 type Props = {
+	selectedApplied: OpportunityListAppliedFilter;
 	selectedSort: OpportunityListSort;
 	selectedTagPks: number[];
+	onSelectedAppliedChange: (applied: OpportunityListAppliedFilter) => void;
 	onSelectedSortChange: (sort: OpportunityListSort) => void;
 	onSelectedTagPksChange: (tagPks: number[]) => void;
+	showAppliedFilter?: boolean;
 };
 
 export function OpportunityListFilters({
+	selectedApplied,
 	selectedSort,
 	selectedTagPks,
+	onSelectedAppliedChange,
 	onSelectedSortChange,
 	onSelectedTagPksChange,
+	showAppliedFilter = true,
 }: Props) {
 	const { data: tags, error, isLoading } = useAllTags();
 	const tagOptions = useMemo(() => tagsToSelectOptions(tags ?? []), [tags]);
@@ -48,6 +63,12 @@ export function OpportunityListFilters({
 			sortOptions.find((option) => option.value === selectedSort) ??
 			sortOptions[0],
 		[selectedSort],
+	);
+	const selectedAppliedOption = useMemo(
+		() =>
+			appliedOptions.find((option) => option.value === selectedApplied) ??
+			appliedOptions[0],
+		[selectedApplied],
 	);
 
 	const handleTagChange = (
@@ -73,9 +94,31 @@ export function OpportunityListFilters({
 		onSelectedSortChange("newest");
 	};
 
+	const handleAppliedChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		if (isMultiSelectValue(value)) {
+			onSelectedAppliedChange("");
+			return;
+		}
+
+		if (value?.value === "true" || value?.value === "false") {
+			onSelectedAppliedChange(value.value);
+			return;
+		}
+
+		onSelectedAppliedChange("");
+	};
+
 	return (
 		<div className="rounded-2xl border border-gray-200 bg-white p-4">
-			<div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start">
+			<div
+				className={
+					showAppliedFilter
+						? "grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px_220px] sm:items-start"
+						: "grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start"
+				}
+			>
 				<div>
 					<label
 						className="mb-2 block text-sm font-medium text-gray-900"
@@ -106,6 +149,25 @@ export function OpportunityListFilters({
 						</Text>
 					) : null}
 				</div>
+
+				{showAppliedFilter ? (
+					<div>
+						<label
+							className="mb-2 block text-sm font-medium text-gray-900"
+							htmlFor="opportunity-applied-filter"
+						>
+							Applied status
+						</label>
+						<Select
+							arrOptions={appliedOptions}
+							bCompact
+							id="opportunity-applied-filter"
+							isSearchable={false}
+							onChange={handleAppliedChange}
+							value={selectedAppliedOption}
+						/>
+					</div>
+				) : null}
 
 				<div>
 					<label

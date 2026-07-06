@@ -1,5 +1,6 @@
 export type {
 	AdminOpportunityStatus,
+	OpportunityListAppliedFilter,
 	OpportunityListSort,
 } from "./useOpportunities";
 export {
@@ -31,6 +32,7 @@ export {
 	opportunityDetailPath,
 	parseAdminOpportunityStatus,
 	parseAdminOpportunityStatusFromSearchParams,
+	parseAppliedFromSearchParams,
 	parseSortFromSearchParams,
 	parseTagPksFromSearchParams,
 	patchOpportunity,
