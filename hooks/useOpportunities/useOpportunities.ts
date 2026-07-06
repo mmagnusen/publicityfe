@@ -37,6 +37,57 @@ export const OPPORTUNITIES_PER_PAGE = 20;
 
 export type OpportunityListSort = "newest" | "deadline";
 
+export type AdminOpportunityStatus =
+	| "submitted"
+	| "approved"
+	| "draft"
+	| "declined"
+	| "archived";
+
+const ADMIN_OPPORTUNITY_STATUSES: AdminOpportunityStatus[] = [
+	"submitted",
+	"approved",
+	"draft",
+	"declined",
+	"archived",
+];
+
+export const ADMIN_OPPORTUNITY_STATUS_SELECT_OPTIONS = [
+	{ label: "Submitted", value: "submitted" },
+	{ label: "Approved", value: "approved" },
+	{ label: "Draft", value: "draft" },
+	{ label: "Declined", value: "declined" },
+	{ label: "Archived", value: "archived" },
+] as const satisfies ReadonlyArray<{
+	label: string;
+	value: AdminOpportunityStatus;
+}>;
+
+export const ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS = [
+	{ label: "All statuses", value: "" },
+	...ADMIN_OPPORTUNITY_STATUS_SELECT_OPTIONS,
+];
+
+export const parseAdminOpportunityStatus = (
+	value: string | null | undefined,
+): AdminOpportunityStatus | null => {
+	if (
+		value &&
+		ADMIN_OPPORTUNITY_STATUSES.includes(value as AdminOpportunityStatus)
+	) {
+		return value as AdminOpportunityStatus;
+	}
+
+	return null;
+};
+
+export const formatAdminOpportunityStatusLabel = (
+	status: AdminOpportunityStatus,
+): string =>
+	ADMIN_OPPORTUNITY_STATUS_SELECT_OPTIONS.find(
+		(option) => option.value === status,
+	)?.label ?? status;
+
 export const DEFAULT_OPPORTUNITY_LIST_SORT: OpportunityListSort = "newest";
 
 const appendTagsToSearchParams = (
@@ -84,6 +135,30 @@ export const parseSortFromSearchParams = (
 	return sort === "deadline" ? "deadline" : "newest";
 };
 
+export const parseAdminOpportunityStatusFromSearchParams = (
+	searchParams: Pick<URLSearchParams, "get">,
+): AdminOpportunityStatus | "" => {
+	const status = searchParams.get("status") ?? "";
+	return parseAdminOpportunityStatus(status) ?? "";
+};
+
+export const buildAdminOpportunitiesPageHref = (
+	page: number,
+	status: AdminOpportunityStatus | "" = "",
+): string => {
+	const query = new URLSearchParams();
+	if (page > 1) {
+		query.set("page", String(page));
+	}
+	if (status) {
+		query.set("status", status);
+	}
+	const queryString = query.toString();
+	return queryString
+		? `/admin/opportunity?${queryString}`
+		: "/admin/opportunity";
+};
+
 export const opportunitiesListKey = (
 	page: number,
 	perPage: number,
@@ -114,11 +189,18 @@ export const buildOpportunitiesPageHref = (
 	return queryString ? `/opportunity?${queryString}` : "/opportunity";
 };
 
-export const adminOpportunitiesListKey = (page: number, perPage: number) => {
+export const adminOpportunitiesListKey = (
+	page: number,
+	perPage: number,
+	status: AdminOpportunityStatus | "" = "",
+) => {
 	const query = new URLSearchParams({
 		page: String(page),
 		per_page: String(perPage),
 	});
+	if (status) {
+		query.set("status", status);
+	}
 	return `${OPPORTUNITIES_ADMIN_LIST_PATH}?${query.toString()}`;
 };
 
@@ -269,11 +351,14 @@ export const useOpportunities = (
 export const useAdminOpportunities = (
 	page: number,
 	perPage: number = OPPORTUNITIES_PER_PAGE,
+	status: AdminOpportunityStatus | "" = "",
 ) => {
 	const { isAdmin, isLoggedIn } = useAuthenticatedUser();
 
 	return useSWR<OpportunitiesPaginatedResponse>(
-		isLoggedIn && isAdmin ? adminOpportunitiesListKey(page, perPage) : null,
+		isLoggedIn && isAdmin
+			? adminOpportunitiesListKey(page, perPage, status)
+			: null,
 		fetcher,
 		{ revalidateOnMount: true },
 	);

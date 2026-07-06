@@ -14,6 +14,7 @@ export type ApiOpportunity = {
 	creator_username?: string | null;
 	application_deadline?: string | null;
 	is_favorited?: boolean;
+	status?: string | null;
 	created_at?: string;
 	updated_at?: string;
 };
@@ -44,7 +45,9 @@ export type OpportunitySetFavoriteResponse = {
 	is_favorited: boolean;
 };
 
-export type OpportunityUpdatePayload = Partial<OpportunityCreatePayload>;
+export type OpportunityUpdatePayload = Partial<OpportunityCreatePayload> & {
+	status?: string;
+};
 
 /** Row from GET /opportunities/fetch-my-favorites (may wrap the opportunity). */
 export type OpportunityFavoriteRecord = {

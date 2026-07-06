@@ -7,23 +7,31 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
+	ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS,
+	type AdminOpportunityStatus,
+	buildAdminOpportunitiesPageHref,
 	normalizeOpportunityListResponse,
 	OPPORTUNITIES_PER_PAGE,
+	parseAdminOpportunityStatusFromSearchParams,
 	useAdminOpportunities,
 } from "@hooks/useOpportunities";
+import type { MultiValue, SingleValue } from "react-select";
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import { OpportunityCardWithCreator } from "@/components/opportunities-list";
+import Select, { type SelectOption } from "@/components/Select/Select";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import { TRADING_NAME } from "@/constants/tradingName";
 
 function ListPagination({
 	currentPage,
+	status,
 	totalCount,
 }: {
 	currentPage: number;
+	status: AdminOpportunityStatus | "";
 	totalCount: number;
 }) {
 	const totalPages = Math.max(
@@ -37,11 +45,11 @@ function ListPagination({
 
 	const prevHref =
 		currentPage > 1
-			? `/admin/opportunities?page=${currentPage - 1}`
+			? buildAdminOpportunitiesPageHref(currentPage - 1, status)
 			: undefined;
 	const nextHref =
 		currentPage < totalPages
-			? `/admin/opportunities?page=${currentPage + 1}`
+			? buildAdminOpportunitiesPageHref(currentPage + 1, status)
 			: undefined;
 
 	return (
@@ -86,8 +94,18 @@ export function AdminOpportunitiesList() {
 
 	const pageFromQuery = Number(searchParams.get("page")) || 1;
 	const currentPage = pageFromQuery >= 1 ? pageFromQuery : 1;
+	const statusQuery = parseAdminOpportunityStatusFromSearchParams(searchParams);
 
-	const { data, error, isLoading } = useAdminOpportunities(currentPage);
+	const selectedStatus =
+		ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS.find(
+			(option) => option.value === statusQuery,
+		) ?? ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS[0];
+
+	const { data, error, isLoading } = useAdminOpportunities(
+		currentPage,
+		OPPORTUNITIES_PER_PAGE,
+		statusQuery,
+	);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
 
 	const accessDenied = axios.isAxiosError(error)
@@ -114,6 +132,20 @@ export function AdminOpportunitiesList() {
 		);
 	}
 
+	const handleStatusChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		const option = Array.isArray(value) ? value[0] : value;
+		router.push(
+			buildAdminOpportunitiesPageHref(
+				1,
+				parseAdminOpportunityStatusFromSearchParams(
+					new URLSearchParams(option?.value ? { status: option.value } : {}),
+				),
+			),
+		);
+	};
+
 	return (
 		<SidebarLayout>
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -130,38 +162,64 @@ export function AdminOpportunitiesList() {
 				</Button>
 			</div>
 
-			<div className="mt-8">
-				{!authenticationChecked || (isLoading && !data) ? (
-					<div className="rounded-2xl border border-gray-200 bg-white p-6">
+			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
+				<div className="max-w-xs">
+					<label
+						className="mb-2 block text-sm font-medium text-gray-900"
+						htmlFor="admin-opportunity-status"
+					>
+						Status
+					</label>
+					<Select
+						arrOptions={[...ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS]}
+						bCompact
+						id="admin-opportunity-status"
+						isSearchable={false}
+						onChange={handleStatusChange}
+						value={selectedStatus}
+					/>
+				</div>
+
+				<div className="mt-6">
+					{!authenticationChecked || (isLoading && !data) ? (
 						<Text variant="loading">Loading opportunities…</Text>
-					</div>
-				) : error ? (
-					<div className="rounded-2xl border border-gray-200 bg-white p-6">
+					) : error ? (
 						<Text variant="error">
 							{accessDenied
 								? "Access denied. Sign in with a staff account to continue."
 								: "Could not load opportunities. Check the API is available and try again."}
 						</Text>
-					</div>
-				) : list.results.length === 0 ? (
-					<div className="rounded-2xl border border-gray-200 bg-white p-6">
-						<Text variant="center-sm">No opportunities yet.</Text>
-					</div>
-				) : (
-					<>
-						<Text variant="stat-label">
-							{list.count} opportunit{list.count === 1 ? "y" : "ies"}
+					) : list.results.length === 0 ? (
+						<Text variant="center-sm">
+							{statusQuery
+								? "No opportunities found for this status."
+								: "No opportunities yet."}
 						</Text>
-						<ul className="mt-4 list-none space-y-4">
-							{list.results.map((api) => (
-								<li key={api.pk}>
-									<OpportunityCardWithCreator api={api} showEdit />
-								</li>
-							))}
-						</ul>
-						<ListPagination currentPage={currentPage} totalCount={list.count} />
-					</>
-				)}
+					) : (
+						<>
+							<Text variant="stat-label">
+								{list.count} opportunit{list.count === 1 ? "y" : "ies"}
+							</Text>
+							<ul className="mt-4 list-none space-y-4">
+								{list.results.map((api) => (
+									<li key={api.pk}>
+										<OpportunityCardWithCreator
+											api={api}
+											detailHref={`/admin/opportunity/${api.pk}`}
+											editHref={`/admin/opportunity/${api.pk}/edit`}
+											showEdit
+										/>
+									</li>
+								))}
+							</ul>
+							<ListPagination
+								currentPage={currentPage}
+								status={statusQuery}
+								totalCount={list.count}
+							/>
+						</>
+					)}
+				</div>
 			</div>
 		</SidebarLayout>
 	);

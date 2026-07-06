@@ -25,9 +25,9 @@ export function MarketingHomeContent() {
 			<HeroSection />
 			<TrustedBySection />
 			<GallerySection />
-			<FeaturesSection />
 			<HowItWorksSection />
 			<CreatorsSection />
+			<FeaturesSection />
 			{isPricingReleased ? <PricingSection /> : null}
 			<CtaSection />
 			<Footer />

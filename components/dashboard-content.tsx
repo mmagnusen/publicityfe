@@ -21,6 +21,9 @@ import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import { profilePagePath } from "@/lib/publicUser";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 function DashboardStatLink({
 	href,
 	label,
@@ -135,7 +138,11 @@ export function DashboardContent() {
 				isLoggedIn={isLoggedIn}
 			/>
 
-			<DashboardBillingSupport hasActiveSubscription={hasActiveSubscription} />
+			{isPricingReleased ? (
+				<DashboardBillingSupport
+					hasActiveSubscription={hasActiveSubscription}
+				/>
+			) : null}
 		</SidebarLayout>
 	);
 }

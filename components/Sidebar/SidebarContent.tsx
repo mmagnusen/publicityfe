@@ -11,6 +11,9 @@ import { SectionHeader } from "./SectionHeader";
 import { SidebarNavLink } from "./SidebarNavLink";
 import { useSidebar } from "./SidebarProvider";
 
+const isPricingReleased =
+	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
+
 export function SidebarContent() {
 	const { authenticatedUser, funcLogout, isAdmin } = useAuthenticatedUser();
 	const { closeSidebar } = useSidebar();
@@ -82,11 +85,16 @@ export function SidebarContent() {
 					</div>
 					<ul className="list-none">
 						<li className="py-1">
+							<SidebarNavLink href="/admin/opportunity" onNavigate={onNavigate}>
+								All opportunities
+							</SidebarNavLink>
+						</li>
+						<li className="py-1">
 							<SidebarNavLink
-								href="/admin/opportunities"
+								href="/admin/applications"
 								onNavigate={onNavigate}
 							>
-								All opportunities
+								All applications
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
@@ -116,26 +124,33 @@ export function SidebarContent() {
 				</section>
 			) : null}
 
+			{isPricingReleased ? (
+				<section>
+					<div className="px-4 py-2">
+						<SectionHeader title="Account" />
+					</div>
+					<ul className="list-none">
+						<li className="py-1">
+							<SidebarNavLink href="/pricing" onNavigate={onNavigate}>
+								Pricing
+							</SidebarNavLink>
+						</li>
+						<li className="py-1">
+							<SidebarNavLink href="/billing" onNavigate={onNavigate}>
+								Billing
+							</SidebarNavLink>
+						</li>
+						<li className="py-1">
+							<SidebarNavLink href="/referrals" onNavigate={onNavigate}>
+								Referrals
+							</SidebarNavLink>
+						</li>
+					</ul>
+				</section>
+			) : null}
+
 			<section>
-				<div className="px-4 py-2">
-					<SectionHeader title="Account" />
-				</div>
 				<ul className="list-none">
-					<li className="py-1">
-						<SidebarNavLink href="/pricing" onNavigate={onNavigate}>
-							Pricing
-						</SidebarNavLink>
-					</li>
-					<li className="py-1">
-						<SidebarNavLink href="/billing" onNavigate={onNavigate}>
-							Billing
-						</SidebarNavLink>
-					</li>
-					<li className="py-1">
-						<SidebarNavLink href="/referrals" onNavigate={onNavigate}>
-							Referrals
-						</SidebarNavLink>
-					</li>
 					<li className="mt-4 border-t border-gray-200 pt-4">
 						<button
 							type="button"

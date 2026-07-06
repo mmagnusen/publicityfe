@@ -13,7 +13,6 @@ const isPricingReleased =
 	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
 
 const footerLinks = [
-	{ href: "/about-us", label: "About us" },
 	{ href: "/contact-us", label: "Contact us" },
 	...(isPricingReleased ? [{ href: "/pricing", label: "Pricing" }] : []),
 	{ href: "/terms-and-conditions", label: "Terms and conditions" },

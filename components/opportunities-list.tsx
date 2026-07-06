@@ -131,9 +131,13 @@ function CreatorAvatar({
 
 export function OpportunityCardWithCreator({
 	api,
+	detailHref,
+	editHref,
 	showEdit,
 }: {
 	api: ApiOpportunity;
+	detailHref?: string;
+	editHref?: string;
 	showEdit?: boolean;
 }) {
 	const creatorUsername = opportunityCreatorUsername(api);
@@ -147,18 +151,31 @@ export function OpportunityCardWithCreator({
 		return base;
 	}, [api, creator]);
 
-	return <OpportunityCard opportunity={opportunity} showEdit={showEdit} />;
+	return (
+		<OpportunityCard
+			detailHref={detailHref}
+			editHref={editHref}
+			opportunity={opportunity}
+			showEdit={showEdit}
+		/>
+	);
 }
 
 export function OpportunityCard({
+	detailHref,
+	editHref,
 	opportunity,
 	showEdit,
 }: {
+	detailHref?: string;
+	editHref?: string;
 	opportunity: Opportunity;
 	showEdit?: boolean;
 }) {
 	const isOpen = opportunity.status === "open";
 	const showNewTodayBadge = isOpportunityNewToday(opportunity.createdAt);
+	const opportunityHref = detailHref ?? `/opportunity/${opportunity.id}`;
+	const opportunityEditHref = editHref ?? `/opportunity/${opportunity.id}/edit`;
 
 	return (
 		<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -171,7 +188,7 @@ export function OpportunityCard({
 					/>
 				</div>
 				<Link
-					href={`/opportunity/${opportunity.id}`}
+					href={opportunityHref}
 					className="block rounded-2xl border border-gray-200 bg-white p-6 pr-16 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
 				>
 					<div className="flex min-w-0 flex-1 gap-4">
@@ -233,7 +250,7 @@ export function OpportunityCard({
 
 			{showEdit ? (
 				<Button
-					href={`/opportunity/${opportunity.id}/edit`}
+					href={opportunityEditHref}
 					size="small"
 					strVariant="transparentWithBorder"
 					textTransform="none"

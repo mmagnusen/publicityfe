@@ -1,11 +1,18 @@
-export type { OpportunityListSort } from "./useOpportunities";
+export type {
+	AdminOpportunityStatus,
+	OpportunityListSort,
+} from "./useOpportunities";
 export {
+	ADMIN_OPPORTUNITY_STATUS_FILTER_OPTIONS,
+	ADMIN_OPPORTUNITY_STATUS_SELECT_OPTIONS,
 	adminOpportunitiesListKey,
+	buildAdminOpportunitiesPageHref,
 	buildOpportunitiesPageHref,
 	createOpportunity,
 	DEFAULT_OPPORTUNITY_LIST_SORT,
 	deleteOpportunity,
 	extractOpportunityFromFavoriteItem,
+	formatAdminOpportunityStatusLabel,
 	getOpportunityApiErrorMessage,
 	getOpportunityPkFromItem,
 	MY_OPPORTUNITIES_PATH,
@@ -22,6 +29,8 @@ export {
 	opportunitiesListKey,
 	opportunityAdminDetailPath,
 	opportunityDetailPath,
+	parseAdminOpportunityStatus,
+	parseAdminOpportunityStatusFromSearchParams,
 	parseSortFromSearchParams,
 	parseTagPksFromSearchParams,
 	patchOpportunity,

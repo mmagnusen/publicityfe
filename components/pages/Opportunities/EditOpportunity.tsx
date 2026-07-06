@@ -1,88 +1,36 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
-import { useAllMediaOutlets } from "@hooks/useMediaOutlets";
-import {
-	deleteOpportunity,
-	patchOpportunity,
-	revalidateOpportunityDetailCaches,
-	revalidateOpportunityLists,
-	useAdminOpportunity,
-} from "@hooks/useOpportunities";
 
 import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
-import { OpportunityForm } from "./OpportunityForm";
-import {
-	formValuesToUpdatePayload,
-	type OpportunityFormValues,
-	opportunityToFormValues,
-} from "./opportunityFormValues";
+import { EditOpportunityContent } from "./EditOpportunityContent";
 
-export function EditOpportunity() {
+type EditOpportunityProps = {
+	backHref?: string;
+	successRedirectHref?: string;
+};
+
+export function EditOpportunity({
+	backHref = "/opportunity",
+	successRedirectHref = "/dashboard",
+}: EditOpportunityProps = {}) {
 	const router = useRouter();
 	const params = useParams<{ pk: string }>();
 	const pk = Number(params.pk);
 
 	const { authenticationChecked, isAdmin, isLoggedIn } = useAuthenticatedUser();
-	const { data, error, isLoading } = useAdminOpportunity(
-		Number.isFinite(pk) && pk > 0 ? pk : null,
-	);
-	const { data: mediaOutlets } = useAllMediaOutlets();
-
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [isDeleting, setIsDeleting] = useState(false);
-
-	const initialValues = useMemo(
-		() => (data ? opportunityToFormValues(data, mediaOutlets) : null),
-		[data, mediaOutlets],
-	);
 
 	useEffect(() => {
 		if (authenticationChecked && !isLoggedIn) {
 			router.replace("/login");
 		}
 	}, [authenticationChecked, isLoggedIn, router]);
-
-	const handleSubmit = async (values: OpportunityFormValues) => {
-		if (!Number.isFinite(pk) || pk <= 0) {
-			return;
-		}
-
-		setIsSubmitting(true);
-		try {
-			await patchOpportunity(pk, formValuesToUpdatePayload(values));
-			await revalidateOpportunityDetailCaches(pk);
-			await revalidateOpportunityLists();
-			await router.push("/dashboard");
-		} finally {
-			setIsSubmitting(false);
-		}
-	};
-
-	const handleDelete = async () => {
-		if (!Number.isFinite(pk) || pk <= 0) {
-			return;
-		}
-
-		if (!window.confirm("Delete this opportunity? This cannot be undone.")) {
-			return;
-		}
-
-		setIsDeleting(true);
-		try {
-			await deleteOpportunity(pk);
-			await revalidateOpportunityLists();
-			await router.push("/dashboard");
-		} finally {
-			setIsDeleting(false);
-		}
-	};
 
 	if (authenticationChecked && !isLoggedIn) {
 		return null;
@@ -110,7 +58,7 @@ export function EditOpportunity() {
 		<SidebarLayout>
 			<div className="mb-6">
 				<Link
-					href="/opportunity"
+					href={backHref}
 					className="text-sm font-medium text-gray-600 hover:text-black"
 				>
 					← Back to opportunities
@@ -125,24 +73,11 @@ export function EditOpportunity() {
 			</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
-				{isLoading ? (
-					<Text variant="loading">Loading opportunity…</Text>
-				) : error || !data || !initialValues ? (
-					<Text variant="error">
-						Could not load this opportunity. It may not exist or you may not
-						have permission to edit it.
-					</Text>
-				) : (
-					<OpportunityForm
-						key={`${pk}-${data.application_deadline ?? "none"}`}
-						initialValues={initialValues}
-						isDeleting={isDeleting}
-						isSubmitting={isSubmitting}
-						onDelete={handleDelete}
-						onSubmit={handleSubmit}
-						submitLabel="Save changes"
-					/>
-				)}
+				<EditOpportunityContent
+					onDeleteSuccess={() => router.push(successRedirectHref)}
+					onSubmitSuccess={() => router.push(successRedirectHref)}
+					opportunityPk={pk}
+				/>
 			</div>
 		</SidebarLayout>
 	);
