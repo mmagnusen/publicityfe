@@ -10,6 +10,7 @@ export {
 	buildAdminOpportunitiesPageHref,
 	buildOpportunitiesPageHref,
 	createOpportunity,
+	createUserOpportunity,
 	DEFAULT_OPPORTUNITY_LIST_SORT,
 	deleteOpportunity,
 	extractOpportunityFromFavoriteItem,

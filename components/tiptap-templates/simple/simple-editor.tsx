@@ -144,6 +144,7 @@ const MobileToolbarContent = ({
 export type SimpleEditorProps = {
 	allowImages?: boolean;
 	children?: React.ReactNode;
+	contentMinHeight?: string;
 	editor: Editor | null;
 	objValidation?: Validation;
 	renderToolbar?: boolean;
@@ -154,6 +155,7 @@ const SimpleEditor = ({
 	allowImages = false,
 	editor,
 	children,
+	contentMinHeight,
 	renderToolbar,
 	bIsEnabled = true,
 }: SimpleEditorProps) => {
@@ -211,6 +213,7 @@ const SimpleEditor = ({
 				className={cn("content-wrapper", {
 					"content-wrapper--no-toolbar": !renderToolbar,
 				})}
+				style={contentMinHeight ? { minHeight: contentMinHeight } : undefined}
 			>
 				<EditorContent
 					className="simple-editor-content"

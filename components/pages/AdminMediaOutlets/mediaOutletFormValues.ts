@@ -46,18 +46,34 @@ const parseFoundedYear = (value: string): number | null => {
 	return Number.isInteger(year) && year > 0 ? year : null;
 };
 
+const appendImageUrlIfPresent = (
+	payload: MediaOutletCreatePayload,
+	imageUrl: string,
+): MediaOutletCreatePayload => {
+	const trimmed = imageUrl.trim();
+	if (!trimmed) {
+		return payload;
+	}
+
+	return {
+		...payload,
+		image_url: trimmed,
+	};
+};
+
 export const formValuesToCreatePayload = (
 	values: MediaOutletFormValues,
-): MediaOutletCreatePayload => ({
-	name: values.name.trim(),
-	website_url: values.website_url.trim(),
-	founded_year: parseFoundedYear(values.founded_year),
-	tag_pks: selectOptionsToTagPks(values.tags),
-});
+): MediaOutletCreatePayload =>
+	appendImageUrlIfPresent(
+		{
+			name: values.name.trim(),
+			website_url: values.website_url.trim(),
+			founded_year: parseFoundedYear(values.founded_year),
+			tag_pks: selectOptionsToTagPks(values.tags),
+		},
+		values.image_url,
+	);
 
 export const formValuesToUpdatePayload = (
 	values: MediaOutletFormValues,
-): MediaOutletUpdatePayload => ({
-	...formValuesToCreatePayload(values),
-	image_url: values.image_url.trim() || null,
-});
+): MediaOutletUpdatePayload => formValuesToCreatePayload(values);

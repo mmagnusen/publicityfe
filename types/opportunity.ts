@@ -4,10 +4,12 @@ export type ApiOpportunity = {
 	pk: number;
 	title: string;
 	type?: string | null;
+	type_other?: string | null;
 	short_description: string;
 	full_description: string;
 	media_outlet: number | null;
 	media_outlet_name?: string | null;
+	other_media_outlet?: string | null;
 	tags?: Tag[];
 	creator?: number | { pk?: number | null; username?: string | null } | null;
 	creator_pk?: number | null;
@@ -30,9 +32,11 @@ export type OpportunitiesPaginatedResponse = {
 export type OpportunityCreatePayload = {
 	title: string;
 	type?: string;
+	type_other?: string | null;
 	short_description: string;
 	full_description: string;
 	media_outlet?: number | null;
+	other_media_outlet?: string | null;
 	application_deadline?: string | null;
 };
 

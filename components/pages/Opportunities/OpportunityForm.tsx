@@ -17,56 +17,30 @@ import TextAreaField from "@/components/FormikFields/TextAreaField";
 import TipTapEditorField from "@/components/FormikFields/TipTapEditorField";
 import Text from "@/components/Text";
 import {
+	opportunityFormValidationSchema,
+	SHORT_DESCRIPTION_MAX_LENGTH,
+} from "./opportunityFormValidation";
+import {
 	applicationDeadlineHourOptions,
 	applicationDeadlineYesNoOptions,
 	hasApplicationDeadlineSelected,
+	isOtherMediaOutletSelected,
+	isOtherOpportunityTypeSelected,
 	mediaOutletsToSelectOptions,
 	normalizeOpportunityFormValuesForSubmit,
 	type OpportunityFormValues,
 	opportunityTypeOptions,
-	validateFullDescription,
 } from "./opportunityFormValues";
 
 const drfFieldMap: Partial<Record<string, keyof OpportunityFormValues>> = {
 	title: "title",
 	type: "type",
+	type_other: "type_other",
 	short_description: "short_description",
 	full_description: "full_description",
 	media_outlet: "media_outlet",
+	other_media_outlet: "other_media_outlet",
 	application_deadline: "application_deadline_date",
-};
-
-const validateOpportunityForm = (values: OpportunityFormValues) => {
-	const errors: Partial<Record<keyof OpportunityFormValues, string>> = {};
-
-	if (!values.title.trim()) {
-		errors.title = "Title is required";
-	}
-
-	if (!values.type) {
-		errors.type = "Type is required";
-	}
-
-	if (!values.short_description.trim()) {
-		errors.short_description = "Short description is required";
-	}
-
-	const fullDescriptionError = validateFullDescription(values.full_description);
-	if (fullDescriptionError) {
-		errors.full_description = fullDescriptionError;
-	}
-
-	if (hasApplicationDeadlineSelected(values.has_application_deadline)) {
-		if (!values.application_deadline_date.trim()) {
-			errors.application_deadline_date = "Select a date";
-		}
-
-		if (!values.application_deadline_hour) {
-			errors.application_deadline_hour = "Select an hour";
-		}
-	}
-
-	return errors;
 };
 
 function DeadlineFieldFooter({
@@ -129,7 +103,7 @@ export function OpportunityForm({
 		<Formik<OpportunityFormValues>
 			enableReinitialize
 			initialValues={initialValues}
-			validate={validateOpportunityForm}
+			validationSchema={opportunityFormValidationSchema}
 			onSubmit={async (values, { setFieldError, setStatus }) => {
 				setStatus(undefined);
 				try {
@@ -166,6 +140,10 @@ export function OpportunityForm({
 				const showApplicationDeadlineFields = hasApplicationDeadlineSelected(
 					values.has_application_deadline,
 				);
+				const showOtherTypeField = isOtherOpportunityTypeSelected(values.type);
+				const showOtherMediaOutletField = isOtherMediaOutletSelected(
+					values.media_outlet,
+				);
 
 				return (
 					<Form noValidate className="space-y-2">
@@ -173,7 +151,7 @@ export function OpportunityForm({
 							<InputField
 								name="title"
 								placeHolder="Pitch your startup"
-								strHelperMessage="Headline shown in opportunity listings"
+								strHelperMessage="Title shown in the opportunity listing"
 							/>
 						</Field>
 
@@ -182,15 +160,37 @@ export function OpportunityForm({
 								arrOptions={typeOptions}
 								isSearchable={false}
 								name="type"
+								onChangeCallback={(option) => {
+									if (
+										option != null &&
+										!Array.isArray(option) &&
+										"value" in option &&
+										option.value !== "other"
+									) {
+										setFieldValue("type_other", "");
+									}
+								}}
 								placeholder="Select a type"
+								helperText="Eg is this for an article, podcast, panel etc?"
 							/>
 						</Field>
 
-						<Field fieldLabel="Short description" fieldName="short_description">
+						{showOtherTypeField ? (
+							<Field fieldLabel="Other opportunity type" fieldName="type_other">
+								<InputField
+									name="type_other"
+									placeHolder="e.g. Newsletter, TV appearance"
+									strHelperMessage="Please describe the type of opportunity"
+								/>
+							</Field>
+						) : null}
+
+						<Field fieldLabel="Short summary" fieldName="short_description">
 							<TextAreaField
+								maxLength={SHORT_DESCRIPTION_MAX_LENGTH}
 								name="short_description"
 								placeHolder="Brief summary"
-								strHelperMessage="Shown on cards and search results"
+								strHelperMessage="A short summary of the opportunity, 250 characters max"
 							/>
 						</Field>
 
@@ -285,6 +285,16 @@ export function OpportunityForm({
 								isDisabled={isLoadingMediaOutlets}
 								isSearchable
 								name="media_outlet"
+								onChangeCallback={(option) => {
+									if (
+										option != null &&
+										!Array.isArray(option) &&
+										"value" in option &&
+										option.value !== "other"
+									) {
+										setFieldValue("other_media_outlet", "");
+									}
+								}}
 								placeholder={
 									isLoadingMediaOutlets
 										? "Loading media outlets…"
@@ -293,6 +303,18 @@ export function OpportunityForm({
 							/>
 						</Field>
 
+						{showOtherMediaOutletField ? (
+							<Field
+								fieldLabel="Other media outlet"
+								fieldName="other_media_outlet"
+							>
+								<InputField
+									name="other_media_outlet"
+									placeHolder="e.g. Local newsletter, industry blog"
+								/>
+							</Field>
+						) : null}
+
 						{mediaOutletsError ? (
 							<Text variant="error">
 								Could not load media outlets. Try refreshing the page.
@@ -300,6 +322,7 @@ export function OpportunityForm({
 						) : null}
 
 						<TipTapEditorField
+							contentMinHeight="12rem"
 							existingContent={values.full_description.editorJSON}
 							key={`full-description-${initialValues.title}`}
 							name="full_description"

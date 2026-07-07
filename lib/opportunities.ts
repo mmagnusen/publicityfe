@@ -272,7 +272,10 @@ export const mapApiOpportunityToDisplay = (
 		api.short_description?.trim() ||
 		"";
 	const publicationName =
-		mediaOutlet?.name?.trim() || api.media_outlet_name?.trim() || "Publication";
+		mediaOutlet?.name?.trim() ||
+		api.media_outlet_name?.trim() ||
+		api.other_media_outlet?.trim() ||
+		"Publication";
 	const publicationUrl = mediaOutlet?.website_url?.trim() || "";
 	const creatorUsername = opportunityCreatorUsername(api);
 	const apiTags = api.tags ?? [];
@@ -293,7 +296,10 @@ export const mapApiOpportunityToDisplay = (
 		id: String(api.pk),
 		status: "open",
 		title: api.title?.trim() || "Untitled opportunity",
-		type: opportunityTypeLabel(api.type ?? DEFAULT_OPPORTUNITY_TYPE),
+		type:
+			api.type === "other" && api.type_other?.trim()
+				? api.type_other.trim()
+				: opportunityTypeLabel(api.type ?? DEFAULT_OPPORTUNITY_TYPE),
 		shortDescription,
 		description,
 		matchScore: 70 + (api.pk % 28),

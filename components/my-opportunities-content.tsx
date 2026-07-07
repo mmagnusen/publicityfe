@@ -54,7 +54,7 @@ export function MyOpportunitiesContent() {
 					<Text variant="page-subtitle">Opportunities you have created.</Text>
 				</div>
 				{isAdmin ? (
-					<Button href="/opportunity/create" textTransform="none">
+					<Button href="/create-opportunity" textTransform="none">
 						New opportunity
 					</Button>
 				) : null}
@@ -80,7 +80,7 @@ export function MyOpportunitiesContent() {
 						</Text>
 						{isAdmin ? (
 							<div className="mt-4 flex justify-center">
-								<Button href="/opportunity/create" textTransform="none">
+								<Button href="/create-opportunity" textTransform="none">
 									Add opportunity
 								</Button>
 							</div>

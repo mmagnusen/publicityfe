@@ -23,8 +23,7 @@ export type MediaOutletCreatePayload = {
 	website_url: string;
 	founded_year?: number | null;
 	tag_pks?: number[];
+	image_url?: string;
 };
 
-export type MediaOutletUpdatePayload = Partial<MediaOutletCreatePayload> & {
-	image_url?: string | null;
-};
+export type MediaOutletUpdatePayload = Partial<MediaOutletCreatePayload>;

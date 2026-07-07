@@ -449,6 +449,17 @@ export const createOpportunity = async (
 	return data;
 };
 
+/** Create an opportunity as the authenticated user (non-admin). */
+export const createUserOpportunity = async (
+	payload: OpportunityCreatePayload,
+): Promise<ApiOpportunity> => {
+	const { data } = await instanceAxios.post<ApiOpportunity>(
+		OPPORTUNITIES_LIST_PATH,
+		payload,
+	);
+	return data;
+};
+
 export const patchOpportunity = async (
 	pk: number,
 	payload: OpportunityUpdatePayload,

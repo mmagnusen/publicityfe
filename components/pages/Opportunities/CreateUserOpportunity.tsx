@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
-	createOpportunity,
+	createUserOpportunity,
 	revalidateOpportunityLists,
 } from "@hooks/useOpportunities";
 
@@ -14,6 +14,7 @@ import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
 import { TRADING_NAME } from "@/constants/tradingName";
+import { CREATE_OPPORTUNITY_AUTHENTICATE_PATH } from "./CreateOpportunityAuthenticate";
 import { OpportunityForm } from "./OpportunityForm";
 import {
 	defaultOpportunityFormValues,
@@ -21,59 +22,49 @@ import {
 	type OpportunityFormValues,
 } from "./opportunityFormValues";
 
-export function CreateOpportunity() {
+export function CreateUserOpportunity() {
 	const router = useRouter();
-	const { authenticationChecked, isAdmin, isLoggedIn } = useAuthenticatedUser();
+	const { authenticationChecked, isLoggedIn } = useAuthenticatedUser();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const initialValues = useMemo(() => defaultOpportunityFormValues(), []);
 
 	useEffect(() => {
 		if (authenticationChecked && !isLoggedIn) {
-			router.replace("/login");
+			router.replace(CREATE_OPPORTUNITY_AUTHENTICATE_PATH);
 		}
 	}, [authenticationChecked, isLoggedIn, router]);
 
 	const handleSubmit = async (values: OpportunityFormValues) => {
 		setIsSubmitting(true);
 		try {
-			await createOpportunity(formValuesToCreatePayload(values));
+			await createUserOpportunity(formValuesToCreatePayload(values));
 			await revalidateOpportunityLists();
-			await router.push("/dashboard");
+			await router.push("/my-opportunities");
 		} finally {
 			setIsSubmitting(false);
 		}
 	};
 
-	if (authenticationChecked && !isLoggedIn) {
+	if (!authenticationChecked || !isLoggedIn) {
 		return null;
-	}
-
-	if (authenticationChecked && isLoggedIn && !isAdmin) {
-		return (
-			<SidebarLayout>
-				<Text variant="center-sm">
-					You don&apos;t have permission to view this page.
-				</Text>
-			</SidebarLayout>
-		);
 	}
 
 	return (
 		<SidebarLayout>
 			<div className="mb-6">
 				<Link
-					href="/opportunity"
+					href="/dashboard"
 					className="text-sm font-medium text-gray-600 hover:text-black"
 				>
-					← Back to opportunities
+					← Back to dashboard
 				</Link>
 			</div>
 
 			<Heading level={1} variant="page-lg">
-				New opportunity
+				Post an opportunity
 			</Heading>
 			<Text variant="page-subtitle">
-				Create a media opportunity for {TRADING_NAME} users.
+				Share a media opportunity with {TRADING_NAME} members.
 			</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
@@ -81,7 +72,7 @@ export function CreateOpportunity() {
 					initialValues={initialValues}
 					isSubmitting={isSubmitting}
 					onSubmit={handleSubmit}
-					submitLabel="Create opportunity"
+					submitLabel="Post opportunity"
 				/>
 			</div>
 		</SidebarLayout>

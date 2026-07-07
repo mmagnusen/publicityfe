@@ -56,7 +56,17 @@ const validationSchema = Yup.object().shape({
 	),
 });
 
-export function RegisterForm() {
+type RegisterFormProps = {
+	disableRedirect?: boolean;
+	onSuccess?: () => void;
+	redirectTo?: string;
+};
+
+export function RegisterForm({
+	disableRedirect = false,
+	onSuccess,
+	redirectTo = "/dashboard",
+}: RegisterFormProps = {}) {
 	const router = useRouter();
 	const { authenticationChecked, funcRegister, isLoggedIn } =
 		useAuthenticatedUser();
@@ -66,10 +76,14 @@ export function RegisterForm() {
 	const [formError, setFormError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (authenticationChecked && isLoggedIn) {
-			router.replace("/dashboard");
+		if (disableRedirect) {
+			return;
 		}
-	}, [authenticationChecked, isLoggedIn, router]);
+
+		if (authenticationChecked && isLoggedIn) {
+			router.replace(redirectTo);
+		}
+	}, [authenticationChecked, disableRedirect, isLoggedIn, redirectTo, router]);
 
 	const submitRegister = async (
 		formikValues: RegisterFormValues,
@@ -80,7 +94,12 @@ export function RegisterForm() {
 		try {
 			setFormError(null);
 			await funcRegister(firstName, lastName, email, password, username);
-			router.replace("/dashboard");
+
+			if (disableRedirect) {
+				onSuccess?.();
+			} else {
+				router.replace(redirectTo);
+			}
 		} catch (error: unknown) {
 			reportError(error, "registration_email_password", {
 				scrubRequestKeys: ["password"],

@@ -71,9 +71,7 @@ export function CreateMediaOutlet() {
 			<Heading level={1} variant="page-lg">
 				New media outlet
 			</Heading>
-			<Text variant="page-subtitle">
-				Add a media outlet to ${TRADING_NAME}.
-			</Text>
+			<Text variant="page-subtitle">Add a media outlet to {TRADING_NAME}.</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
 				<MediaOutletForm

@@ -48,7 +48,7 @@ export function DashboardAddOpportunitySection() {
 				</li>
 			</ul>
 			<div className="mt-4">
-				<Button href="/opportunity/create" textTransform="none">
+				<Button href="/create-opportunity" textTransform="none">
 					Add opportunity
 				</Button>
 			</div>

@@ -18,7 +18,17 @@ import validationSchema, {
 	type LoginFormValues,
 } from "./login-form-validation";
 
-export function LoginForm() {
+type LoginFormProps = {
+	disableRedirect?: boolean;
+	onSuccess?: () => void;
+	redirectTo?: string;
+};
+
+export function LoginForm({
+	disableRedirect = false,
+	onSuccess,
+	redirectTo = "/dashboard",
+}: LoginFormProps = {}) {
 	const router = useRouter();
 	const { authenticationChecked, funcLogin, isLoggedIn } =
 		useAuthenticatedUser();
@@ -28,10 +38,14 @@ export function LoginForm() {
 	const [formError, setFormError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (authenticationChecked && isLoggedIn) {
-			router.replace("/dashboard");
+		if (disableRedirect) {
+			return;
 		}
-	}, [authenticationChecked, isLoggedIn, router]);
+
+		if (authenticationChecked && isLoggedIn) {
+			router.replace(redirectTo);
+		}
+	}, [authenticationChecked, disableRedirect, isLoggedIn, redirectTo, router]);
 
 	const submitLogin = async (
 		formikValues: LoginFormValues,
@@ -41,7 +55,11 @@ export function LoginForm() {
 			"Unable to sign in. Please check your details and try again.";
 
 		if (authenticationChecked && isLoggedIn) {
-			router.replace("/dashboard");
+			if (disableRedirect) {
+				onSuccess?.();
+			} else {
+				router.replace(redirectTo);
+			}
 			return;
 		}
 
@@ -51,7 +69,12 @@ export function LoginForm() {
 			setFieldError("password", undefined);
 
 			await funcLogin(formikValues.email, formikValues.password);
-			router.replace("/dashboard");
+
+			if (disableRedirect) {
+				onSuccess?.();
+			} else {
+				router.replace(redirectTo);
+			}
 		} catch (error: unknown) {
 			const { formMessage, email, password } = parseLoginApiError(error);
 

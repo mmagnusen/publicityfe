@@ -83,7 +83,9 @@ const Select = ({
 			isDisabled={isDisabled}
 			isMulti={isMulti}
 			isSearchable={isSearchable}
+			menuPlacement="auto"
 			menuPortalTarget={menuPortalTarget}
+			menuPosition="fixed"
 			onBlur={onBlur}
 			onChange={onChange}
 			options={arrOptions}
@@ -103,12 +105,16 @@ const Select = ({
 			<div className={labelRowVariants()}>
 				{strLabel ? <label htmlFor={id ?? "select"}>{strLabel}</label> : null}
 			</div>
-			<HelperText>{helperText}</HelperText>
 			{selectControl}
 			{!bHideInlineMessages && objValidation.bIsValid === false ? (
 				<span className={fieldMessageVariants({ kind: "error" })}>
 					{objValidation.strErrorMessage}
 				</span>
+			) : null}
+			{!bHideInlineMessages &&
+			objValidation.bIsValid !== false &&
+			helperText ? (
+				<HelperText>{helperText}</HelperText>
 			) : null}
 		</section>
 	);
