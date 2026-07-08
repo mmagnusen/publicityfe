@@ -134,7 +134,7 @@ export function ApplyContent() {
 						{resolveBytescaleDisplayUrl(
 							creator.human_profile.profile_image_url,
 						) ? (
-							// Profile images come from Bytescale CDN URLs— not in next/image config.
+							// Profile images come from Bytescale CDN URLs- not in next/image config.
 							// eslint-disable-next-line @next/next/no-img-element
 							<img
 								src={

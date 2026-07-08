@@ -4,7 +4,7 @@ import { MarketingHomeContent } from "@/components/marketing-home-content";
 import { TRADING_NAME } from "@/constants/tradingName";
 
 export const metadata: Metadata = {
-	title: `${TRADING_NAME}- Promote yourself on interviews`,
+	title: `${TRADING_NAME}- Get featured on interviews`,
 	description:
 		"Connect with journalists, podcast hosts, and event organizers actively looking for experts like you.",
 };

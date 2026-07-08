@@ -12,7 +12,7 @@ const steps = [
 		number: 2,
 		title: "Browse Opportunities",
 		description:
-			"Every week, new opportunities land on the platform from journalists, podcast hosts, editors and event organisers actively looking for experts like you.",
+			"Every day, new opportunities land on the platform from journalists, podcast hosts, editors and event organisers actively looking for experts like you.",
 	},
 	{
 		number: 3,

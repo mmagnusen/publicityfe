@@ -28,20 +28,21 @@ function CheckIcon() {
 
 const images = [
 	{
-		src: "/creators/media-interview.png",
-		alt: "Woman being interviewed on camera in a studio with bookshelves",
+		src: "/creators/cosmo.png",
+		alt: "Cosmopolitan magazine cover featuring Maisie Peters",
+		imageClassName: "object-cover object-top",
 	},
 	{
-		src: "/creators/house-and-garden-cover.png",
-		alt: "House & Garden magazine cover featuring a luxurious living room interior",
+		src: "/creators/media-interview.png",
+		alt: "Woman being interviewed on camera in a studio with bookshelves",
 	},
 	{
 		src: "/creators/podcast-studio.png",
 		alt: "Man wearing headphones recording a podcast in a professional studio",
 	},
 	{
-		src: "https://picsum.photos/seed/getfeatured-panel/480/480",
-		alt: "Panel discussion on stage with seated speakers",
+		src: "/creators/house-and-garden-cover.png",
+		alt: "House & Garden magazine cover featuring a luxurious living room interior",
 	},
 ] as const;
 
@@ -52,7 +53,7 @@ const masonryColumns = [
 
 const benefits = [
 	{
-		title: "Verified Opportunities",
+		title: "Vetted Opportunities",
 		description:
 			"Every opportunity on the platform is vetted before it goes live - so you're only pitching to real journalists, genuine podcast hosts and legitimate event organisers.",
 	},
@@ -62,7 +63,7 @@ const benefits = [
 			"One monthly subscription. No commission, no hidden fees, no percentage taken from speaking fees or deals. What you earn is yours.",
 	},
 	{
-		title: "New Opportunities Every Week",
+		title: "New Opportunities Every Day",
 		description:
 			"Fresh press, podcast, panel and speaking opportunities added regularly - so there's always something worth pitching for, whatever your industry.",
 	},
@@ -88,7 +89,11 @@ export function CreatorsSection() {
 										alt={image.alt}
 										fill
 										sizes="(max-width: 1024px) 45vw, 280px"
-										className="object-cover"
+										className={
+											"imageClassName" in image && image.imageClassName
+												? image.imageClassName
+												: "object-cover"
+										}
 									/>
 								</div>
 							))}

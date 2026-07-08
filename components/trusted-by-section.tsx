@@ -1,3 +1,5 @@
+import Text from "@/components/Text";
+
 const brands = [
 	{
 		name: "Forbes",
@@ -35,14 +37,12 @@ const brands = [
 	},
 ];
 
-import Text from "@/components/Text";
-
 export function TrustedBySection() {
 	return (
-		<section className="border-t border-b border-gray-200 bg-white px-6 py-12 sm:py-14">
-			<Text variant="trusted-by">Land coverage in publications like</Text>
+		<section className="border-t border-b border-gray-200 bg-white px-6 py-16 sm:py-20">
+			<Text variant="trusted-by">Get featured in publications like</Text>
 
-			<ul className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-12 md:gap-x-14">
+			<ul className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:mt-12 sm:gap-x-12 md:gap-x-14">
 				{brands.map((brand) => (
 					<li key={brand.name}>
 						<span className={`text-gray-400 ${brand.className}`}>
@@ -51,6 +51,14 @@ export function TrustedBySection() {
 					</li>
 				))}
 			</ul>
+
+			<Text
+				variant="caption"
+				className="mx-auto mt-10 max-w-2xl text-center leading-relaxed sm:mt-12"
+			>
+				We work directly with journalists and editors from leading titles who
+				are actively looking for experts, founders and creatives to feature.
+			</Text>
 		</section>
 	);
 }

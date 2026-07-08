@@ -130,12 +130,12 @@ function AdminApplicationApprovalControl({
 
 function formatDateTime(value: string | undefined) {
 	if (!value) {
-		return "—";
+		return "-";
 	}
 
 	const date = new Date(value);
 	if (Number.isNaN(date.getTime())) {
-		return "—";
+		return "-";
 	}
 
 	return date.toLocaleString(undefined, {
@@ -277,7 +277,7 @@ function AdminApplicationDetailsTab({
 								{formatAdminApplicationApprovalStatusLabel(approvalStatus)}
 							</Tag>
 						) : (
-							"—"
+							"-"
 						)}
 					</DetailRow>
 					<DetailRow label="Opportunity">
@@ -533,12 +533,12 @@ function AdminApplicationApplicantTab({
 				</Heading>
 				<dl className="mt-4 grid gap-4 sm:grid-cols-2 sm:gap-x-8">
 					<DetailRow label="User ID">{user.pk}</DetailRow>
-					<DetailRow label="First name">{user.first_name || "—"}</DetailRow>
-					<DetailRow label="Last name">{user.last_name || "—"}</DetailRow>
+					<DetailRow label="First name">{user.first_name || "-"}</DetailRow>
+					<DetailRow label="Last name">{user.last_name || "-"}</DetailRow>
 					<DetailRow label="Username">{user.username}</DetailRow>
 					<DetailRow label="Email">{user.email}</DetailRow>
 					<DetailRow label="Registration method">
-						{user.registration_method || "—"}
+						{user.registration_method || "-"}
 					</DetailRow>
 					<DetailRow label="Date joined">
 						{formatDateTime(user.date_joined)}
@@ -569,12 +569,12 @@ function AdminApplicationApplicantTab({
 					Profile
 				</Heading>
 				<dl className="mt-4 grid gap-4 sm:grid-cols-2 sm:gap-x-8">
-					<DetailRow label="Headline">{headline || "—"}</DetailRow>
+					<DetailRow label="Headline">{headline || "-"}</DetailRow>
 					<DetailRow label="City">
-						{user.human_profile?.city?.trim() || "—"}
+						{user.human_profile?.city?.trim() || "-"}
 					</DetailRow>
 					<DetailRow label="Timezone">
-						{user.human_profile?.timezone?.trim() || "—"}
+						{user.human_profile?.timezone?.trim() || "-"}
 					</DetailRow>
 					<DetailRow label="Website">
 						{user.human_profile?.personal_website_url?.trim() ? (
@@ -582,28 +582,28 @@ function AdminApplicationApplicantTab({
 								href={user.human_profile.personal_website_url.trim()}
 							/>
 						) : (
-							"—"
+							"-"
 						)}
 					</DetailRow>
 					<DetailRow label="LinkedIn">
 						{user.human_profile?.linked_in_url?.trim() ? (
 							<ExternalLink href={user.human_profile.linked_in_url.trim()} />
 						) : (
-							"—"
+							"-"
 						)}
 					</DetailRow>
 					<DetailRow label="Instagram">
 						{user.human_profile?.instagram_url?.trim() ? (
 							<ExternalLink href={user.human_profile.instagram_url.trim()} />
 						) : (
-							"—"
+							"-"
 						)}
 					</DetailRow>
 					<DetailRow label="Facebook">
 						{user.human_profile?.facebook_url?.trim() ? (
 							<ExternalLink href={user.human_profile.facebook_url.trim()} />
 						) : (
-							"—"
+							"-"
 						)}
 					</DetailRow>
 				</dl>

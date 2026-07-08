@@ -27,14 +27,14 @@ export function HeroSection() {
 				</div>
 
 				<Heading level={1} variant="hero">
-					Promote yourself on
+					Get featured on
 					<br />
 					<RotatingWord />
 				</Heading>
 
 				<Text variant="hero-lead">
-					Connect with journalists, podcast hosts, and event organizers actively
-					looking for experts like you.
+					Connect with journalists, podcast hosts, and event organizers who are
+					actively looking for founders and experts to feature.
 				</Text>
 
 				<Button
