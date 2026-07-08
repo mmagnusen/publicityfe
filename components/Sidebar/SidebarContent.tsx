@@ -47,13 +47,18 @@ export function SidebarContent() {
 				</div>
 				<ul className="list-none">
 					<li className="py-1">
+						<SidebarNavLink href="/create-opportunity" onNavigate={onNavigate}>
+							Post an opportunity
+						</SidebarNavLink>
+					</li>
+					<li className="py-1">
 						<SidebarNavLink href="/opportunity" onNavigate={onNavigate}>
 							Browse opportunities
 						</SidebarNavLink>
 					</li>
 					<li className="py-1">
 						<SidebarNavLink href="/favourites" onNavigate={onNavigate}>
-							Favourites
+							My favourites
 						</SidebarNavLink>
 					</li>
 				</ul>
@@ -61,7 +66,7 @@ export function SidebarContent() {
 
 			<section className="mb-8">
 				<div className="px-4 py-2">
-					<SectionHeader title="Profile" />
+					<SectionHeader title="My account" />
 				</div>
 				<ul className="list-none">
 					<li className="py-1">

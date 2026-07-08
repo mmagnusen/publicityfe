@@ -2,6 +2,7 @@
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 
+import Button from "@/components/Button";
 import { LogoLink } from "@/components/Navigation/LogoLink";
 import { DASHBOARD_HEADER_HEIGHT } from "./constants";
 import { useSidebar } from "./SidebarProvider";
@@ -32,11 +33,21 @@ export function DashboardHeader() {
 			<div className="flex h-full items-center justify-between px-6">
 				<LogoLink />
 
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-3 sm:gap-4">
 					{authenticatedUser ? (
-						<span className="hidden text-sm text-gray-600 sm:inline">
-							{authenticatedUser.firstName}
-						</span>
+						<>
+							<Button
+								className="hidden sm:inline-flex"
+								href="/create-opportunity"
+								size="small"
+								textTransform="none"
+							>
+								Post an opportunity
+							</Button>
+							<span className="hidden text-sm text-gray-600 sm:inline">
+								{authenticatedUser.firstName}
+							</span>
+						</>
 					) : null}
 					<button
 						type="button"

@@ -108,7 +108,7 @@ export function MobileNavSidebar({
 						Sign In
 					</Button>
 					<Button href="/register" textTransform="none">
-						Get Started
+						Get started for free
 					</Button>
 				</div>
 			</aside>

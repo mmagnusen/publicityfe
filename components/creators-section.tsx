@@ -126,7 +126,7 @@ export function CreatorsSection() {
 					</ul>
 
 					<Button href="/register" textTransform="none" className="mt-8">
-						Get Started
+						Get started for free
 					</Button>
 				</div>
 			</div>

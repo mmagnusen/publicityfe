@@ -10,6 +10,7 @@ import {
 	useFeaturedJournalists,
 } from "@hooks/useFeaturedJournalists";
 
+import Heading from "@/components/Heading";
 import Text from "@/components/Text";
 import { FEATURED_JOURNALIST_USERNAMES } from "@/constants/featuredJournalists";
 import { TRADING_NAME } from "@/constants/tradingName";
@@ -89,19 +90,18 @@ export function GallerySection() {
 	}
 
 	return (
-		<section className="bg-white px-6 py-16 sm:py-20">
-			<Text variant="trusted-by">
-				Founders on {TRADING_NAME || "Get Featured"}
-			</Text>
-			<Text
-				variant="caption"
-				className="mx-auto mt-4 max-w-2xl text-center leading-relaxed sm:mt-5"
-			>
-				Founders across every industry are using{" "}
-				{TRADING_NAME || "Get Featured"} to land coverage, grow their authority
-				and get in front of the right audiences.
-			</Text>
-			<div className="mx-auto mt-10 grid w-full max-w-5xl grid-cols-3 gap-3 sm:mt-12 sm:gap-4">
+		<section className="bg-white px-6 py-20 sm:py-24">
+			<div className="mx-auto max-w-4xl text-center">
+				<Heading level={2}>
+					Founders on {TRADING_NAME || "Get Featured"}
+				</Heading>
+				<Text variant="section-lead-relaxed" className="mx-auto mt-4 max-w-2xl">
+					Founders across every industry are using{" "}
+					{TRADING_NAME || "Get Featured"} to land coverage, grow their
+					authority and get in front of the right audiences.
+				</Text>
+			</div>
+			<div className="mx-auto mt-12 grid w-full max-w-5xl grid-cols-3 gap-3 sm:mt-14 sm:gap-4">
 				{journalists.map((user, index) => (
 					<JournalistCard key={`${user.pk}-${index}`} user={user} />
 				))}

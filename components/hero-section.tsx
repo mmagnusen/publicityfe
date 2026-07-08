@@ -45,7 +45,7 @@ export function HeroSection() {
 					className="mt-10"
 				>
 					<span className="inline-flex items-center gap-2">
-						Get Started
+						Get started for free
 						<ArrowIcon />
 					</span>
 				</Button>

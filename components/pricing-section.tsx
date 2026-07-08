@@ -131,7 +131,7 @@ export function PricingPlans({ freeCtaHref = "/register" }: PricingPlansProps) {
 					textTransform="none"
 					className="mt-10"
 				>
-					Get started free
+					Get started for free
 				</Button>
 			</article>
 

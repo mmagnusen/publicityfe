@@ -26,7 +26,7 @@ export function CtaSection() {
 					textTransform="none"
 					className="mt-8"
 				>
-					Get Started Free
+					Get started for free
 				</Button>
 
 				{isPricingReleased ? (
