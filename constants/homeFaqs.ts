@@ -15,7 +15,7 @@ export const homeFaqs: HomeFaq[] = [
 	{
 		question: "Who is it for?",
 		answer:
-			"Founders, freelancers, consultants, creatives and subject-matter experts who want press coverage, podcast interviews, panel spots or speaking gigs — without hiring a traditional PR agency.",
+			"Founders, freelancers, consultants, creatives and subject-matter experts who want press coverage, podcast interviews, panel spots or speaking gigs - without hiring a traditional PR agency.",
 	},
 	{
 		question: "How do opportunities work?",
@@ -25,15 +25,15 @@ export const homeFaqs: HomeFaq[] = [
 	{
 		question: "Are the opportunities verified?",
 		answer:
-			"Yes. Every opportunity is reviewed before it goes live, so you're pitching to real outlets and legitimate requests — not spam listings or outdated calls for contributors.",
+			"Yes. Every opportunity is reviewed before it goes live, so you're pitching to real outlets and legitimate requests - not spam listings or outdated calls for contributors.",
 	},
 	{
 		question: "How much does it cost?",
-		answer: `${brandName} uses simple flat pricing — one monthly subscription with no commission on deals you land and no percentage taken from speaking fees. What you earn is yours.`,
+		answer: `${brandName} uses simple flat pricing - one monthly subscription with no commission on deals you land and no percentage taken from speaking fees. What you earn is yours.`,
 	},
 	{
 		question: "Do I need PR experience to get started?",
 		answer:
-			"No. Your profile acts as your media CV, and each opportunity includes enough context to help you write a focused pitch. Many members land their first feature within weeks of joining.",
+			"No. Your profile acts as your media CV, and each opportunity includes enough context to help you write a focused pitch.",
 	},
 ];

@@ -115,11 +115,11 @@ export function OpportunityListFilters({
 			<div
 				className={
 					showAppliedFilter
-						? "grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px_220px] sm:items-start"
-						: "grid gap-4 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-start"
+						? "grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_220px] lg:items-start"
+						: "grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start"
 				}
 			>
-				<div>
+				<div className="min-w-0 md:col-span-2 lg:col-span-1">
 					<label
 						className="mb-2 block text-sm font-medium text-gray-900"
 						htmlFor="opportunity-tag-filter"
@@ -151,7 +151,7 @@ export function OpportunityListFilters({
 				</div>
 
 				{showAppliedFilter ? (
-					<div>
+					<div className="min-w-0">
 						<label
 							className="mb-2 block text-sm font-medium text-gray-900"
 							htmlFor="opportunity-applied-filter"
@@ -169,7 +169,7 @@ export function OpportunityListFilters({
 					</div>
 				) : null}
 
-				<div>
+				<div className="min-w-0">
 					<label
 						className="mb-2 block text-sm font-medium text-gray-900"
 						htmlFor="opportunity-sort-filter"

@@ -346,13 +346,19 @@ export const formValuesToCreatePayload = (
 	values: OpportunityFormValues,
 ): OpportunityCreatePayload => {
 	const normalizedValues = normalizeOpportunityFormValuesForSubmit(values);
+	const typeOther = isOtherOpportunityTypeSelected(normalizedValues.type)
+		? normalizedValues.type_other.trim()
+		: "";
+	const otherMediaOutlet = isOtherMediaOutletSelected(
+		normalizedValues.media_outlet,
+	)
+		? normalizedValues.other_media_outlet.trim()
+		: "";
 
 	return {
 		title: normalizedValues.title.trim(),
 		type: normalizedValues.type?.value ?? DEFAULT_OPPORTUNITY_TYPE,
-		type_other: isOtherOpportunityTypeSelected(normalizedValues.type)
-			? normalizedValues.type_other.trim() || null
-			: null,
+		...(typeOther ? { type_other: typeOther } : {}),
 		short_description: normalizedValues.short_description.trim(),
 		full_description: fullDescriptionToApiField(
 			normalizedValues.full_description,
@@ -362,11 +368,7 @@ export const formValuesToCreatePayload = (
 			: normalizedValues.media_outlet
 				? Number(normalizedValues.media_outlet.value)
 				: null,
-		other_media_outlet: isOtherMediaOutletSelected(
-			normalizedValues.media_outlet,
-		)
-			? normalizedValues.other_media_outlet.trim() || null
-			: null,
+		...(otherMediaOutlet ? { other_media_outlet: otherMediaOutlet } : {}),
 		application_deadline: applicationDeadlineToApiValue(normalizedValues),
 	};
 };

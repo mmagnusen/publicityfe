@@ -9,11 +9,13 @@ export function OpportunitiesCommunitySection() {
 	return (
 		<section className="bg-gray-50 px-6 py-20 sm:py-24">
 			<div className="mx-auto max-w-4xl text-center">
-				<Heading level={2}>A platform built on trust</Heading>
+				<Heading level={2} className="mx-auto max-w-2xl">
+					Direct access to media opportunities, without the PR agency
+				</Heading>
 				<Text variant="section-lead-relaxed" className="mx-auto mt-4 max-w-2xl">
 					Every opportunity on {brandName} comes directly from journalists,
 					editors, podcast hosts and event organisers who are genuinely looking
-					for contributors. No cold outreach, no guesswork — just real
+					for contributors. No cold outreach, no guesswork - just real
 					opportunities from real media.
 				</Text>
 			</div>

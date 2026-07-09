@@ -1,31 +1,72 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
-import type {
-	OpportunityListAppliedFilter,
-	OpportunityListSort,
-} from "@hooks/useOpportunities";
 import {
 	normalizeOpportunityListResponse,
 	useOpportunities,
 } from "@hooks/useOpportunities";
 
-import Button from "@/components/Button";
 import Heading from "@/components/Heading";
-import { LogoLink } from "@/components/Navigation/LogoLink";
 import { OpportunityCardWithCreator } from "@/components/opportunities-list";
-import { OpportunityListFilters } from "@/components/opportunity-tag-filter";
 import {
 	DASHBOARD_HEADER_HEIGHT,
 	DESKTOP_SIDEBAR_WIDTH,
 } from "@/components/Sidebar/constants";
 import { SectionHeader } from "@/components/Sidebar/SectionHeader";
 import Text from "@/components/Text";
+import { TRADING_NAME } from "@/constants/tradingName";
 import { cn } from "@/lib/cn";
 
 const PREVIEW_OPPORTUNITIES_COUNT = 3;
+
+function ChevronDownIcon() {
+	return (
+		<svg
+			viewBox="0 0 16 16"
+			fill="none"
+			className="size-4 shrink-0 text-gray-400"
+			aria-hidden
+		>
+			<path
+				d="M4 6l4 4 4-4"
+				stroke="currentColor"
+				strokeWidth="1.5"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
+function MockFilterField({ label, value }: { label: string; value: string }) {
+	return (
+		<div>
+			<span className="mb-2 block text-sm font-medium text-gray-900">
+				{label}
+			</span>
+			<div className="flex h-10 items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-600">
+				<span className="min-w-0 flex-1 truncate">{value}</span>
+				<ChevronDownIcon />
+			</div>
+		</div>
+	);
+}
+
+function MockOpportunityListFilters() {
+	return (
+		<div className="rounded-2xl border border-gray-200 bg-white p-4">
+			<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_220px_220px] lg:items-start">
+				<div className="min-w-0 md:col-span-2 lg:col-span-1">
+					<MockFilterField label="Filter by tag" value="Search by tag…" />
+				</div>
+				<MockFilterField label="Applied status" value="All opportunities" />
+				<MockFilterField label="Sort by" value="Newest first" />
+			</div>
+		</div>
+	);
+}
 
 function MockSidebarNavLink({
 	children,
@@ -49,7 +90,7 @@ function MockSidebarNavLink({
 function MockSidebar() {
 	return (
 		<aside
-			className="hidden shrink-0 border-r border-gray-200 bg-white sm:block"
+			className="hidden shrink-0 border-r border-gray-200 bg-white md:block"
 			style={{ width: DESKTOP_SIDEBAR_WIDTH }}
 		>
 			<div className="px-4 py-4">
@@ -101,25 +142,29 @@ function MockDashboardHeader() {
 			style={{ height: DASHBOARD_HEADER_HEIGHT }}
 		>
 			<div className="flex h-full items-center justify-between px-6">
-				<LogoLink />
+				<div className="flex items-center gap-2.5">
+					<div className="flex size-8 items-center justify-center rounded-lg bg-black">
+						<svg viewBox="0 0 16 16" fill="none" className="size-4" aria-hidden>
+							<path
+								d="M3 11L6.5 7.5L9 9.5L13 4"
+								stroke="white"
+								strokeWidth="1.5"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							/>
+						</svg>
+					</div>
+					<span className="text-lg font-semibold tracking-tight text-black">
+						{TRADING_NAME}
+					</span>
+				</div>
 				<div className="flex items-center gap-3 sm:gap-4">
-					<Button
-						className="hidden sm:inline-flex"
-						href="/create-opportunity"
-						size="small"
-						textTransform="none"
-					>
+					<span className="hidden rounded-lg bg-black px-3 py-1.5 text-xs font-semibold text-white md:inline-flex">
 						Post an opportunity
-					</Button>
-					{authenticatedUser?.firstName ? (
-						<span className="hidden text-sm text-gray-600 sm:inline">
-							{authenticatedUser.firstName}
-						</span>
-					) : (
-						<span className="hidden text-sm text-gray-400 sm:inline">
-							Guest
-						</span>
-					)}
+					</span>
+					<span className="hidden text-sm text-gray-600 md:inline">
+						{authenticatedUser?.firstName ?? "Guest"}
+					</span>
 				</div>
 			</div>
 		</header>
@@ -127,24 +172,17 @@ function MockDashboardHeader() {
 }
 
 export function OpportunitiesListMockup() {
-	const { isLoggedIn } = useAuthenticatedUser();
-	const [selectedTagPks, setSelectedTagPks] = useState<number[]>([]);
-	const [selectedSort, setSelectedSort] =
-		useState<OpportunityListSort>("newest");
-	const [selectedApplied, setSelectedApplied] =
-		useState<OpportunityListAppliedFilter>("");
-
 	const { data, error, isLoading } = useOpportunities(
 		1,
 		PREVIEW_OPPORTUNITIES_COUNT,
-		selectedTagPks,
-		selectedSort,
-		selectedApplied,
 	);
 	const list = useMemo(() => normalizeOpportunityListResponse(data), [data]);
 
 	return (
-		<div className="mx-auto overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 shadow-xl shadow-gray-200/60">
+		<div
+			aria-hidden
+			className="pointer-events-none mx-auto select-none overflow-hidden rounded-2xl border border-gray-200 bg-gray-50 shadow-xl shadow-gray-200/60"
+		>
 			<MockDashboardHeader />
 			<div className="flex">
 				<MockSidebar />
@@ -159,15 +197,7 @@ export function OpportunitiesListMockup() {
 					</div>
 
 					<div className="mt-6">
-						<OpportunityListFilters
-							onSelectedAppliedChange={setSelectedApplied}
-							onSelectedSortChange={setSelectedSort}
-							onSelectedTagPksChange={setSelectedTagPks}
-							selectedApplied={selectedApplied}
-							selectedSort={selectedSort}
-							selectedTagPks={selectedTagPks}
-							showAppliedFilter={isLoggedIn}
-						/>
+						<MockOpportunityListFilters />
 					</div>
 
 					<div className="relative mt-8">
@@ -200,10 +230,7 @@ export function OpportunitiesListMockup() {
 									))}
 								</ul>
 								{list.count > PREVIEW_OPPORTUNITIES_COUNT ? (
-									<div
-										aria-hidden
-										className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-gray-50 to-transparent"
-									/>
+									<div className="absolute inset-x-0 bottom-0 h-24 bg-linear-to-t from-gray-50 to-transparent" />
 								) : null}
 							</>
 						)}

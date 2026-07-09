@@ -17,31 +17,32 @@ import Text from "@/components/Text";
 import { TRADING_NAME } from "@/constants/tradingName";
 
 function ContactCard({
-	children,
+	action,
+	description,
 	icon,
 	title,
 }: {
-	children: React.ReactNode;
+	action: React.ReactNode;
+	description: string;
 	icon: string;
 	title: string;
 }) {
 	return (
-		<div className="rounded-2xl border border-gray-200 bg-white p-6">
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-				<span
-					className="inline-flex size-14 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700"
-					aria-hidden
-				>
-					<Icon horizontal path={icon} rotate={180} size={1.25} vertical />
-				</span>
-				<div className="min-w-0">
-					<Heading level={2} variant="subsection">
-						{title}
-					</Heading>
-					<div className="mt-2">{children}</div>
-				</div>
-			</div>
-		</div>
+		<article className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
+			<span
+				className="inline-flex size-11 items-center justify-center rounded-xl bg-violet-100 text-violet-700"
+				aria-hidden
+			>
+				<Icon horizontal path={icon} rotate={180} size={1.1} vertical />
+			</span>
+			<Heading level={2} variant="subsection" className="mt-4">
+				{title}
+			</Heading>
+			<Text variant="card-body" className="mt-2 max-w-xl">
+				{description}
+			</Text>
+			<div className="mt-5">{action}</div>
+		</article>
 	);
 }
 
@@ -73,70 +74,52 @@ export function ContactUsContent() {
 					</Text>
 
 					<div className="mt-10 space-y-4">
-						<ContactCard icon={mdiSend} title="Send a query">
-							<p className="max-w-2xl text-[0.9375rem] leading-relaxed text-gray-600">
-								Send us a message with your question and we&apos;ll reply by
-								email as soon as we can.
-							</p>
-							<div className="mt-4">
+						<ContactCard
+							description="Send us a message with your question and we'll reply by email as soon as we can."
+							icon={mdiSend}
+							title="Send a query"
+							action={
 								<Button
 									onClick={() => setIsQueryModalOpen(true)}
 									textTransform="none"
 									type="button"
 								>
-									<span className="inline-flex items-center gap-2">
-										<Icon
-											horizontal
-											path={mdiSend}
-											rotate={180}
-											size={0.85}
-											vertical
-										/>
-										Send a message
-									</span>
+									Send a message
 								</Button>
-							</div>
-						</ContactCard>
+							}
+						/>
 
-						<ContactCard icon={mdiChat} title="Live chat">
-							<p className="max-w-2xl text-[0.9375rem] leading-relaxed text-gray-600">
-								Chat with our support team for the fastest response on account,
-								billing, and platform questions.
-							</p>
-							<div className="mt-4">
+						<ContactCard
+							description="Chat with our support team for the fastest response on account, billing, and platform questions."
+							icon={mdiChat}
+							title="Live chat"
+							action={
 								<Button
 									onClick={openLiveChat}
 									textTransform="none"
 									type="button"
 								>
-									<span className="inline-flex items-center gap-2">
-										<Icon
-											horizontal
-											path={mdiChat}
-											rotate={180}
-											size={0.85}
-											vertical
-										/>
-										Start live chat
-									</span>
+									Start live chat
 								</Button>
-							</div>
-						</ContactCard>
+							}
+						/>
 
-						<ContactCard icon={mdiEmailOutline} title="Email">
-							<p className="max-w-2xl text-[0.9375rem] leading-relaxed text-gray-600">
-								Prefer email? Reach us directly and we&apos;ll get back to you
-								as soon as we can.
-							</p>
-							<p className="mt-4">
-								<a
-									className="text-sm font-semibold text-gray-900 underline underline-offset-2"
-									href={`mailto:${supportEmail}`}
-								>
-									{supportEmail}
-								</a>
-							</p>
-						</ContactCard>
+						{supportEmail ? (
+							<ContactCard
+								description="Prefer email? Reach us directly and we'll get back to you as soon as we can."
+								icon={mdiEmailOutline}
+								title="Email"
+								action={
+									<Button
+										href={`mailto:${supportEmail}`}
+										strVariant="transparentWithBorder"
+										textTransform="none"
+									>
+										{supportEmail}
+									</Button>
+								}
+							/>
+						) : null}
 					</div>
 				</div>
 			</main>
