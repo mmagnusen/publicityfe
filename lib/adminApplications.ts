@@ -2,7 +2,14 @@ import axios from "axios";
 
 import fetcher from "@util/fetcher";
 
-const ADMIN_APPLICATIONS_PATH = "/opportunities/admin/applications";
+const ADMIN_APPLICATIONS_LIST_PATH = "/opportunities/admin/applications";
+const ADMIN_APPLICATION_PATH = "/opportunities/admin/application";
+
+export const adminApplicationPatchPath = (pk: number) =>
+	`${ADMIN_APPLICATION_PATH}/${pk}`;
+
+export const adminApplicationDetailPath = (pk: number) =>
+	`${ADMIN_APPLICATIONS_LIST_PATH}/${pk}`;
 
 export type AdminApplicationApprovalStatus = "submitted" | "approved";
 
@@ -51,8 +58,44 @@ export const formatAdminApplicationApprovalStatusLabel = (
 	return "Submitted";
 };
 
-export const adminApplicationDetailPath = (pk: number) =>
-	`${ADMIN_APPLICATIONS_PATH}/${pk}`;
+export type AdminApplicationApprovalStatusFilter =
+	| ""
+	| AdminApplicationApprovalStatus;
+
+export const ADMIN_APPLICATION_APPROVAL_STATUS_FILTER_OPTIONS = [
+	{ label: "All statuses", value: "" },
+	{ label: "Submitted", value: "submitted" },
+	{ label: "Approved", value: "approved" },
+] as const satisfies ReadonlyArray<{
+	label: string;
+	value: AdminApplicationApprovalStatusFilter;
+}>;
+
+export const parseAdminApplicationApprovalStatusFromSearchParams = (
+	searchParams: Pick<URLSearchParams, "get">,
+): AdminApplicationApprovalStatusFilter => {
+	const status = searchParams.get("approval_status") ?? "";
+	return parseAdminApplicationApprovalStatus(status) ?? "";
+};
+
+export const buildAdminApplicationsPageHref = (
+	page: number,
+	approvalStatus: AdminApplicationApprovalStatusFilter = "",
+): string => {
+	const query = new URLSearchParams();
+	if (page > 1) {
+		query.set("page", String(page));
+	}
+	if (approvalStatus) {
+		query.set("approval_status", approvalStatus);
+	}
+	const queryString = query.toString();
+	return queryString
+		? `/admin/applications?${queryString}`
+		: "/admin/applications";
+};
+
+export { ADMIN_APPLICATIONS_LIST_PATH as ADMIN_APPLICATIONS_PATH };
 
 export const applicationApplicantPk = (
 	application: AdminApplication,
@@ -84,7 +127,7 @@ const findApplicationInList = async (
 	const perPage = 100;
 
 	while (page <= 20) {
-		const data = await fetcher(ADMIN_APPLICATIONS_PATH, {
+		const data = await fetcher(ADMIN_APPLICATIONS_LIST_PATH, {
 			page,
 			per_page: perPage,
 		});

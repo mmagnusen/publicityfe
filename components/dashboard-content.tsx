@@ -16,37 +16,56 @@ import {
 	useMyOpportunities,
 } from "@hooks/useOpportunities";
 
-import Button from "@/components/Button";
 import { DashboardAddOpportunitySection } from "@/components/dashboard-add-opportunity-section";
 import { DashboardBillingSupport } from "@/components/dashboard-billing-support";
+import { DashboardCompleteProfileSection } from "@/components/dashboard-complete-profile-section";
 import { DashboardReferralsSection } from "@/components/dashboard-referrals-section";
 import Heading from "@/components/Heading";
 import { SidebarLayout } from "@/components/Sidebar";
 import Text from "@/components/Text";
-import { profilePagePath } from "@/lib/publicUser";
 
 const isPricingReleased =
 	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
 
 function DashboardStatLink({
+	description,
 	href,
 	label,
 	value,
 }: {
+	description: string;
 	href: string;
 	label: string;
 	value: React.ReactNode;
 }) {
 	return (
 		<Link
-			className="flex flex-col rounded-2xl border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300 hover:bg-gray-50/50"
+			className="flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-gray-300 hover:bg-gray-50/50"
 			href={href}
 		>
-			<Text variant="stat-label">{label}</Text>
-			<Text variant="stat-value">{value}</Text>
-			<span className="mt-4 text-sm font-semibold text-violet-700">
-				View all
-			</span>
+			<div className="flex flex-1 items-center p-6 pb-4">
+				<div className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-x-4 gap-y-2">
+					<Text
+						variant="stat-value"
+						className="mt-0 shrink-0 text-4xl leading-none tabular-nums"
+					>
+						{value}
+					</Text>
+					<div className="min-w-36">
+						<p className="text-sm font-semibold text-black">{label}</p>
+						<Text variant="card-body" className="mt-1 text-pretty">
+							{description}
+						</Text>
+					</div>
+				</div>
+			</div>
+			<div className="mt-auto px-6 pb-4">
+				<div className="border-t border-gray-200 pt-4">
+					<span className="text-sm font-semibold text-violet-700">
+						View all
+					</span>
+				</div>
+			</div>
 		</Link>
 	);
 }
@@ -101,15 +120,17 @@ export function DashboardContent() {
 				Your dashboard for managing media opportunities and your profile.
 			</Text>
 
-			<div className="mt-8 grid gap-4 sm:grid-cols-3">
+			<div className="mt-8 grid grid-cols-[repeat(auto-fit,minmax(min(100%,17.5rem),1fr))] gap-4">
 				<DashboardStatLink
+					description="Opportunities you've posted for others to apply to."
 					href="/my-opportunities"
 					label="My opportunities"
 					value={isLoading && !data ? "…" : list.count}
 				/>
 				<DashboardStatLink
+					description="Opportunities you've applied to."
 					href="/applications"
-					label="Applications"
+					label="My applications"
 					value={
 						isLoadingApplications && !applicationsData
 							? "…"
@@ -117,6 +138,7 @@ export function DashboardContent() {
 					}
 				/>
 				<DashboardStatLink
+					description="Opportunities you've saved to revisit later."
 					href="/favourites"
 					label="My favourites"
 					value={
@@ -125,25 +147,11 @@ export function DashboardContent() {
 				/>
 			</div>
 
-			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
-				<Heading level={2} variant="subsection">
-					Quick links
-				</Heading>
-				<div className="mt-4 flex flex-wrap gap-3">
-					<Button href="/opportunity" textTransform="none">
-						Browse opportunities
-					</Button>
-					{authenticatedUser.username?.trim() ? (
-						<Button
-							href={profilePagePath(authenticatedUser.username)}
-							strVariant="transparentWithBorder"
-							textTransform="none"
-						>
-							View your profile
-						</Button>
-					) : null}
-				</div>
-			</div>
+			{authenticatedUser.username?.trim() ? (
+				<DashboardCompleteProfileSection
+					username={authenticatedUser.username.trim()}
+				/>
+			) : null}
 
 			<DashboardAddOpportunitySection />
 

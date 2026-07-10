@@ -2,13 +2,15 @@ import type { ProfileHighlight } from "@customTypes/profileHighlight";
 import type { Tag } from "@customTypes/tag";
 import type { GalleryAsset } from "@hooks/useAdvertisement";
 
-/** Public member profile from `/users/public-user/:username` (no email or auth fields). */
+/** Public member profile from `/users/public-user/:username`. */
 export type PublicUser = {
 	pk: number;
 	first_name: string;
 	last_name: string;
 	username: string;
 	is_active: boolean;
+	/** Contact email exposed for media inquiries when available. */
+	email?: string;
 	tags?: Tag[];
 	human_profile: {
 		pk: number;

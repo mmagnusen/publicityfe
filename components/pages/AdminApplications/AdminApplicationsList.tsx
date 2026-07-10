@@ -5,16 +5,33 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import {
+	ADMIN_APPLICATION_APPROVAL_STATUS_FILTER_OPTIONS,
+	type AdminApplicationApprovalStatusFilter,
+	APPLICATIONS_PER_PAGE,
+	buildAdminApplicationsPageHref,
+	parseAdminApplicationApprovalStatusFromSearchParams,
+	useAdminApplications,
+} from "@hooks/useAdminApplications";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
+import type { MultiValue, SingleValue } from "react-select";
 
 import Heading from "@/components/Heading";
+import Select, { type SelectOption } from "@/components/Select/Select";
 import { SidebarLayout } from "@/components/Sidebar";
+import Tag from "@/components/Tag";
+import type { TagSkin } from "@/components/Tag/Tag";
 import Text from "@/components/Text";
 import {
 	type AdminApplication,
-	APPLICATIONS_PER_PAGE,
-	useAdminApplications,
-} from "@/hooks/useAdminApplications";
+	formatAdminApplicationApprovalStatusLabel,
+	parseAdminApplicationApprovalStatus,
+} from "@/lib/adminApplications";
+
+const APPROVAL_STATUS_TAG_SKINS: Record<"submitted" | "approved", TagSkin> = {
+	submitted: "yellow",
+	approved: "green",
+};
 
 function formatDate(dateString: string) {
 	try {
@@ -29,6 +46,10 @@ function formatDate(dateString: string) {
 }
 
 function ApplicationCard({ application }: { application: AdminApplication }) {
+	const approvalStatus = parseAdminApplicationApprovalStatus(
+		application.approval_status,
+	);
+
 	return (
 		<Link
 			className="block rounded-xl border border-gray-200 bg-white p-5 transition-colors hover:border-gray-300 hover:bg-gray-50"
@@ -52,6 +73,13 @@ function ApplicationCard({ application }: { application: AdminApplication }) {
 							</span>
 						) : null}
 					</p>
+					{approvalStatus ? (
+						<div className="mt-2">
+							<Tag skin={APPROVAL_STATUS_TAG_SKINS[approvalStatus]}>
+								{formatAdminApplicationApprovalStatusLabel(approvalStatus)}
+							</Tag>
+						</div>
+					) : null}
 				</div>
 				<span className="shrink-0 text-xs text-gray-400">
 					{formatDate(application.created_at)}
@@ -68,9 +96,11 @@ function ApplicationCard({ application }: { application: AdminApplication }) {
 }
 
 function ListPagination({
+	approvalStatus,
 	currentPage,
 	totalCount,
 }: {
+	approvalStatus: AdminApplicationApprovalStatusFilter;
 	currentPage: number;
 	totalCount: number;
 }) {
@@ -81,10 +111,12 @@ function ListPagination({
 	}
 
 	const prevHref =
-		currentPage > 1 ? `/admin/applications?page=${currentPage - 1}` : undefined;
+		currentPage > 1
+			? buildAdminApplicationsPageHref(currentPage - 1, approvalStatus)
+			: undefined;
 	const nextHref =
 		currentPage < totalPages
-			? `/admin/applications?page=${currentPage + 1}`
+			? buildAdminApplicationsPageHref(currentPage + 1, approvalStatus)
 			: undefined;
 
 	return (
@@ -129,8 +161,19 @@ export function AdminApplicationsList() {
 
 	const pageFromQuery = Number(searchParams.get("page")) || 1;
 	const currentPage = pageFromQuery >= 1 ? pageFromQuery : 1;
+	const approvalStatusQuery =
+		parseAdminApplicationApprovalStatusFromSearchParams(searchParams);
 
-	const { data, error, isLoading } = useAdminApplications(currentPage);
+	const selectedApprovalStatus =
+		ADMIN_APPLICATION_APPROVAL_STATUS_FILTER_OPTIONS.find(
+			(option) => option.value === approvalStatusQuery,
+		) ?? ADMIN_APPLICATION_APPROVAL_STATUS_FILTER_OPTIONS[0];
+
+	const { data, error, isLoading } = useAdminApplications(
+		currentPage,
+		APPLICATIONS_PER_PAGE,
+		approvalStatusQuery,
+	);
 
 	const accessDenied = axios.isAxiosError(error)
 		? error.response?.status === 401 || error.response?.status === 403
@@ -156,6 +199,22 @@ export function AdminApplicationsList() {
 		);
 	}
 
+	const handleApprovalStatusChange = (
+		value: SingleValue<SelectOption> | MultiValue<SelectOption>,
+	) => {
+		const option = Array.isArray(value) ? value[0] : value;
+		router.push(
+			buildAdminApplicationsPageHref(
+				1,
+				parseAdminApplicationApprovalStatusFromSearchParams(
+					new URLSearchParams(
+						option?.value ? { approval_status: option.value } : {},
+					),
+				),
+			),
+		);
+	};
+
 	return (
 		<SidebarLayout>
 			<Heading level={1} variant="page-lg">
@@ -166,31 +225,58 @@ export function AdminApplicationsList() {
 			</Text>
 
 			<div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6">
-				{!authenticationChecked || (isLoading && !data) ? (
-					<Text variant="loading">Loading applications…</Text>
-				) : error ? (
-					<Text variant="error">
-						{accessDenied
-							? "Access denied. Sign in with a staff account to continue."
-							: "Could not load applications. Check the API is available and try again."}
-					</Text>
-				) : !data || data.results.length === 0 ? (
-					<Text variant="center-sm">No applications yet.</Text>
-				) : (
-					<>
-						<Text variant="stat-label">
-							{data.count} application{data.count === 1 ? "" : "s"}
+				<div className="max-w-xs">
+					<label
+						className="mb-2 block text-sm font-medium text-gray-900"
+						htmlFor="admin-application-approval-status"
+					>
+						Application status
+					</label>
+					<Select
+						arrOptions={[...ADMIN_APPLICATION_APPROVAL_STATUS_FILTER_OPTIONS]}
+						bCompact
+						id="admin-application-approval-status"
+						isSearchable={false}
+						onChange={handleApprovalStatusChange}
+						value={selectedApprovalStatus}
+					/>
+				</div>
+
+				<div className="mt-6">
+					{!authenticationChecked || (isLoading && !data) ? (
+						<Text variant="loading">Loading applications…</Text>
+					) : error ? (
+						<Text variant="error">
+							{accessDenied
+								? "Access denied. Sign in with a staff account to continue."
+								: "Could not load applications. Check the API is available and try again."}
 						</Text>
-						<ul className="mt-4 list-none space-y-4">
-							{data.results.map((application) => (
-								<li key={application.pk}>
-									<ApplicationCard application={application} />
-								</li>
-							))}
-						</ul>
-						<ListPagination currentPage={currentPage} totalCount={data.count} />
-					</>
-				)}
+					) : !data || data.results.length === 0 ? (
+						<Text variant="center-sm">
+							{approvalStatusQuery
+								? "No applications found for this status."
+								: "No applications yet."}
+						</Text>
+					) : (
+						<>
+							<Text variant="stat-label">
+								{data.count} application{data.count === 1 ? "" : "s"}
+							</Text>
+							<ul className="mt-4 list-none space-y-4">
+								{data.results.map((application) => (
+									<li key={application.pk}>
+										<ApplicationCard application={application} />
+									</li>
+								))}
+							</ul>
+							<ListPagination
+								approvalStatus={approvalStatusQuery}
+								currentPage={currentPage}
+								totalCount={data.count}
+							/>
+						</>
+					)}
+				</div>
 			</div>
 		</SidebarLayout>
 	);

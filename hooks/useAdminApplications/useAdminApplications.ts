@@ -8,7 +8,9 @@ import { instanceAxios } from "@util/instanceAxios";
 import {
 	type AdminApplication,
 	type AdminApplicationApprovalStatus,
+	type AdminApplicationApprovalStatusFilter,
 	adminApplicationDetailPath,
+	adminApplicationPatchPath,
 	fetchAdminApplication,
 } from "@/lib/adminApplications";
 
@@ -23,22 +25,32 @@ type AdminApplicationsPaginatedResponse = {
 	results: AdminApplication[];
 };
 
-const adminApplicationsListKey = (page: number, perPage: number) => {
+const adminApplicationsListKey = (
+	page: number,
+	perPage: number,
+	approvalStatus: AdminApplicationApprovalStatusFilter = "",
+) => {
 	const query = new URLSearchParams({
 		page: String(page),
 		per_page: String(perPage),
 	});
+	if (approvalStatus) {
+		query.set("approval_status", approvalStatus);
+	}
 	return `${ADMIN_APPLICATIONS_PATH}?${query.toString()}`;
 };
 
 export const useAdminApplications = (
 	page: number,
 	perPage: number = APPLICATIONS_PER_PAGE,
+	approvalStatus: AdminApplicationApprovalStatusFilter = "",
 ) => {
 	const { isAdmin, isLoggedIn } = useAuthenticatedUser();
 
 	return useSWR<AdminApplicationsPaginatedResponse>(
-		isLoggedIn && isAdmin ? adminApplicationsListKey(page, perPage) : null,
+		isLoggedIn && isAdmin
+			? adminApplicationsListKey(page, perPage, approvalStatus)
+			: null,
 		fetcher,
 		{ revalidateOnMount: true },
 	);
@@ -85,7 +97,7 @@ export const patchAdminApplication = async (
 	payload: AdminApplicationUpdatePayload,
 ): Promise<AdminApplication> => {
 	const { data } = await instanceAxios.patch<AdminApplication>(
-		adminApplicationDetailPath(pk),
+		adminApplicationPatchPath(pk),
 		payload,
 	);
 	return data;

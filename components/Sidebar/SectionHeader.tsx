@@ -1,7 +1,12 @@
+import { cn } from "@/lib/cn";
+
 type SectionHeaderProps = {
+	className?: string;
 	title: string;
 };
 
-export function SectionHeader({ title }: SectionHeaderProps) {
-	return <h3 className="px-2 text-lg font-bold text-black">{title}</h3>;
+export function SectionHeader({ className, title }: SectionHeaderProps) {
+	return (
+		<h3 className={cn("text-lg font-bold text-black", className)}>{title}</h3>
+	);
 }

@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import type { ProfileHighlight } from "@customTypes/profileHighlight";
 import type { Tag } from "@customTypes/tag";
 import type { GalleryAsset } from "@hooks/useAdvertisement";
+import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
+import { usePublicUser } from "@hooks/usePublicUser";
 
 import Button from "@/components/Button";
+import { ContactEmailModal } from "@/components/contact-email-modal";
 import Heading from "@/components/Heading";
 import { HistoryBackLink } from "@/components/history-back-link";
 import { ProfilePageEditButton } from "@/components/pages/Profile/ProfilePageEditButton";
@@ -259,6 +262,7 @@ const liveProfileDisplayFromFormValues = (
 };
 
 type FounderProfileDetailProps = {
+	contactEmail?: string | null;
 	displayName?: string;
 	avatarUrl?: string | null;
 	location?: string | null;
@@ -275,6 +279,7 @@ type FounderProfileDetailProps = {
 };
 
 export function FounderProfileDetail({
+	contactEmail,
 	displayName,
 	avatarUrl,
 	location,
@@ -290,6 +295,9 @@ export function FounderProfileDetail({
 	userPk,
 }: FounderProfileDetailProps) {
 	const fallbackName = profileUsername;
+	const { authenticatedUser, isLoggedIn } = useAuthenticatedUser();
+	const { data: publicUser } = usePublicUser(profileUsername);
+	const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 	const [liveProfile, setLiveProfile] = useState<LiveProfileDisplay>(() =>
 		buildLiveProfileDisplay({
 			displayName,
@@ -320,136 +328,178 @@ export function FounderProfileDetail({
 
 	const name = liveProfile.displayName;
 	const displayTagline = liveProfile.tagline;
+	const resolvedContactEmail = useMemo(() => {
+		const fromProps = contactEmail?.trim();
+		if (fromProps) {
+			return fromProps;
+		}
+
+		const fromPublicUser = publicUser?.email?.trim();
+		if (fromPublicUser) {
+			return fromPublicUser;
+		}
+
+		if (
+			isLoggedIn &&
+			authenticatedUser?.username === profileUsername &&
+			authenticatedUser.email?.trim()
+		) {
+			return authenticatedUser.email.trim();
+		}
+
+		return null;
+	}, [
+		authenticatedUser?.email,
+		authenticatedUser?.username,
+		contactEmail,
+		isLoggedIn,
+		profileUsername,
+		publicUser?.email,
+	]);
+
 	return (
-		<div className="min-h-full bg-white font-sans">
-			<header className="border-b border-gray-200 px-6 py-4">
-				<div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
-					<HistoryBackLink className="text-sm font-medium text-gray-500 transition-colors hover:text-black">
-						← Back
-					</HistoryBackLink>
-					<Link
-						href="/"
-						className="text-lg font-semibold tracking-tight text-black"
-					>
-						{TRADING_NAME}
-					</Link>
-				</div>
-			</header>
-
-			<main className="mx-auto max-w-6xl px-6 py-10">
-				<div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
-					<aside>
-						<ProfileAvatarSection
-							name={name}
-							initialAvatarUrl={avatarUrl}
-							profileUsername={profileUsername}
-						/>
-
-						<Heading level={1} variant="page-profile">
-							{name}
-						</Heading>
-						{displayTagline ? (
-							<Text variant="profile-role">{displayTagline}</Text>
-						) : null}
-						{liveProfile.location ? (
-							<Text variant="profile-location">
-								<MapPinIcon />
-								{liveProfile.location}
-							</Text>
-						) : null}
-
-						<Button
-							type="button"
-							isFullWidth
-							borderRadius="large"
-							textTransform="none"
-							className="mt-6 border-none bg-linear-to-r from-violet-600 to-fuchsia-500 hover:bg-linear-to-r hover:opacity-90"
+		<>
+			<div className="min-h-full bg-white font-sans">
+				<header className="border-b border-gray-200 px-6 py-4">
+					<div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+						<HistoryBackLink className="text-sm font-medium text-gray-500 transition-colors hover:text-black">
+							← Back
+						</HistoryBackLink>
+						<Link
+							href="/"
+							className="text-lg font-semibold tracking-tight text-black"
 						>
-							<span className="inline-flex items-center justify-center gap-2">
-								<MailIcon />
-								Contact for media
-							</span>
-						</Button>
+							{TRADING_NAME}
+						</Link>
+					</div>
+				</header>
 
-						{liveProfile.links.length > 0 ? (
-							<ul className="mt-4 space-y-2">
-								{liveProfile.links.map((link) => (
-									<li key={`${link.type}-${link.href}`}>
-										<a
-											href={link.href}
-											target="_blank"
-											rel="noopener noreferrer"
-											className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
-										>
-											<LinkIcon type={link.type} />
-											<span className="min-w-0 flex-1 truncate">
-												{link.label}
-											</span>
-											<ExternalLinkIcon />
-										</a>
-									</li>
-								))}
-							</ul>
-						) : null}
+				<main className="mx-auto max-w-6xl px-6 py-10">
+					<div className="grid gap-10 lg:grid-cols-[280px_1fr] lg:gap-14">
+						<aside>
+							<ProfileAvatarSection
+								name={name}
+								initialAvatarUrl={avatarUrl}
+								profileUsername={profileUsername}
+							/>
 
-						{liveProfile.tagNames.length > 0 ? (
-							<div className="mt-8">
-								<Text variant="label">Speaks about</Text>
-								<ul className="mt-3 flex flex-wrap gap-2">
-									{liveProfile.tagNames.map((topic) => (
-										<li
-											key={topic}
-											className="rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-600"
-										>
-											{topic}
+							<Heading level={1} variant="page-profile">
+								{name}
+							</Heading>
+							{displayTagline ? (
+								<Text variant="profile-role">{displayTagline}</Text>
+							) : null}
+							{liveProfile.location ? (
+								<Text variant="profile-location">
+									<MapPinIcon />
+									{liveProfile.location}
+								</Text>
+							) : null}
+
+							<Button
+								type="button"
+								isFullWidth
+								borderRadius="large"
+								textTransform="none"
+								className="mt-6 border-none bg-linear-to-r from-violet-600 to-fuchsia-500 hover:bg-linear-to-r hover:opacity-90"
+								onClick={() => setIsContactModalOpen(true)}
+							>
+								<span className="inline-flex items-center justify-center gap-2">
+									<MailIcon />
+									Contact for media
+								</span>
+							</Button>
+
+							{liveProfile.links.length > 0 ? (
+								<ul className="mt-4 space-y-2">
+									{liveProfile.links.map((link) => (
+										<li key={`${link.type}-${link.href}`}>
+											<a
+												href={link.href}
+												target="_blank"
+												rel="noopener noreferrer"
+												className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+											>
+												<LinkIcon type={link.type} />
+												<span className="min-w-0 flex-1 truncate">
+													{link.label}
+												</span>
+												<ExternalLinkIcon />
+											</a>
 										</li>
 									))}
 								</ul>
-							</div>
-						) : null}
-					</aside>
+							) : null}
 
-					<div>
-						<div className="flex items-center justify-between gap-4">
-							{openToMedia ? (
-								<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-									<span className="size-1.5 rounded-full bg-violet-500" />
-									Open to media opportunities
-								</span>
-							) : (
-								<span />
-							)}
-							<ProfilePageEditButton
+							{liveProfile.tagNames.length > 0 ? (
+								<div className="mt-8">
+									<Text variant="label">Speaks about</Text>
+									<ul className="mt-3 flex flex-wrap gap-2">
+										{liveProfile.tagNames.map((topic) => (
+											<li
+												key={topic}
+												className="rounded-full bg-gray-100 px-3 py-1.5 text-xs text-gray-600"
+											>
+												{topic}
+											</li>
+										))}
+									</ul>
+								</div>
+							) : null}
+						</aside>
+
+						<div>
+							<div className="flex items-center justify-between gap-4">
+								{openToMedia ? (
+									<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
+										<span className="size-1.5 rounded-full bg-violet-500" />
+										Open to media opportunities
+									</span>
+								) : (
+									<span />
+								)}
+								<ProfilePageEditButton
+									profileUsername={profileUsername}
+									initialValues={liveProfile.profileFormValues}
+									onProfileSaved={(values) => {
+										setLiveProfile(
+											liveProfileDisplayFromFormValues(values, profileUsername),
+										);
+									}}
+								/>
+							</div>
+
+							<ProfileBioContent
+								bio={liveProfile.bio}
+								key={liveProfile.bio ?? "empty"}
+							/>
+
+							<ProfileGallerySection
+								displayName={name}
+								initialGallery={gallery}
 								profileUsername={profileUsername}
-								initialValues={liveProfile.profileFormValues}
-								onProfileSaved={(values) => {
-									setLiveProfile(
-										liveProfileDisplayFromFormValues(values, profileUsername),
-									);
-								}}
+								userPk={userPk}
+							/>
+
+							<ProfileHighlightsSection
+								initialHighlights={highlights}
+								profileUsername={profileUsername}
+								userPk={userPk}
 							/>
 						</div>
-
-						<ProfileBioContent
-							bio={liveProfile.bio}
-							key={liveProfile.bio ?? "empty"}
-						/>
-
-						<ProfileGallerySection
-							displayName={name}
-							initialGallery={gallery}
-							profileUsername={profileUsername}
-							userPk={userPk}
-						/>
-
-						<ProfileHighlightsSection
-							initialHighlights={highlights}
-							profileUsername={profileUsername}
-							userPk={userPk}
-						/>
 					</div>
-				</div>
-			</main>
-		</div>
+				</main>
+			</div>
+
+			<ContactEmailModal
+				contactName={name}
+				description={`Email ${name} about media opportunities using the address below.`}
+				email={resolvedContactEmail}
+				isOpen={isContactModalOpen}
+				onClose={() => setIsContactModalOpen(false)}
+				title="Contact for media"
+				unavailableMessage="Email address is not available for this profile."
+			/>
+		</>
 	);
 }

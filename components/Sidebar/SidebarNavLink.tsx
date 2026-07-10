@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Icon from "@mdi/react";
 
 import { cn } from "@/lib/cn";
 
 type SidebarNavLinkProps = {
 	children: React.ReactNode;
 	href: string;
+	icon?: string;
 	onNavigate?: () => void;
 };
 
@@ -22,6 +24,7 @@ function isActivePath(pathname: string, href: string) {
 export function SidebarNavLink({
 	children,
 	href,
+	icon,
 	onNavigate,
 }: SidebarNavLinkProps) {
 	const pathname = usePathname();
@@ -32,13 +35,18 @@ export function SidebarNavLink({
 			href={href}
 			onClick={onNavigate}
 			className={cn(
-				"block rounded-md px-4 py-2 text-sm font-medium transition-colors",
+				"flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium transition-colors",
 				isActive
 					? "bg-gray-100 text-black"
 					: "text-gray-600 hover:bg-gray-50 hover:text-black",
 			)}
 		>
-			{children}
+			{icon ? (
+				<span className="flex size-5 shrink-0 items-center justify-center">
+					<Icon horizontal path={icon} rotate={180} size={0.85} vertical />
+				</span>
+			) : null}
+			<span className="min-w-0">{children}</span>
 		</Link>
 	);
 }

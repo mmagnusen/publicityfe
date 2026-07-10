@@ -1,6 +1,23 @@
 "use client";
 
-import { mdiExitToApp } from "@mdi/js";
+import {
+	mdiAccountGroupOutline,
+	mdiAccountOutline,
+	mdiBriefcaseOutline,
+	mdiClipboardTextOutline,
+	mdiClockOutline,
+	mdiCreditCardOutline,
+	mdiExitToApp,
+	mdiGiftOutline,
+	mdiHeartOutline,
+	mdiInboxArrowDownOutline,
+	mdiMagnify,
+	mdiNewspaperVariantOutline,
+	mdiPlusCircleOutline,
+	mdiTagOutline,
+	mdiTagTextOutline,
+	mdiViewDashboardOutline,
+} from "@mdi/js";
 import Icon from "@mdi/react";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
@@ -28,54 +45,77 @@ export function SidebarContent() {
 
 	return (
 		<div className="h-full overflow-y-auto bg-white pb-20 md:pb-12">
-			<section className="mb-8">
-				<div className="px-4 py-2">
-					<SectionHeader title="Overview" />
-				</div>
+			<section className="mb-8 px-4">
+				<SectionHeader className="py-2" title="Overview" />
 				<ul className="list-none">
 					<li className="py-1">
-						<SidebarNavLink href="/dashboard" onNavigate={onNavigate}>
+						<SidebarNavLink
+							href="/dashboard"
+							icon={mdiViewDashboardOutline}
+							onNavigate={onNavigate}
+						>
 							Dashboard
 						</SidebarNavLink>
 					</li>
 				</ul>
 			</section>
 
-			<section className="mb-8">
-				<div className="px-4 py-2">
-					<SectionHeader title="Opportunities" />
-				</div>
+			<section className="mb-8 px-4">
+				<SectionHeader className="py-2" title="Opportunities" />
 				<ul className="list-none">
 					<li className="py-1">
-						<SidebarNavLink href="/create-opportunity" onNavigate={onNavigate}>
+						<SidebarNavLink
+							href="/create-opportunity"
+							icon={mdiPlusCircleOutline}
+							onNavigate={onNavigate}
+						>
 							Post an opportunity
 						</SidebarNavLink>
 					</li>
 					<li className="py-1">
-						<SidebarNavLink href="/opportunity" onNavigate={onNavigate}>
+						<SidebarNavLink
+							href="/applications-received"
+							icon={mdiInboxArrowDownOutline}
+							onNavigate={onNavigate}
+						>
+							Applications received
+						</SidebarNavLink>
+					</li>
+					<li className="py-1">
+						<SidebarNavLink
+							href="/opportunity"
+							icon={mdiMagnify}
+							onNavigate={onNavigate}
+						>
 							Browse opportunities
 						</SidebarNavLink>
 					</li>
 					<li className="py-1">
-						<SidebarNavLink href="/favourites" onNavigate={onNavigate}>
+						<SidebarNavLink
+							href="/favourites"
+							icon={mdiHeartOutline}
+							onNavigate={onNavigate}
+						>
 							My favourites
 						</SidebarNavLink>
 					</li>
 				</ul>
 			</section>
 
-			<section className="mb-8">
-				<div className="px-4 py-2">
-					<SectionHeader title="My account" />
-				</div>
+			<section className="mb-8 px-4">
+				<SectionHeader className="py-2" title="My account" />
 				<ul className="list-none">
 					<li className="py-1">
 						{profileHref ? (
-							<SidebarNavLink href={profileHref} onNavigate={onNavigate}>
+							<SidebarNavLink
+								href={profileHref}
+								icon={mdiAccountOutline}
+								onNavigate={onNavigate}
+							>
 								View profile
 							</SidebarNavLink>
 						) : (
-							<div className="px-4 py-2">
+							<div className="px-2 py-2">
 								<Skeleton width="100%" height="20px" />
 							</div>
 						)}
@@ -84,19 +124,22 @@ export function SidebarContent() {
 			</section>
 
 			{isAdmin ? (
-				<section className="mb-8">
-					<div className="px-4 py-2">
-						<SectionHeader title="Admin" />
-					</div>
+				<section className="mb-8 px-4">
+					<SectionHeader className="py-2" title="Admin" />
 					<ul className="list-none">
 						<li className="py-1">
-							<SidebarNavLink href="/admin/opportunity" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/admin/opportunity"
+								icon={mdiBriefcaseOutline}
+								onNavigate={onNavigate}
+							>
 								All opportunities
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
 							<SidebarNavLink
 								href="/admin/applications"
+								icon={mdiClipboardTextOutline}
 								onNavigate={onNavigate}
 							>
 								All applications
@@ -105,23 +148,36 @@ export function SidebarContent() {
 						<li className="py-1">
 							<SidebarNavLink
 								href="/admin/media-outlets"
+								icon={mdiNewspaperVariantOutline}
 								onNavigate={onNavigate}
 							>
 								Media Outlets
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
-							<SidebarNavLink href="/admin/tags" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/admin/tags"
+								icon={mdiTagOutline}
+								onNavigate={onNavigate}
+							>
 								Tags
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
-							<SidebarNavLink href="/admin/waitlist" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/admin/waitlist"
+								icon={mdiClockOutline}
+								onNavigate={onNavigate}
+							>
 								Waitlist
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
-							<SidebarNavLink href="/admin/users" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/admin/users"
+								icon={mdiAccountGroupOutline}
+								onNavigate={onNavigate}
+							>
 								Users
 							</SidebarNavLink>
 						</li>
@@ -130,23 +186,33 @@ export function SidebarContent() {
 			) : null}
 
 			{isPricingReleased ? (
-				<section>
-					<div className="px-4 py-2">
-						<SectionHeader title="Account" />
-					</div>
+				<section className="px-4">
+					<SectionHeader className="py-2" title="Account" />
 					<ul className="list-none">
 						<li className="py-1">
-							<SidebarNavLink href="/pricing" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/pricing"
+								icon={mdiTagTextOutline}
+								onNavigate={onNavigate}
+							>
 								Pricing
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
-							<SidebarNavLink href="/billing" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/billing"
+								icon={mdiCreditCardOutline}
+								onNavigate={onNavigate}
+							>
 								Billing
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">
-							<SidebarNavLink href="/referrals" onNavigate={onNavigate}>
+							<SidebarNavLink
+								href="/referrals"
+								icon={mdiGiftOutline}
+								onNavigate={onNavigate}
+							>
 								Referrals
 							</SidebarNavLink>
 						</li>
@@ -154,7 +220,7 @@ export function SidebarContent() {
 				</section>
 			) : null}
 
-			<section>
+			<section className="px-4">
 				<ul className="list-none">
 					<li className="mt-4 border-t border-gray-200 pt-4">
 						<button
@@ -163,9 +229,17 @@ export function SidebarContent() {
 								onNavigate();
 								void funcLogout();
 							}}
-							className="flex w-full items-center gap-2 rounded-md px-4 py-2 text-left text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-black"
+							className="flex w-full items-center gap-2.5 rounded-md px-2 py-2 text-left text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 hover:text-black"
 						>
-							<Icon horizontal path={mdiExitToApp} rotate={180} size={0.8} />
+							<span className="flex size-5 shrink-0 items-center justify-center">
+								<Icon
+									horizontal
+									path={mdiExitToApp}
+									rotate={180}
+									size={0.85}
+									vertical
+								/>
+							</span>
 							Sign out
 						</button>
 					</li>

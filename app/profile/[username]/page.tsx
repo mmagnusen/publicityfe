@@ -48,6 +48,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
 
 	return (
 		<FounderProfileDetail
+			contactEmail={apiUser.email ?? null}
 			displayName={publicUserDisplayName(apiUser)}
 			avatarUrl={apiUser.human_profile?.profile_image_url}
 			location={apiUser.human_profile?.city}

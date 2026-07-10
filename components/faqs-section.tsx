@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { mdiChevronDown } from "@mdi/js";
+import Icon from "@mdi/react";
 
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
@@ -31,20 +33,18 @@ function FaqAccordionItem({
 	const buttonId = `faq-button-${index}`;
 
 	return (
-		<div
+		<button
+			aria-controls={panelId}
+			aria-expanded={isOpen}
 			className={cn(
-				"rounded-2xl bg-gray-50 px-5 py-4 transition-colors sm:px-6 sm:py-5",
-				isOpen && "border-2 border-black bg-white",
+				"block w-full rounded-2xl bg-gray-50 px-5 py-4 text-left transition-[background-color,border-color,box-shadow] duration-300 ease-out sm:px-6 sm:py-5",
+				isOpen && "border-2 border-black bg-white shadow-sm",
 			)}
+			id={buttonId}
+			onClick={onToggle}
+			type="button"
 		>
-			<button
-				aria-controls={panelId}
-				aria-expanded={isOpen}
-				className="flex w-full items-start gap-4 text-left"
-				id={buttonId}
-				onClick={onToggle}
-				type="button"
-			>
+			<span className="flex w-full items-start gap-4">
 				<span className="w-8 shrink-0 pt-0.5 text-xs font-medium tabular-nums text-gray-400">
 					{formatFaqIndex(index)}
 				</span>
@@ -53,27 +53,29 @@ function FaqAccordionItem({
 				</span>
 				<span
 					aria-hidden
-					className="flex size-8 shrink-0 items-center justify-center text-xl leading-none text-gray-500"
+					className="faq-accordion-chevron flex size-8 shrink-0 items-center justify-center text-gray-500"
+					data-open={isOpen ? "true" : "false"}
 				>
-					{isOpen ? "−" : "+"}
+					<Icon
+						horizontal
+						path={mdiChevronDown}
+						rotate={180}
+						size={0.9}
+						vertical
+					/>
 				</span>
-			</button>
+			</span>
 			<div
-				aria-labelledby={buttonId}
-				className={cn(
-					"grid transition-[grid-template-rows] duration-200 ease-out",
-					isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
-				)}
+				aria-hidden={!isOpen}
+				className="faq-accordion-panel"
+				data-open={isOpen ? "true" : "false"}
 				id={panelId}
-				role="region"
 			>
-				<div className="overflow-hidden">
-					<p className="pb-1 pl-12 pr-12 text-sm leading-relaxed text-gray-500 sm:text-base">
-						{answer}
-					</p>
-				</div>
+				<p className="pb-1 pl-12 pr-12 pt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
+					{answer}
+				</p>
 			</div>
-		</div>
+		</button>
 	);
 }
 
