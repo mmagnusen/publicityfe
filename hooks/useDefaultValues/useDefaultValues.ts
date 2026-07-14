@@ -1,5 +1,5 @@
+import { patchContent } from "@hooks/useContent";
 import useErrorReport, { REPORT_POSTHOG_ONLY } from "@hooks/useErrorReport";
-import { instanceAxios } from "@util/instanceAxios";
 
 const useDefaultValues = () => {
 	const { reportError } = useErrorReport({
@@ -14,14 +14,10 @@ const useDefaultValues = () => {
 		pk: number;
 	}) => {
 		try {
-			await instanceAxios({
-				method: "patch",
-				url: `/content/update-content/${pk}`,
-				data: { content },
-			});
+			await patchContent(pk, { content });
 		} catch (error) {
 			reportError(error, "editAdDefaultValue", REPORT_POSTHOG_ONLY);
-			throw error; // Re-throw the error to handle it in the calling component
+			throw error;
 		}
 	};
 
