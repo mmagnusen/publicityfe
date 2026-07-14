@@ -22,7 +22,7 @@ export function MarketingHomeContent() {
 	const { isLoggedIn } = useAuthenticatedUser();
 
 	return (
-		<div className="min-h-full bg-white font-sans">
+		<div className="home-page min-h-full bg-[#FAF8F4] font-sans">
 			<Navigation isLoggedIn={isLoggedIn} />
 			<HeroSection />
 			<TrustedBySection />

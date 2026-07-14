@@ -9,8 +9,8 @@ export const textVariants = cva("", {
 			"section-lead-relaxed":
 				"mt-4 text-base leading-relaxed text-gray-500 sm:text-lg",
 			"section-lead-inverse":
-				"mt-4 text-base leading-relaxed text-gray-400 sm:text-lg",
-			"hero-lead": "mt-6 max-w-xl text-lg leading-relaxed text-gray-500",
+				"mt-4 text-base leading-relaxed text-[#c9c5b8] sm:text-lg",
+			"hero-lead": "mt-6 max-w-xl text-[19px] leading-relaxed text-[#4A473F]",
 			"hero-note": "mt-4 text-sm text-gray-400",
 			"card-body": "mt-2 text-sm leading-relaxed text-gray-500",
 			"card-body-narrow": "mt-2 max-w-xs text-sm leading-relaxed text-gray-500",

@@ -1,6 +1,16 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+	mdiAccountOutline,
+	mdiExitToApp,
+	mdiHeartOutline,
+	mdiInboxArrowDownOutline,
+	mdiMagnify,
+	mdiPlusCircleOutline,
+	mdiViewDashboardOutline,
+} from "@mdi/js";
+import Icon from "@mdi/react";
 
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
 import {
@@ -70,19 +80,24 @@ function MockOpportunityListFilters() {
 
 function MockSidebarNavLink({
 	children,
+	icon,
 	isActive = false,
 }: {
 	children: React.ReactNode;
+	icon: string;
 	isActive?: boolean;
 }) {
 	return (
 		<span
 			className={cn(
-				"block rounded-md px-4 py-2 text-sm font-medium",
+				"flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium",
 				isActive ? "bg-gray-100 text-black" : "text-gray-600",
 			)}
 		>
-			{children}
+			<span className="flex size-5 shrink-0 items-center justify-center">
+				<Icon horizontal path={icon} rotate={180} size={0.85} vertical />
+			</span>
+			<span className="min-w-0">{children}</span>
 		</span>
 	);
 }
@@ -93,38 +108,70 @@ function MockSidebar() {
 			className="hidden shrink-0 border-r border-gray-200 bg-white md:block"
 			style={{ width: DESKTOP_SIDEBAR_WIDTH }}
 		>
-			<div className="px-4 py-4">
-				<section className="mb-8">
-					<SectionHeader title="Overview" />
-					<ul className="mt-1 list-none">
+			<div className="pb-12">
+				<section className="mb-8 px-4">
+					<SectionHeader className="py-2" title="Overview" />
+					<ul className="list-none">
 						<li className="py-1">
-							<MockSidebarNavLink>Dashboard</MockSidebarNavLink>
+							<MockSidebarNavLink icon={mdiViewDashboardOutline}>
+								Dashboard
+							</MockSidebarNavLink>
 						</li>
 					</ul>
 				</section>
 
-				<section className="mb-8">
-					<SectionHeader title="Opportunities" />
-					<ul className="mt-1 list-none">
+				<section className="mb-8 px-4">
+					<SectionHeader className="py-2" title="Opportunities" />
+					<ul className="list-none">
 						<li className="py-1">
-							<MockSidebarNavLink>Post an opportunity</MockSidebarNavLink>
+							<MockSidebarNavLink icon={mdiPlusCircleOutline}>
+								Post an opportunity
+							</MockSidebarNavLink>
 						</li>
 						<li className="py-1">
-							<MockSidebarNavLink isActive>
+							<MockSidebarNavLink icon={mdiInboxArrowDownOutline}>
+								Applications received
+							</MockSidebarNavLink>
+						</li>
+						<li className="py-1">
+							<MockSidebarNavLink icon={mdiMagnify} isActive>
 								Browse opportunities
 							</MockSidebarNavLink>
 						</li>
 						<li className="py-1">
-							<MockSidebarNavLink>My favourites</MockSidebarNavLink>
+							<MockSidebarNavLink icon={mdiHeartOutline}>
+								My favourites
+							</MockSidebarNavLink>
 						</li>
 					</ul>
 				</section>
 
-				<section>
-					<SectionHeader title="My account" />
-					<ul className="mt-1 list-none">
+				<section className="mb-8 px-4">
+					<SectionHeader className="py-2" title="My account" />
+					<ul className="list-none">
 						<li className="py-1">
-							<MockSidebarNavLink>View profile</MockSidebarNavLink>
+							<MockSidebarNavLink icon={mdiAccountOutline}>
+								View profile
+							</MockSidebarNavLink>
+						</li>
+					</ul>
+				</section>
+
+				<section className="px-4">
+					<ul className="list-none">
+						<li className="mt-4 border-t border-gray-200 pt-4">
+							<span className="flex items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-gray-600">
+								<span className="flex size-5 shrink-0 items-center justify-center">
+									<Icon
+										horizontal
+										path={mdiExitToApp}
+										rotate={180}
+										size={0.85}
+										vertical
+									/>
+								</span>
+								Sign out
+							</span>
 						</li>
 					</ul>
 				</section>

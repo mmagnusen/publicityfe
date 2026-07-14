@@ -7,10 +7,13 @@ const brandName = TRADING_NAME || "Get Featured";
 
 export function OpportunitiesCommunitySection() {
 	return (
-		<section className="bg-gray-50 px-6 py-20 sm:py-24">
+		<section className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto max-w-4xl text-center">
 				<Heading level={2} className="mx-auto max-w-2xl">
-					Direct access to media opportunities, without the PR agency
+					Direct access to media opportunities,{" "}
+					<span className="box-decoration-clone bg-[#C1FF1A] px-1.5">
+						without the PR agency
+					</span>
 				</Heading>
 				<Text variant="section-lead-relaxed" className="mx-auto mt-4 max-w-2xl">
 					Every opportunity on {brandName} comes directly from journalists,

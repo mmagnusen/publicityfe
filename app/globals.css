@@ -12,8 +12,9 @@
 @theme inline {
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
+	--font-sans: var(--font-inter), Helvetica, Arial, sans-serif;
 	--font-mono: var(--font-geist-mono);
+	--font-display: var(--font-anton);
 	--animate-zoom-up: zoom-up 500ms ease-out forwards;
 }
 
@@ -51,8 +52,35 @@
 	transform: rotate(180deg);
 }
 
+.home-page > header,
+.home-page footer {
+	background-color: #faf8f4;
+}
+
+.home-page {
+	color: #5c594e;
+}
+
+.home-page h1,
+.home-page h2 {
+	text-transform: uppercase;
+}
+
+.home-page .text-gray-500,
+.home-page .text-gray-400 {
+	color: #5c594e;
+}
+
+.home-page footer a {
+	color: #16140f;
+}
+
+.home-page footer a:hover {
+	color: #ff00ae;
+}
+
 body {
 	background: var(--background);
 	color: var(--foreground);
-	font-family: var(--font-geist-sans), system-ui, sans-serif;
+	font-family: var(--font-inter), Helvetica, Arial, sans-serif;
 }

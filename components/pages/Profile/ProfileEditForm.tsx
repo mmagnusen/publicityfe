@@ -59,8 +59,7 @@ export function ProfileEditForm({
 	onSuccess,
 	onCancel,
 }: ProfileEditFormProps) {
-	const { funcUpdateProfile, funcUpdateUser, funcUpdateUserTags } =
-		useAuthenticatedUser();
+	const { funcUpdateProfile, funcUpdateUser } = useAuthenticatedUser();
 	const {
 		data: tags,
 		error: tagsError,
@@ -79,6 +78,7 @@ export function ProfileEditForm({
 					await funcUpdateUser({
 						first_name: values.first_name.trim(),
 						last_name: values.last_name.trim(),
+						tag_pks: selectOptionsToTagPks(values.tags),
 					});
 					await funcUpdateProfile({
 						bio: bioToApiField(values.bio),
@@ -90,11 +90,6 @@ export function ProfileEditForm({
 						instagram_url: values.instagram_url.trim(),
 						facebook_url: values.facebook_url.trim(),
 					});
-					try {
-						await funcUpdateUserTags(selectOptionsToTagPks(values.tags));
-					} catch {
-						// Tags use an admin-only endpoint; don't block profile saves.
-					}
 					onSuccess(values);
 				} catch (error: unknown) {
 					setSubmitting(false);

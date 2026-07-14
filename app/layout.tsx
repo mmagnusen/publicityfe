@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Anton, Geist_Mono, Inter } from "next/font/google";
 
 import type { Metadata } from "next";
 
@@ -9,14 +9,20 @@ import "./tiptap-keyframes.css";
 import "./tiptap.css";
 import "./globals.css";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const inter = Inter({
+	variable: "--font-inter",
 	subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+});
+
+const anton = Anton({
+	variable: "--font-anton",
+	subsets: ["latin"],
+	weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -33,7 +39,7 @@ export default function RootLayout({
 	return (
 		<html
 			lang="en"
-			className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+			className={`${inter.variable} ${geistMono.variable} ${anton.variable} h-full antialiased`}
 		>
 			<body className="min-h-full flex flex-col">
 				<AppProviders>{children}</AppProviders>

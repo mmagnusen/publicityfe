@@ -23,7 +23,7 @@ const steps = [
 
 function StepIcon({ number }: { number: number }) {
 	return (
-		<span className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-black text-sm font-semibold text-white">
+		<span className="relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#C1FF1A] text-sm font-semibold text-black">
 			{number}
 		</span>
 	);
@@ -60,11 +60,15 @@ function StepItem({ description, index, isLast, title }: StepItemProps) {
 
 export function HowItWorksSection() {
 	return (
-		<section id="how-it-works" className="bg-white px-6 py-20 sm:py-24">
+		<section id="how-it-works" className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
 				<div>
-					<Heading level={2}>
-						Getting press coverage is as easy as 3 steps
+					<Heading level={2} className="uppercase">
+						Getting{" "}
+						<span className="box-decoration-clone bg-[#C1FF1A] px-1.5">
+							press coverage
+						</span>{" "}
+						is as easy as 3 steps
 					</Heading>
 					<Text variant="section-lead-relaxed" className="mt-4 max-w-lg">
 						Get started in minutes and start getting media coverage today. Build

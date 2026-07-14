@@ -44,7 +44,7 @@ export function SidebarContent() {
 		: null;
 
 	return (
-		<div className="h-full overflow-y-auto bg-white pb-20 md:pb-12">
+		<div className="h-full overflow-y-auto !bg-white pb-20 md:pb-12">
 			<section className="mb-8 px-4">
 				<SectionHeader className="py-2" title="Overview" />
 				<ul className="list-none">

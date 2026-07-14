@@ -61,9 +61,7 @@ function DashboardStatLink({
 			</div>
 			<div className="mt-auto px-6 pb-4">
 				<div className="border-t border-gray-200 pt-4">
-					<span className="text-sm font-semibold text-violet-700">
-						View all
-					</span>
+					<span className="text-sm font-semibold text-[#FF00AE]">View all</span>
 				</div>
 			</div>
 		</Link>

@@ -177,7 +177,7 @@ export function PricingPlans({ freeCtaHref = "/register" }: PricingPlansProps) {
 
 export function PricingSection() {
 	return (
-		<section id="pricing" className="bg-white px-6 py-20 sm:py-24">
+		<section id="pricing" className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto max-w-4xl">
 				<div className="text-center">
 					<Heading level={2}>Simple, transparent pricing</Heading>

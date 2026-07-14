@@ -612,15 +612,10 @@ export const AuthenticatedUserContextProvider = ({
 	};
 
 	const funcUpdateUserTags = async (tagPks: number[]) => {
-		const userPk = authenticatedUser?.pk;
-		if (!userPk) {
-			throw new Error("User is not authenticated.");
-		}
-
 		try {
 			await instanceAxios({
 				method: "patch",
-				url: `/users/admin-user-detail/${userPk}`,
+				url: `/users/update-user`,
 				data: { tag_pks: tagPks },
 			});
 		} catch (error: unknown) {

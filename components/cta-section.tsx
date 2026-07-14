@@ -9,8 +9,13 @@ export function CtaSection() {
 	return (
 		<section className="bg-[#0a0a0f] px-6 py-20 sm:py-24">
 			<div className="mx-auto flex max-w-2xl flex-col items-center text-center">
-				<Heading level={2} variant="section-inverse">
-					Ready to Get Featured?
+				<Heading
+					level={2}
+					variant="section-inverse"
+					className="uppercase sm:whitespace-nowrap"
+				>
+					<span className="text-white">Ready to</span>{" "}
+					<span className="text-[#C1FF1A]">Get Featured?</span>
 				</Heading>
 
 				<Text variant="section-lead-inverse">

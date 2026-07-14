@@ -401,7 +401,7 @@ export function FounderProfileDetail({
 								isFullWidth
 								borderRadius="large"
 								textTransform="none"
-								className="mt-6 border-none bg-linear-to-r from-violet-600 to-fuchsia-500 hover:bg-linear-to-r hover:opacity-90"
+								className="mt-6 border-none !bg-[#FF00AE] text-white hover:!bg-[#e6009c] hover:opacity-100 [&>span]:text-white"
 								onClick={() => setIsContactModalOpen(true)}
 							>
 								<span className="inline-flex items-center justify-center gap-2">
@@ -433,7 +433,7 @@ export function FounderProfileDetail({
 
 							{liveProfile.tagNames.length > 0 ? (
 								<div className="mt-8">
-									<Text variant="label">Speaks about</Text>
+									<Text variant="label">I speak about</Text>
 									<ul className="mt-3 flex flex-wrap gap-2">
 										{liveProfile.tagNames.map((topic) => (
 											<li
@@ -451,8 +451,8 @@ export function FounderProfileDetail({
 						<div>
 							<div className="flex items-center justify-between gap-4">
 								{openToMedia ? (
-									<span className="inline-flex items-center gap-1.5 rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-violet-700">
-										<span className="size-1.5 rounded-full bg-violet-500" />
+									<span className="inline-flex items-center gap-1.5 rounded-full bg-[#C1FF1A]/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-black">
+										<span className="size-1.5 rounded-full bg-[#FF00AE]" />
 										Open to media opportunities
 									</span>
 								) : (

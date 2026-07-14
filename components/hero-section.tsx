@@ -20,16 +20,19 @@ function ArrowIcon() {
 
 export function HeroSection() {
 	return (
-		<section className="bg-white px-6 pt-12 pb-20 sm:pt-16 sm:pb-28">
-			<div className="mx-auto flex max-w-3xl flex-col items-center text-center">
-				<div className="mb-8 inline-flex items-center rounded-full border border-gray-200 bg-gray-50/80 px-4 py-1.5 text-sm font-semibold text-black">
+		<section className="bg-[#FAF8F4] px-6 pt-12 pb-20 sm:pt-16 sm:pb-28">
+			<div className="mx-auto flex max-w-3xl flex-col items-center text-center sm:max-w-5xl">
+				<div className="mb-8 inline-flex items-center rounded-full border border-[#C1FF1A] bg-[#C1FF1A] px-4 py-1.5 text-sm font-semibold text-black">
 					⚡ Early access now open
 				</div>
 
-				<Heading level={1} variant="hero">
-					Get featured on
-					<br />
-					<RotatingWord />
+				<Heading
+					level={1}
+					variant="heroMarketing"
+					className="sm:whitespace-nowrap"
+				>
+					Get featured on <br className="sm:hidden" />
+					<RotatingWord variant="typewriter" />
 				</Heading>
 
 				<Text variant="hero-lead">

@@ -140,39 +140,16 @@ const normalizeProfileLinkUrl = (url: string): string => {
 	return `https://${trimmed}`;
 };
 
-const profileLinkLabel = (url: string, type: ProfileLink["type"]): string => {
-	try {
-		const parsed = new URL(normalizeProfileLinkUrl(url));
-
-		if (type === "instagram") {
-			const handle = parsed.pathname.replace(/^\/+|\/+$/g, "");
-			if (handle) {
-				return handle.startsWith("@") ? handle : `@${handle}`;
-			}
-		}
-
-		if (type === "facebook") {
-			const path = parsed.pathname.replace(/^\/+|\/+$/g, "");
-			if (path) {
-				return path;
-			}
-		}
-
-		if (type === "linkedin") {
-			const path = parsed.pathname.replace(/^\/+|\/+$/g, "");
-			if (path) {
-				return path.replace(/^in\//, "");
-			}
-		}
-
-		return (
-			parsed.hostname.replace(/^www\./, "") +
-			(parsed.pathname !== "/" ? parsed.pathname : "")
-		);
-	} catch {
-		return url.trim();
-	}
+const PROFILE_LINK_LABELS: Record<ProfileLink["type"], string> = {
+	website: "Website",
+	linkedin: "LinkedIn",
+	instagram: "Instagram",
+	facebook: "Facebook",
+	twitter: "X",
 };
+
+const profileLinkLabel = (_url: string, type: ProfileLink["type"]): string =>
+	PROFILE_LINK_LABELS[type];
 
 /** Sidebar links built from human_profile URL fields. */
 export const profileLinksFromFields = (

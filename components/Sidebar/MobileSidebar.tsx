@@ -32,7 +32,7 @@ export function MobileSidebar() {
 				className="fixed inset-0 z-40 bg-black/40 md:hidden"
 				onClick={closeSidebar}
 			/>
-			<aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col bg-white shadow-xl md:hidden">
+			<aside className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col !bg-white shadow-xl md:hidden">
 				<div className="flex justify-end border-b border-gray-200 px-4 py-3">
 					<button
 						type="button"

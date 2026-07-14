@@ -83,18 +83,24 @@ export function FaqsSection() {
 	const [openIndex, setOpenIndex] = useState<number | null>(0);
 
 	return (
-		<section id="faqs" className="bg-white px-6 py-20 sm:py-24">
+		<section id="faqs" className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
 				<div className="lg:sticky lg:top-28">
-					<Text variant="eyebrow">FAQs</Text>
-					<Heading level={2} className="mt-3">
+					<Text variant="eyebrow" className="text-[#FF00AE]">
+						FAQs
+					</Text>
+					<Heading level={2} className="mt-3 uppercase">
 						Frequently asked questions
 					</Heading>
 					<Text variant="section-lead-relaxed" className="mt-4 max-w-md">
 						Quick answers to common questions about how the platform works, what
 						it costs, and how to land your next feature.
 					</Text>
-					<Button className="mt-8" href="/contact-us" textTransform="none">
+					<Button
+						className="mt-8 border-[#C1FF1A] bg-[#C1FF1A] text-black hover:bg-[#b3ef00] [&>span]:text-black"
+						href="/contact-us"
+						textTransform="none"
+					>
 						Contact us
 					</Button>
 				</div>

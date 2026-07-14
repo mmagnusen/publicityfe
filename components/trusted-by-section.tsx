@@ -39,7 +39,7 @@ const brands = [
 
 export function TrustedBySection() {
 	return (
-		<section className="border-t border-b border-gray-200 bg-white px-6 py-16 sm:py-20">
+		<section className="border-t border-b border-gray-200 bg-[#FAF8F4] px-6 py-16 sm:py-20">
 			<Text variant="trusted-by">Get featured in publications like</Text>
 
 			<ul className="mx-auto mt-10 flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-8 sm:mt-12 sm:gap-x-12 md:gap-x-14">

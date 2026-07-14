@@ -54,7 +54,7 @@ export function Footer() {
 								{footerLinks.map((link) => (
 									<li key={link.href}>
 										<Link
-											className="text-sm text-gray-500 transition-colors hover:text-black"
+											className="text-sm text-[#16140F] transition-colors hover:text-[#FF00AE]"
 											href={link.href}
 										>
 											{link.label}
@@ -70,7 +70,7 @@ export function Footer() {
 								{socialLinks.map((link) => (
 									<li key={link.label}>
 										<a
-											className="inline-flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-black"
+											className="inline-flex items-center gap-2 text-sm text-[#16140F] transition-colors hover:text-[#FF00AE]"
 											href={link.href}
 											rel="noopener noreferrer"
 											target="_blank"

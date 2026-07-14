@@ -14,10 +14,10 @@ function CheckIcon() {
 			aria-hidden
 		>
 			<title>Included</title>
-			<circle cx="8" cy="8" r="8" className="fill-green-500" />
+			<circle cx="8" cy="8" r="8" className="fill-[#C1FF1A]" />
 			<path
 				d="M5 8l2 2 4-4"
-				stroke="white"
+				stroke="black"
 				strokeWidth="1.5"
 				strokeLinecap="round"
 				strokeLinejoin="round"
@@ -71,7 +71,7 @@ const benefits = [
 
 export function CreatorsSection() {
 	return (
-		<section className="bg-gray-50 px-6 py-20 sm:py-24">
+		<section className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
 				<div className="grid grid-cols-2 gap-3 sm:gap-4">
 					{masonryColumns.map((column, columnIndex) => (
@@ -102,8 +102,11 @@ export function CreatorsSection() {
 				</div>
 
 				<div>
-					<Heading level={2}>
-						You&apos;ve built something great. Let&apos;s make sure people know.
+					<Heading level={2} className="uppercase">
+						You&apos;ve built something great. Let&apos;s make sure{" "}
+						<span className="box-decoration-clone bg-[#C1FF1A] px-1.5">
+							people know.
+						</span>
 					</Heading>
 					<Text variant="section-lead-relaxed">
 						Whether you&apos;re a founder, freelancer, creative, consultant or

@@ -90,10 +90,13 @@ export function GallerySection() {
 	}
 
 	return (
-		<section className="bg-white px-6 py-20 sm:py-24">
+		<section className="bg-[#FAF8F4] px-6 py-20 sm:py-24">
 			<div className="mx-auto max-w-4xl text-center">
-				<Heading level={2}>
-					Founders on {TRADING_NAME || "Get Featured"}
+				<Heading level={2} className="uppercase">
+					<span className="box-decoration-clone bg-[#C1FF1A] px-1.5">
+						Founders
+					</span>{" "}
+					on {TRADING_NAME || "Get Featured"}
 				</Heading>
 				<Text variant="section-lead-relaxed" className="mx-auto mt-4 max-w-2xl">
 					Founders across every industry are using{" "}

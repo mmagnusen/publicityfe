@@ -249,16 +249,37 @@ export const parseTipTapDocFromApi = (raw: unknown): JSONContent | null => {
 	return isTipTapDoc(value) ? value : null;
 };
 
+const BLOCK_NODE_TYPES = new Set([
+	"blockquote",
+	"bulletList",
+	"heading",
+	"listItem",
+	"orderedList",
+	"paragraph",
+]);
+
 const extractPlainTextFromNode = (node: JSONContent): string => {
+	if (node.type === "hardBreak") {
+		return "\n";
+	}
+
 	if (node.type === "text" && typeof node.text === "string") {
 		return node.text;
 	}
 
-	if (Array.isArray(node.content)) {
-		return node.content.map(extractPlainTextFromNode).join("");
+	if (!Array.isArray(node.content)) {
+		return "";
 	}
 
-	return "";
+	const parts = node.content.map(extractPlainTextFromNode).filter(Boolean);
+	const joinWithNewline =
+		node.type === "doc" ||
+		(parts.length > 1 &&
+			node.content.some(
+				(child) => child.type != null && BLOCK_NODE_TYPES.has(child.type),
+			));
+
+	return parts.join(joinWithNewline ? "\n" : "");
 };
 
 /** Plain text for display when API stores a TipTap JSON string or doc. */
