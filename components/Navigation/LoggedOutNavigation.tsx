@@ -11,8 +11,8 @@ const isPricingReleased =
 	String(process.env.NEXT_PUBLIC_PRICING_RELEASED) === "true";
 
 const navLinks = [
-	{ href: "#features", label: "Features" },
-	{ href: "#how-it-works", label: "How it Works" },
+	{ href: "/#features", label: "Features" },
+	{ href: "/#how-it-works", label: "How it Works" },
 	...(isPricingReleased ? [{ href: "/pricing", label: "Pricing" }] : []),
 	{ href: "/opportunity", label: "Opportunities" },
 ];
