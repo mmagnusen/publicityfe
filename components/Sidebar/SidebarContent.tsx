@@ -8,6 +8,7 @@ import {
 	mdiClockOutline,
 	mdiCreditCardOutline,
 	mdiExitToApp,
+	mdiFileDocumentOutline,
 	mdiGiftOutline,
 	mdiHeartOutline,
 	mdiInboxArrowDownOutline,
@@ -161,6 +162,15 @@ export function SidebarContent() {
 								onNavigate={onNavigate}
 							>
 								Tags
+							</SidebarNavLink>
+						</li>
+						<li className="py-1">
+							<SidebarNavLink
+								href="/admin/content"
+								icon={mdiFileDocumentOutline}
+								onNavigate={onNavigate}
+							>
+								Content templates
 							</SidebarNavLink>
 						</li>
 						<li className="py-1">

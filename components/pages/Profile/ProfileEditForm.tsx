@@ -4,14 +4,17 @@ import { useMemo } from "react";
 import axios from "axios";
 import { Form, Formik } from "formik";
 
+import TipTapEditorField, {
+	getInitialEditorValues,
+} from "@components/FormikFields/TipTapEditorField";
 import { useAuthenticatedUser } from "@hooks/useAuthenticatedUser";
+import { PROFILE_BIO_TEMPLATE_SLUG, useContentBySlug } from "@hooks/useContent";
 import { useAllTags } from "@hooks/useTags";
 
 import Button from "@/components/Button";
 import Field from "@/components/FormikFields/Field";
 import InputField from "@/components/FormikFields/InputField";
 import SelectField from "@/components/FormikFields/SelectField";
-import TipTapEditorField from "@/components/FormikFields/TipTapEditorField";
 import Text from "@/components/Text";
 import {
 	bioToApiField,
@@ -67,10 +70,29 @@ export function ProfileEditForm({
 	} = useAllTags();
 	const tagOptions = useMemo(() => tagsToSelectOptions(tags ?? []), [tags]);
 
+	const hasExistingBio = bioToApiField(initialValues.bio).length > 0;
+	const { data: bioTemplate, isLoading: isLoadingBioTemplate } =
+		useContentBySlug(hasExistingBio ? null : PROFILE_BIO_TEMPLATE_SLUG);
+
+	const formInitialValues = useMemo((): ProfileFormValues => {
+		if (hasExistingBio || !bioTemplate?.content?.trim()) {
+			return initialValues;
+		}
+
+		return {
+			...initialValues,
+			bio: getInitialEditorValues(bioTemplate.content),
+		};
+	}, [bioTemplate?.content, hasExistingBio, initialValues]);
+
+	if (!hasExistingBio && isLoadingBioTemplate) {
+		return <Text variant="loading">Loading profile form…</Text>;
+	}
+
 	return (
 		<Formik<ProfileFormValues>
 			enableReinitialize
-			initialValues={initialValues}
+			initialValues={formInitialValues}
 			validate={validateProfileForm}
 			onSubmit={async (values, { setFieldError, setStatus, setSubmitting }) => {
 				setStatus(undefined);
@@ -166,16 +188,16 @@ export function ProfileEditForm({
 					) : null}
 
 					<TipTapEditorField
-						existingContent={initialValues.short_description.editorJSON}
-						key={`profile-short-description-${profileUsername}-${JSON.stringify(initialValues.short_description.editorJSON)}`}
+						existingContent={formInitialValues.short_description.editorJSON}
+						key={`profile-short-description-${profileUsername}-${JSON.stringify(formInitialValues.short_description.editorJSON)}`}
 						name="short_description"
 						renderToolbar
 						strLabel="Short description"
 					/>
 
 					<TipTapEditorField
-						existingContent={initialValues.bio.editorJSON}
-						key={`profile-bio-${profileUsername}-${JSON.stringify(initialValues.bio.editorJSON)}`}
+						existingContent={formInitialValues.bio.editorJSON}
+						key={`profile-bio-${profileUsername}-${JSON.stringify(formInitialValues.bio.editorJSON)}`}
 						name="bio"
 						renderToolbar
 						strLabel="Bio"
