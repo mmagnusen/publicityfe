@@ -1,31 +1,19 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { TRADING_NAME } from "@/constants/tradingName";
 
-function LogoIcon() {
-	return (
-		<div className="flex size-8 items-center justify-center rounded-lg bg-black">
-			<svg viewBox="0 0 16 16" fill="none" className="size-4" aria-hidden>
-				<title>Trending chart</title>
-				<path
-					d="M3 11L6.5 7.5L9 9.5L13 4"
-					stroke="white"
-					strokeWidth="1.5"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-				/>
-			</svg>
-		</div>
-	);
-}
-
 export function LogoLink() {
 	return (
-		<Link href="/" className="flex items-center gap-2.5">
-			<LogoIcon />
-			<span className="text-lg font-semibold tracking-tight text-black">
-				{TRADING_NAME}
-			</span>
+		<Link href="/" className="flex items-center" aria-label={TRADING_NAME}>
+			<Image
+				src="/logo.png"
+				alt={TRADING_NAME}
+				width={1024}
+				height={512}
+				priority
+				className="h-9 w-auto"
+			/>
 		</Link>
 	);
 }

@@ -29,6 +29,9 @@ export const metadata: Metadata = {
 	title: `${TRADING_NAME}- Get featured on interviews`,
 	description:
 		"Connect with journalists, podcast hosts, and event organizers actively looking for experts like you.",
+	icons: {
+		icon: "/favicon.png",
+	},
 };
 
 export default function RootLayout({
